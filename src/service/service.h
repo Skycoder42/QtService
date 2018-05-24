@@ -40,7 +40,7 @@ public:
 	static Service *instance();
 
 	int getSocket();
-	QVector<int> getAllSockets();
+	QList<int> getAllSockets();
 	QHash<int, QByteArray> getAllSocketsNamed();
 
 	QString backend() const;

@@ -20,7 +20,16 @@ void EchoService::start()
 	connect(_server, &QTcpServer::newConnection,
 			this, &EchoService::newConnection);
 
-	if(_server->listen())
+	auto socket = getSocket();
+	auto ok = false;
+	if(socket >= 0) {
+		qDebug() << "Using activated socket descriptor:" << socket;
+		ok = _server->setSocketDescriptor(socket);
+	} else {
+		qDebug() << "No sockets activated - creating normal socket";
+		ok = _server->listen();
+	}
+	if(ok)
 		qInfo() << "Started echo server on port" << _server->serverPort();
 	else {
 		qCritical() << "Failed to start server with error" << _server->errorString();

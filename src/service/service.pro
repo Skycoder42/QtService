@@ -6,7 +6,8 @@ HEADERS += \
 	qtservice_global.h \
 	service.h \
 	service_p.h \
-	serviceplugin.h
+	serviceplugin.h \
+    logging_p.h
 
 SOURCES += \
 	service.cpp \

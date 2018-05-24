@@ -1,6 +1,6 @@
 #include "serviceplugin.h"
+#include <QtService/private/logging_p.h>
 #include <QCtrlSignals>
-#include <QDebug>
 using namespace QtService;
 
 #define EXTEND(a, x, ...) [a](auto... args) { \
@@ -18,9 +18,14 @@ QByteArrayList ServiceBackend::rawArguments(int argc, char **argv)
 	return {};
 }
 
+QHash<int, QByteArray> ServiceBackend::getActivatedSockets()
+{
+	return {};
+}
+
 void ServiceBackend::signalTriggered(int signal)
 {
-	qWarning() << "Unhandled signal:" << signal;
+	qCWarning(logQtService) << "Unhandled signal:" << signal;
 }
 
 bool ServiceBackend::registerForSignal(int signal)

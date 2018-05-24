@@ -1,13 +1,14 @@
 #include "service.h"
 #include "service_p.h"
 #include "serviceplugin.h"
-#include <QDebug>
+#include "logging_p.h"
 #include <QFileInfo>
 #include <QDir>
 
 #include <qpluginfactory.h>
 using namespace QtService;
 
+Q_LOGGING_CATEGORY(logQtService, "qtservice"); //TODO, QtInfoMsg);
 Q_GLOBAL_PLUGIN_OBJECT_FACTORY(ServicePlugin, ServiceBackend, "servicebackends", factory)
 
 Service::Service(int &argc, char **argv, int flags) :
@@ -20,7 +21,7 @@ Service::Service(int &argc, char **argv, int flags) :
 
 int Service::exec()
 {
-	QByteArray provider {"dummy"};
+	QByteArray provider {"standard"};
 	for(auto i = 1; i < d->argc; i++) {
 		QByteArray arg {d->argv[i]};
 		if(arg == "--backend") {
@@ -28,7 +29,7 @@ int Service::exec()
 				provider = d->argv[i+1];
 				break;
 			} else {
-				qCritical() << "You must specify the backend name after the \"--backend\" parameter";
+				qCCritical(logQtService) << "You must specify the backend name after the \"--backend\" parameter";
 				return EXIT_FAILURE;
 			}
 		}
@@ -38,12 +39,12 @@ int Service::exec()
 		d->backendProvider = QString::fromUtf8(provider);
 		d->backend = factory->createInstance(d->backendProvider, this);
 		if(!d->backend) {
-			qCritical() << "No backend found for the name" << provider;
+			qCCritical(logQtService) << "No backend found for the name" << provider;
 			return EXIT_FAILURE;
 		}
 		return d->backend->runService(this, d->argc, d->argv, d->flags);
 	} catch(QPluginLoadException &e) {
-		qCritical() << "Failed to load backend" << provider << "with error:" << e.what();
+		qCCritical(logQtService) << "Failed to load backend" << provider << "with error:" << e.what();
 		return EXIT_FAILURE;
 	}
 }
@@ -55,20 +56,22 @@ Service *Service::instance()
 
 int Service::getSocket()
 {
-	Q_UNIMPLEMENTED();
-	return 0;
+	const auto sockets = getAllSockets();
+	if(sockets.isEmpty())
+		return -1;
+	else if(sockets.size() > 0)
+		qCWarning(logQtService) << "Found" << sockets.size() << "activated sockets instead of just 1";
+	return sockets.first();
 }
 
-QVector<int> Service::getAllSockets()
+QList<int> Service::getAllSockets()
 {
-	Q_UNIMPLEMENTED();
-	return {};
+	return getAllSocketsNamed().keys();
 }
 
 QHash<int, QByteArray> Service::getAllSocketsNamed()
 {
-	Q_UNIMPLEMENTED();
-	return {};
+	return d->backend->getActivatedSockets();
 }
 
 QString Service::backend() const
@@ -115,7 +118,7 @@ void Service::processCommand(int code)
 		reload();
 		break;
 	default:
-		qWarning() << "Unhandled command received:" << code;
+		qCWarning(logQtService) << "Unhandled command received:" << code;
 		break;
 	}
 }
@@ -123,8 +126,8 @@ void Service::processCommand(int code)
 #ifdef Q_OS_ANDROID
 QAndroidBinder *Service::onBind(const QAndroidIntent &intent)
 {
-	Q_UNIMPLEMENTED();
-	return {};
+	Q_UNUSED(intent)
+	return nullptr;
 }
 #endif
 

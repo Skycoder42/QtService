@@ -1,15 +1,15 @@
-#ifndef DUMMYSERVICEBACKEND_H
-#define DUMMYSERVICEBACKEND_H
+#ifndef STANDARDSERVICEBACKEND_H
+#define STANDARDSERVICEBACKEND_H
 
 #include <QtCore/QPointer>
 #include <QtService/ServiceBackend>
 
-class DummyServiceBackend : public QtService::ServiceBackend
+class StandardServiceBackend : public QtService::ServiceBackend
 {
 	Q_OBJECT
 
 public:
-	explicit DummyServiceBackend(QObject *parent = nullptr);
+	explicit StandardServiceBackend(QObject *parent = nullptr);
 
 	int runService(QtService::Service *service, int &argc, char **argv, int flags) override;
 	void quitService() override;
@@ -21,4 +21,4 @@ private:
 	QPointer<QtService::Service> _service;
 };
 
-#endif // DUMMYSERVICEBACKEND_H
+#endif // STANDARDSERVICEBACKEND_H

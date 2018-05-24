@@ -1,4 +1,4 @@
-#include "dummyservicebackend.h"
+#include "standardservicebackend.h"
 #ifdef Q_OS_WIN
 #include <qt_windows.h>
 #else
@@ -6,11 +6,11 @@
 #endif
 using namespace QtService;
 
-DummyServiceBackend::DummyServiceBackend(QObject *parent) :
+StandardServiceBackend::StandardServiceBackend(QObject *parent) :
 	ServiceBackend(parent)
 {}
 
-int DummyServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
+int StandardServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
 {
 	QCoreApplication app(argc, argv, flags);
 
@@ -54,7 +54,7 @@ int DummyServiceBackend::runService(Service *service, int &argc, char **argv, in
 	return app.exec();
 }
 
-void DummyServiceBackend::quitService()
+void StandardServiceBackend::quitService()
 {
 	connect(_service, &Service::stopped,
 			qApp, &QCoreApplication::exit,
@@ -62,7 +62,7 @@ void DummyServiceBackend::quitService()
 	stopService(_service);
 }
 
-void DummyServiceBackend::signalTriggered(int signal)
+void StandardServiceBackend::signalTriggered(int signal)
 {
 	switch(signal) {
 #ifdef Q_OS_WIN
