@@ -1,14 +1,18 @@
 TARGET = QtService
 
-QT = core
+QT = core network
 
 HEADERS += \
 	qtservice_global.h \
-    service.h
+	service.h \
+	service_p.h \
+	serviceplugin.h
 
 SOURCES += \
-    service.cpp
+	service.cpp \
+	serviceplugin.cpp
 
+MODULE_PLUGIN_TYPES = servicebackends
 load(qt_module)
 
 win32 {

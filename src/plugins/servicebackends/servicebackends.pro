@@ -1,9 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS += service \
-	plugins
-
-plugins.depends += service
+SUBDIRS += \
+	dummy
 
 prepareRecursiveTarget(lrelease)
 QMAKE_EXTRA_TARGETS += lrelease

@@ -1,9 +1,8 @@
 TEMPLATE = subdirs
 
-SUBDIRS += service \
-	plugins
-
-plugins.depends += service
+QT_FOR_CONFIG += core
+SUBDIRS += \
+	servicebackends
 
 prepareRecursiveTarget(lrelease)
 QMAKE_EXTRA_TARGETS += lrelease
