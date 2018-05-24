@@ -4,12 +4,13 @@
 #else
 #include <csignal>
 #endif
+using namespace QtService;
 
 DummyServiceBackend::DummyServiceBackend(QObject *parent) :
 	ServiceBackend(parent)
 {}
 
-int DummyServiceBackend::runService(QtService::Service *service, int &argc, char **argv, int flags)
+int DummyServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
 {
 	QCoreApplication app(argc, argv, flags);
 
@@ -36,23 +37,29 @@ int DummyServiceBackend::runService(QtService::Service *service, int &argc, char
 
 	//prepare the app
 	_service = service;
-	if(!service->preStart())
+	if(!preStartService(_service))
 		return EXIT_FAILURE;
-
-	connect(&app, &QCoreApplication::aboutToQuit,
-			service, &QtService::Service::stop);
 
 #ifdef Q_OS_WIN
 	for(const auto signal : {CTRL_C_EVENT, CTRL_BREAK_EVENT}) {
 #else
-	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT}) {
+	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2}) {
 #endif
 		registerForSignal(signal);
 	}
 
 	// start the eventloop
-	QMetaObject::invokeMethod(service, "start", Qt::QueuedConnection);
+	QMetaObject::invokeMethod(this, "startService", Qt::QueuedConnection,
+							  Q_ARG(QtService::Service*, _service));
 	return app.exec();
+}
+
+void DummyServiceBackend::quitService()
+{
+	connect(_service, &Service::stopped,
+			qApp, &QCoreApplication::exit,
+			Qt::UniqueConnection);
+	stopService(_service);
 }
 
 void DummyServiceBackend::signalTriggered(int signal)
@@ -61,22 +68,28 @@ void DummyServiceBackend::signalTriggered(int signal)
 #ifdef Q_OS_WIN
 	case CTRL_C_EVENT:
 	case CTRL_BREAK_EVENT:
+		quitService();
+		break;
 #else
+	case SIGUSR1:
+	case SIGUSR2:
+		processServiceCommand(_service, signal); //TODO translate?
+		break;
 	case SIGHUP:
-		_service->processCommand(QtService::Service::ReloadCode);
+		processServiceCommand(_service, Service::ReloadCode);
 		break;
 	case SIGTSTP:
-		_service->processCommand(QtService::Service::PauseCode);
+		processServiceCommand(_service, Service::PauseCode);
 		break;
 	case SIGCONT:
-		_service->processCommand(QtService::Service::ResumeCode);
+		processServiceCommand(_service, Service::ResumeCode);
 		break;
 	case SIGINT:
 	case SIGTERM:
 	case SIGQUIT:
-#endif
-		qApp->quit();
+		quitService();
 		break;
+#endif
 	default:
 		ServiceBackend::signalTriggered(signal);
 		break;

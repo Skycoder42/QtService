@@ -36,3 +36,23 @@ bool ServiceBackend::unregisterFromSignal(int signal)
 {
 	return QCtrlSignalHandler::instance()->unregisterFromSignal(signal);
 }
+
+bool ServiceBackend::preStartService(Service *service)
+{
+	return service->preStart();
+}
+
+void ServiceBackend::startService(Service *service)
+{
+	service->start();
+}
+
+void ServiceBackend::stopService(Service *service)
+{
+	service->stop();
+}
+
+void ServiceBackend::processServiceCommand(Service *service, int code)
+{
+	service->processCommand(code);
+}

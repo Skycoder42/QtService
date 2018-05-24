@@ -19,13 +19,20 @@ public:
 	static QByteArrayList rawArguments(int argc, char **argv);
 
 	virtual int runService(Service *service, int &argc, char **argv, int flags) = 0;
+	virtual void quitService() = 0;
 
 protected Q_SLOTS:
 	virtual void signalTriggered(int signal);
 
+	void startService(QtService::Service *service);
+	void stopService(QtService::Service *service);
+	void processServiceCommand(QtService::Service *service, int code);
+
 protected:
 	bool registerForSignal(int signal);
 	bool unregisterFromSignal(int signal);
+
+	bool preStartService(Service *service);
 };
 
 class Q_SERVICE_EXPORT ServicePlugin

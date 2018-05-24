@@ -2,6 +2,8 @@
 #include "service_p.h"
 #include "serviceplugin.h"
 #include <QDebug>
+#include <QFileInfo>
+#include <QDir>
 
 #include <qpluginfactory.h>
 using namespace QtService;
@@ -33,12 +35,13 @@ int Service::exec()
 	}
 
 	try {
-		auto backend = factory->createInstance(QString::fromUtf8(provider), this);
-		if(!backend) {
+		d->backendProvider = QString::fromUtf8(provider);
+		d->backend = factory->createInstance(d->backendProvider, this);
+		if(!d->backend) {
 			qCritical() << "No backend found for the name" << provider;
 			return EXIT_FAILURE;
 		}
-		return backend->runService(this, d->argc, d->argv, d->flags);
+		return d->backend->runService(this, d->argc, d->argv, d->flags);
 	} catch(QPluginLoadException &e) {
 		qCritical() << "Failed to load backend" << provider << "with error:" << e.what();
 		return EXIT_FAILURE;
@@ -68,12 +71,36 @@ QHash<int, QByteArray> Service::getAllSocketsNamed()
 	return {};
 }
 
+QString Service::backend() const
+{
+	return d->backendProvider;
+}
+
+void Service::quit()
+{
+	d->backend->quitService();
+}
+
+void Service::stopCompleted(int exitCode)
+{
+	emit stopped(exitCode, {});
+}
+
 bool Service::preStart()
 {
 	return true;
 }
 
-void Service::stop() {}
+void Service::stop()
+{
+	stopCompleted();
+}
+
+void Service::pause() {}
+
+void Service::resume() {}
+
+void Service::reload() {}
 
 void Service::processCommand(int code)
 {
@@ -88,16 +115,10 @@ void Service::processCommand(int code)
 		reload();
 		break;
 	default:
-		// do nothing
+		qWarning() << "Unhandled command received:" << code;
 		break;
 	}
 }
-
-void Service::pause() {}
-
-void Service::resume() {}
-
-void Service::reload() {}
 
 #ifdef Q_OS_ANDROID
 QAndroidBinder *Service::onBind(const QAndroidIntent &intent)

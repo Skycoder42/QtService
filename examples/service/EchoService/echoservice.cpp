@@ -9,6 +9,7 @@ EchoService::EchoService(int &argc, char **argv) :
 bool EchoService::preStart()
 {
 	qDebug() << Q_FUNC_INFO;
+	qInfo() << "Service running with backend:" << backend();
 	return true;
 }
 
@@ -31,6 +32,7 @@ void EchoService::stop()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
+	stopCompleted();
 }
 
 void EchoService::pause()

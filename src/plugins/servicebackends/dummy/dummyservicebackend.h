@@ -12,6 +12,7 @@ public:
 	explicit DummyServiceBackend(QObject *parent = nullptr);
 
 	int runService(QtService::Service *service, int &argc, char **argv, int flags) override;
+	void quitService() override;
 
 protected Q_SLOTS:
 	void signalTriggered(int signal) override;

@@ -4,6 +4,7 @@
 #include <QtCore/QPointer>
 
 #include "service.h"
+#include "serviceplugin.h"
 
 namespace QtService {
 
@@ -17,6 +18,9 @@ public:
 	int &argc;
 	char **argv;
 	int flags;
+
+	QString backendProvider;
+	ServiceBackend *backend = nullptr;
 };
 
 }

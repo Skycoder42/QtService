@@ -16,10 +16,13 @@ class QAndroidIntent;
 
 namespace QtService {
 
+class ServiceBackend;
 class ServicePrivate;
 class Q_SERVICE_EXPORT Service : public QObject
 {
 	Q_OBJECT
+
+	Q_PROPERTY(QString backend READ backend CONSTANT)
 
 public:
 	enum StandardCode {
@@ -36,14 +39,29 @@ public:
 
 	static Service *instance();
 
-	static int getSocket();
-	static QVector<int> getAllSockets();
-	static QHash<int, QByteArray> getAllSocketsNamed();
+	int getSocket();
+	QVector<int> getAllSockets();
+	QHash<int, QByteArray> getAllSocketsNamed();
+
+	QString backend() const;
 
 public Q_SLOTS:
+	void quit();
+
+Q_SIGNALS:
+	void stopped(int exitCode, QPrivateSignal);
+
+protected Q_SLOTS:
+	void stopCompleted(int exitCode = EXIT_SUCCESS);
+
+protected:
 	virtual bool preStart();
 	virtual void start() = 0;
 	virtual void stop();
+
+	virtual void pause();
+	virtual void resume();
+	virtual void reload();
 
 	virtual void processCommand(int code);
 
@@ -51,12 +69,8 @@ public Q_SLOTS:
 	virtual QAndroidBinder *onBind(const QAndroidIntent &intent);
 #endif
 
-protected:
-	virtual void pause();
-	virtual void resume();
-	virtual void reload();
-
 private:
+	friend class QtService::ServiceBackend;
 	QScopedPointer<ServicePrivate> d;
 };
 
