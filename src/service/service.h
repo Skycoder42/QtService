@@ -47,6 +47,7 @@ public:
 
 public Q_SLOTS:
 	void quit();
+	void reload();
 
 Q_SIGNALS:
 	void stopped(int exitCode, QPrivateSignal);
@@ -56,14 +57,14 @@ protected Q_SLOTS:
 
 protected:
 	virtual bool preStart();
-	virtual void start() = 0;
-	virtual void stop();
+	virtual void onStart() = 0; //TODO make async?
+	virtual void onStop();
 
-	virtual void pause();
-	virtual void resume();
-	virtual void reload();
+	virtual void onPause();
+	virtual void onResume();
+	virtual void onReload(); //TODO make async?
 
-	virtual void processCommand(int code);
+	virtual void onCommand(int code);
 
 #ifdef Q_OS_ANDROID
 	virtual QAndroidBinder *onBind(const QAndroidIntent &intent);

@@ -60,6 +60,11 @@ void StandardServiceBackend::quitService()
 	stopService(_service);
 }
 
+void StandardServiceBackend::reloadService()
+{
+	processServiceCommand(_service, Service::ReloadCode);
+}
+
 void StandardServiceBackend::signalTriggered(int signal)
 {
 	switch(signal) {
@@ -74,7 +79,7 @@ void StandardServiceBackend::signalTriggered(int signal)
 		processServiceCommand(_service, signal); //TODO translate?
 		break;
 	case SIGHUP:
-		processServiceCommand(_service, Service::ReloadCode);
+		reloadService();
 		break;
 	case SIGTSTP:
 		processServiceCommand(_service, Service::PauseCode);

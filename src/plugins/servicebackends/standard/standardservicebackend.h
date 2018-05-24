@@ -13,6 +13,7 @@ public:
 
 	int runService(QtService::Service *service, int &argc, char **argv, int flags) override;
 	void quitService() override;
+	void reloadService() override;
 
 protected Q_SLOTS:
 	void signalTriggered(int signal) override;

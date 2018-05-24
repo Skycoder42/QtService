@@ -1,0 +1,18 @@
+[Unit]
+Description=QtService Example Echo Service
+Documentation=https://github.com/Skycoder42/QtService
+After=network-online.target echoservice.socket
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=/path/to/echoservice --backend systemd
+ExecReload=/path/to/echoservice --backend systemd reload
+ExecStop=/path/to/echoservice --backend systemd stop
+WatchdogSec=10
+Restart=on-abnormal
+RuntimeDirectory=echoservice
+
+[Install]
+#WantedBy=multi-user.target
+WantedBy=default.target

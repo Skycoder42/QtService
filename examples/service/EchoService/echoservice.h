@@ -13,11 +13,11 @@ public:
 
 protected:
 	bool preStart() override;
-	void start() override;
-	void stop() override;
-	void pause() override;
-	void resume() override;
-	void reload() override;
+	void onStart() override;
+	void onStop() override;
+	void onPause() override;
+	void onResume() override;
+	void onReload() override;
 
 private Q_SLOTS:
 	void newConnection();

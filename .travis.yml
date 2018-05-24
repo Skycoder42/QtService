@@ -20,6 +20,7 @@ matrix:
         - PLATFORM=gcc_64
         - BUILD_DOC=true
         - BUILD_EXAMPLES=true
+        - EXTRA_PKG="libsystemd-dev" #in order to build the systemd plugin
     - os: linux
       env:
         - PLATFORM=android_armv7

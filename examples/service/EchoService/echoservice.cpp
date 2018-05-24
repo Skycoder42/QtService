@@ -13,7 +13,7 @@ bool EchoService::preStart()
 	return true;
 }
 
-void EchoService::start()
+void EchoService::onStart()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server = new QTcpServer(this);
@@ -32,38 +32,38 @@ void EchoService::start()
 	if(ok)
 		qInfo() << "Started echo server on port" << _server->serverPort();
 	else {
-		qCritical() << "Failed to start server with error" << _server->errorString();
+		qCritical().noquote() << "Failed to start server with error" << _server->errorString();
 		qApp->exit(EXIT_FAILURE);
 	}
 }
 
-void EchoService::stop()
+void EchoService::onStop()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
 	stopCompleted();
 }
 
-void EchoService::pause()
+void EchoService::onPause()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->pauseAccepting();
 }
 
-void EchoService::resume()
+void EchoService::onResume()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->resumeAccepting();
 }
 
-void EchoService::reload()
+void EchoService::onReload()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
 	if(_server->listen())
 		qInfo() << "Restarted echo server on port" << _server->serverPort();
 	else {
-		qCritical() << "Failed to restart server with error" << _server->errorString();
+		qCritical().noquote() << "Failed to restart server with error" << _server->errorString();
 		qApp->exit(EXIT_FAILURE);
 	}
 }
@@ -87,7 +87,7 @@ void EchoService::newConnection()
 		});
 		connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error),
 				socket, [socket](QAbstractSocket::SocketError error) {
-			qWarning() << host(socket) << "Socket-Error[" << error << "]:" << socket->errorString();
+			qWarning() << host(socket) << "Socket-Error[" << error << "]:" << qUtf8Printable(socket->errorString());
 		});
 		qInfo() << host(socket) << "connected";
 	}

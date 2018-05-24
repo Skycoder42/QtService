@@ -20,6 +20,7 @@ public:
 
 	virtual int runService(Service *service, int &argc, char **argv, int flags) = 0;
 	virtual void quitService() = 0;
+	virtual void reloadService() = 0;
 
 	virtual QHash<int, QByteArray> getActivatedSockets();
 

@@ -1,0 +1,11 @@
+[Unit]
+Description=QtService Example Echo Service Socket
+Documentation=https://github.com/Skycoder42/QtService
+After=network.target
+PartOf=echoservice.service
+
+[Socket]
+ListenStream=6627
+
+[Install]
+WantedBy=sockets.target

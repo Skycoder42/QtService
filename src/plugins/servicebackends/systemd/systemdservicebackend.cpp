@@ -1,46 +1,52 @@
 #include "systemdservicebackend.h"
 #include <chrono>
 #include <csignal>
+#include <unistd.h>
 
 #define SD_JOURNAL_SUPPRESS_LOCATION
 #include <systemd/sd-journal.h>
 #include <systemd/sd-daemon.h>
 
-#include <QtCore/QTimer>
+#include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
 #include <QtService/private/logging_p.h>
+
+#include "systemdcommandclient.h"
 
 using namespace QtService;
 
 SystemdServiceBackend::SystemdServiceBackend(QObject *parent) :
-	ServiceBackend(parent)
+	ServiceBackend{parent}
 {}
 
 int SystemdServiceBackend::runService(QtService::Service *service, int &argc, char **argv, int flags)
 {
 	qInstallMessageHandler(SystemdServiceBackend::systemdMessageHandler);
-	QCoreApplication app(argc, argv, flags);
-
-	//prepare the app
-	prepareWatchdog(); //do as early as possible
+	QCoreApplication app{argc, argv, flags};
 	_service = service;
-	if(!preStartService(_service))
-		return EXIT_FAILURE;
 
-	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT})
-		registerForSignal(signal);
-
-	// start the eventloop
-	QMetaObject::invokeMethod(this, "performStart", Qt::QueuedConnection);
-	return app.exec();
+	if(QCoreApplication::arguments().contains(QStringLiteral("stop")))
+		return stop();
+	else if(QCoreApplication::arguments().contains(QStringLiteral("reload")))
+		return reload();
+	else
+		return run();
 }
 
 void SystemdServiceBackend::quitService()
 {
 	connect(_service, &Service::stopped,
 			qApp, &QCoreApplication::exit,
-			Qt::UniqueConnection);
+			Qt::UniqueConnection); //TODO close socket connection to signale completition + stop watchdog
 	sd_notify(false, "STOPPING=1");
 	stopService(_service);
+}
+
+void SystemdServiceBackend::reloadService()
+{
+	sd_notify(false, "RELOADING=1");
+	processServiceCommand(_service, Service::ReloadCode);
+	sd_notify(false, "READY=1"); //TODO make async
 }
 
 QHash<int, QByteArray> SystemdServiceBackend::getActivatedSockets()
@@ -70,9 +76,7 @@ void SystemdServiceBackend::signalTriggered(int signal)
 	qCWarning(logQtService) << "Systemd service should not be controlled via signals!";
 	switch(signal) {
 	case SIGHUP:
-		sd_notify(false, "RELOADING=1");
-		processServiceCommand(_service, Service::ReloadCode);
-		sd_notify(false, "READY=1"); //TODO make async
+		reloadService();
 		break;
 	case SIGTSTP:
 		processServiceCommand(_service, Service::PauseCode);
@@ -93,6 +97,27 @@ void SystemdServiceBackend::signalTriggered(int signal)
 
 void SystemdServiceBackend::performStart()
 {
+	// create the command server
+	_commandServer = new QLocalServer{this};
+	connect(_commandServer, &QLocalServer::newConnection,
+			this, &SystemdServiceBackend::newConnection);
+	//part 1: try to listen, and optionally remove a stale socket if applicable
+	auto sName = getSocketName();
+	if(!_commandServer->listen(sName) &&
+	   _commandServer->serverError() == QAbstractSocket::AddressInUseError) {
+		qCWarning(logQtService) << "Socket" << sName << "is already in use - trying to free it...";
+		if(QLocalServer::removeServer(sName)) {
+			qCInfo(logQtService) << "Successfully freed socket. Trying to listen once more...";
+			_commandServer->listen(sName);
+		}
+	}
+	// part 2: check the listen result for logging
+	if(_commandServer->isListening())
+		qCDebug(logQtService) << "Created daemon socket as" << _commandServer->fullServerName();
+	else
+		qCCritical(logQtService).noquote() << "Failed to start daemon socket with error:" << _commandServer->errorString();
+
+	// perform the actual service start
 	startService(_service);
 	sd_notify(false, "READY=1");
 }
@@ -100,6 +125,52 @@ void SystemdServiceBackend::performStart()
 void SystemdServiceBackend::sendWatchdog()
 {
 	sd_notify(false, "WATCHDOG=1");
+}
+
+void SystemdServiceBackend::newConnection()
+{
+	while(_commandServer->hasPendingConnections()) {
+		auto client = new SystemdCommandClient {
+			_commandServer->nextPendingConnection(),
+			this
+		};
+		client->receiveFor(this);
+	}
+}
+
+int SystemdServiceBackend::run()
+{
+	//prepare the app
+	prepareWatchdog(); //do as early as possible
+	if(!preStartService(_service))
+		return EXIT_FAILURE;
+
+	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT})
+		registerForSignal(signal);
+
+	// start the eventloop
+	QMetaObject::invokeMethod(this, "performStart", Qt::QueuedConnection);
+	return QCoreApplication::exec();
+}
+
+int SystemdServiceBackend::stop()
+{
+	auto client = new SystemdCommandClient {
+		new QLocalSocket{},
+		this
+	};
+	client->sendCommand(getSocketName(), SystemdCommandClient::StopCommand);
+	return QCoreApplication::exec();
+}
+
+int SystemdServiceBackend::reload()
+{
+	auto client = new SystemdCommandClient {
+		new QLocalSocket{},
+		this
+	};
+	client->sendCommand(getSocketName(), SystemdCommandClient::ReloadCommand);
+	return QCoreApplication::exec();
 }
 
 void SystemdServiceBackend::prepareWatchdog()
@@ -114,14 +185,35 @@ void SystemdServiceBackend::prepareWatchdog()
 			mSecs = 1ms;
 		}
 
-		auto watchdogTimer = new QTimer(this);
-		watchdogTimer->setTimerType(Qt::PreciseTimer);
-		watchdogTimer->setInterval(mSecs);
-		connect(watchdogTimer, &QTimer::timeout,
+		_watchdogTimer = new QTimer(this);
+		_watchdogTimer->setTimerType(Qt::PreciseTimer);
+		_watchdogTimer->setInterval(mSecs);
+		connect(_watchdogTimer, &QTimer::timeout,
 				this, &SystemdServiceBackend::sendWatchdog);
-		watchdogTimer->start();
+		_watchdogTimer->start();
 		qCDebug(logQtService) << "Enabled watchdog with an interval of" << mSecs.count() << "ms";
 	}
+}
+
+QString SystemdServiceBackend::getSocketName()
+{
+	QDir runtimeDir;
+	if(::geteuid() == 0)
+		runtimeDir = QStringLiteral("/run");
+	else
+		runtimeDir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+	auto appName = QCoreApplication::applicationName();
+	auto setPerms = !runtimeDir.exists(appName); // set perms if dir does not exist
+	if(!runtimeDir.mkpath(appName) || !runtimeDir.cd(appName)) {
+		qCWarning(logQtService) << "Failed to access default runtime directory - falling back to the temporary dir";
+		runtimeDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+		// dont check for errors here
+		runtimeDir.mkpath(appName);
+		runtimeDir.cd(appName);
+	}
+	if(setPerms)
+		QFile::setPermissions(runtimeDir.absolutePath(), QFileDevice::ReadUser | QFileDevice::WriteUser | QFileDevice::ExeUser);
+	return runtimeDir.absoluteFilePath(QStringLiteral("qdaemon.socket"));
 }
 
 void SystemdServiceBackend::systemdMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)

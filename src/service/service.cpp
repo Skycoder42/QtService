@@ -83,6 +83,10 @@ void Service::quit()
 {
 	d->backend->quitService();
 }
+void Service::reload()
+{
+	d->backend->reloadService();
+}
 
 void Service::stopCompleted(int exitCode)
 {
@@ -94,28 +98,28 @@ bool Service::preStart()
 	return true;
 }
 
-void Service::stop()
+void Service::onStop()
 {
 	stopCompleted();
 }
 
-void Service::pause() {}
+void Service::onPause() {}
 
-void Service::resume() {}
+void Service::onResume() {}
 
-void Service::reload() {}
+void Service::onReload() {}
 
-void Service::processCommand(int code)
+void Service::onCommand(int code)
 {
 	switch(code) {
 	case PauseCode:
-		pause();
+		onPause();
 		break;
 	case ResumeCode:
-		resume();
+		onResume();
 		break;
 	case ReloadCode:
-		reload();
+		onReload();
 		break;
 	default:
 		qCWarning(logQtService) << "Unhandled command received:" << code;

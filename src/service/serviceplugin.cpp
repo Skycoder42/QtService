@@ -49,15 +49,15 @@ bool ServiceBackend::preStartService(Service *service)
 
 void ServiceBackend::startService(Service *service)
 {
-	service->start();
+	service->onStart();
 }
 
 void ServiceBackend::stopService(Service *service)
 {
-	service->stop();
+	service->onStop();
 }
 
 void ServiceBackend::processServiceCommand(Service *service, int code)
 {
-	service->processCommand(code);
+	service->onCommand(code);
 }
