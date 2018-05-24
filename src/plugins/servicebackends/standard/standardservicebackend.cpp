@@ -12,8 +12,6 @@ StandardServiceBackend::StandardServiceBackend(QObject *parent) :
 
 int StandardServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
 {
-	QCoreApplication app(argc, argv, flags);
-
 	//setup logging
 #ifdef Q_OS_WIN
 	qSetMessagePattern(QStringLiteral("[%{time} "
@@ -35,7 +33,7 @@ int StandardServiceBackend::runService(Service *service, int &argc, char **argv,
 									  "%{message}"));
 #endif
 
-	//prepare the app
+	QCoreApplication app(argc, argv, flags);
 	_service = service;
 	if(!preStartService(_service))
 		return EXIT_FAILURE;
