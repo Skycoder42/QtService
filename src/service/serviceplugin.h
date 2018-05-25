@@ -14,9 +14,18 @@ class Q_SERVICE_EXPORT ServiceBackend : public QObject
 	Q_OBJECT
 
 public:
-	ServiceBackend(QObject *parent = nullptr);
+	enum ServiceCommand {
+		StartCommand,
+		StopCommand,
+		ReloadCommand,
+		PauseCommand,
+		ResumeCommand,
 
-	static QByteArrayList rawArguments(int argc, char **argv);
+		UserCommand = 0x1000
+	};
+	Q_ENUM(ServiceCommand)
+
+	ServiceBackend(QObject *parent = nullptr);
 
 	virtual int runService(Service *service, int &argc, char **argv, int flags) = 0;
 	virtual void quitService() = 0;
@@ -27,8 +36,6 @@ public:
 protected Q_SLOTS:
 	virtual void signalTriggered(int signal);
 
-	void startService(QtService::Service *service);
-	void stopService(QtService::Service *service);
 	void processServiceCommand(QtService::Service *service, int code);
 
 protected:

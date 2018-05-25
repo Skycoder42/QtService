@@ -59,7 +59,7 @@ int Service::getSocket()
 	const auto sockets = getAllSockets();
 	if(sockets.isEmpty())
 		return -1;
-	else if(sockets.size() > 0)
+	else if(sockets.size() > 1)
 		qCWarning(logQtService) << "Found" << sockets.size() << "activated sockets instead of just 1";
 	return sockets.first();
 }
@@ -88,43 +88,29 @@ void Service::reload()
 	d->backend->reloadService();
 }
 
-void Service::stopCompleted(int exitCode)
-{
-	emit stopped(exitCode, {});
-}
-
 bool Service::preStart()
 {
 	return true;
 }
 
-void Service::onStop()
+Service::CommandMode Service::onStop(int &exitCode)
 {
-	stopCompleted();
+	Q_UNUSED(exitCode);
+	return Synchronous;
+}
+
+Service::CommandMode Service::onReload()
+{
+	return Synchronous;
 }
 
 void Service::onPause() {}
 
 void Service::onResume() {}
 
-void Service::onReload() {}
-
 void Service::onCommand(int code)
 {
-	switch(code) {
-	case PauseCode:
-		onPause();
-		break;
-	case ResumeCode:
-		onResume();
-		break;
-	case ReloadCode:
-		onReload();
-		break;
-	default:
-		qCWarning(logQtService) << "Unhandled command received:" << code;
-		break;
-	}
+	qCWarning(logQtService) << "Unhandled command received:" << code;
 }
 
 #ifdef Q_OS_ANDROID

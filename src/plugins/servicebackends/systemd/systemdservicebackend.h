@@ -27,6 +27,9 @@ private Q_SLOTS:
 
 	void newConnection();
 
+	void onReady();
+	void onStopped(int exitCode);
+
 private:
 	QPointer<QtService::Service> _service;
 	QTimer *_watchdogTimer = nullptr;

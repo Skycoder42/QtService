@@ -47,8 +47,9 @@ int StandardServiceBackend::runService(Service *service, int &argc, char **argv,
 	}
 
 	// start the eventloop
-	QMetaObject::invokeMethod(this, "startService", Qt::QueuedConnection,
-							  Q_ARG(QtService::Service*, _service));
+	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
+							  Q_ARG(QtService::Service*, _service),
+							  Q_ARG(int, StartCommand));
 	return app.exec();
 }
 
@@ -57,12 +58,12 @@ void StandardServiceBackend::quitService()
 	connect(_service, &Service::stopped,
 			qApp, &QCoreApplication::exit,
 			Qt::UniqueConnection);
-	stopService(_service);
+	processServiceCommand(_service, StopCommand);
 }
 
 void StandardServiceBackend::reloadService()
 {
-	processServiceCommand(_service, Service::ReloadCode);
+	processServiceCommand(_service, ReloadCommand);
 }
 
 void StandardServiceBackend::signalTriggered(int signal)
@@ -74,23 +75,25 @@ void StandardServiceBackend::signalTriggered(int signal)
 		quitService();
 		break;
 #else
-	case SIGUSR1:
-	case SIGUSR2:
-		processServiceCommand(_service, signal); //TODO translate?
+	case SIGINT:
+	case SIGTERM:
+	case SIGQUIT:
+		quitService();
 		break;
 	case SIGHUP:
 		reloadService();
 		break;
 	case SIGTSTP:
-		processServiceCommand(_service, Service::PauseCode);
+		processServiceCommand(_service, PauseCommand);
 		break;
 	case SIGCONT:
-		processServiceCommand(_service, Service::ResumeCode);
+		processServiceCommand(_service, ResumeCommand);
 		break;
-	case SIGINT:
-	case SIGTERM:
-	case SIGQUIT:
-		quitService();
+	case SIGUSR1:
+		processServiceCommand(_service, UserCommand + 1);
+		break;
+	case SIGUSR2:
+		processServiceCommand(_service, UserCommand + 2);
 		break;
 #endif
 	default:

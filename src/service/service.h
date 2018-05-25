@@ -25,12 +25,11 @@ class Q_SERVICE_EXPORT Service : public QObject
 	Q_PROPERTY(QString backend READ backend CONSTANT)
 
 public:
-	enum StandardCode {
-		PauseCode,
-		ResumeCode,
-		ReloadCode
+	enum CommandMode {
+		Synchronous,
+		Asynchronous
 	};
-	Q_ENUM(StandardCode)
+	Q_ENUM(CommandMode)
 
 	explicit Service(int &argc, char **argv, int = QCoreApplication::ApplicationFlags);
 	~Service() override;
@@ -50,19 +49,19 @@ public Q_SLOTS:
 	void reload();
 
 Q_SIGNALS:
-	void stopped(int exitCode, QPrivateSignal);
-
-protected Q_SLOTS:
-	void stopCompleted(int exitCode = EXIT_SUCCESS);
+	void started();
+	void stopped(int exitCode);
+	void reloaded();
 
 protected:
 	virtual bool preStart();
-	virtual void onStart() = 0; //TODO make async?
-	virtual void onStop();
+
+	virtual CommandMode onStart() = 0;
+	virtual CommandMode onStop(int &exitCode);
+	virtual CommandMode onReload();
 
 	virtual void onPause();
 	virtual void onResume();
-	virtual void onReload(); //TODO make async?
 
 	virtual void onCommand(int code);
 

@@ -12,12 +12,6 @@ ServiceBackend::ServiceBackend(QObject *parent) :
 	QObject{parent}
 {}
 
-QByteArrayList ServiceBackend::rawArguments(int argc, char **argv)
-{
-	Q_UNIMPLEMENTED();
-	return {};
-}
-
 QHash<int, QByteArray> ServiceBackend::getActivatedSockets()
 {
 	return {};
@@ -26,6 +20,37 @@ QHash<int, QByteArray> ServiceBackend::getActivatedSockets()
 void ServiceBackend::signalTriggered(int signal)
 {
 	qCWarning(logQtService) << "Unhandled signal:" << signal;
+}
+
+void ServiceBackend::processServiceCommand(Service *service, int code)
+{
+	//TODO add support for "pending" commands
+	// => ignore new commands if an old one of the same time has not yet been processed???
+	switch(code) {
+	case StartCommand:
+		if(service->onStart() == Service::Synchronous)
+			emit service->started();
+		break;
+	case StopCommand:
+	{
+		auto exitCode = EXIT_SUCCESS;
+		if(service->onStop(exitCode) == Service::Synchronous)
+			emit service->stopped(exitCode);
+		break;
+	}
+	case ReloadCommand:
+		if(service->onReload() == Service::Synchronous)
+			emit service->reloaded();
+		break;
+	case PauseCommand:
+		service->onPause();
+		break;
+	case ResumeCommand:
+		service->onResume();
+		break;
+	default:
+		service->onCommand(code);
+	}
 }
 
 bool ServiceBackend::registerForSignal(int signal)
@@ -45,19 +70,4 @@ bool ServiceBackend::unregisterFromSignal(int signal)
 bool ServiceBackend::preStartService(Service *service)
 {
 	return service->preStart();
-}
-
-void ServiceBackend::startService(Service *service)
-{
-	service->onStart();
-}
-
-void ServiceBackend::stopService(Service *service)
-{
-	service->onStop();
-}
-
-void ServiceBackend::processServiceCommand(Service *service, int code)
-{
-	service->onCommand(code);
 }

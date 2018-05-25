@@ -1,6 +1,7 @@
 #include "echoservice.h"
 #include <QDebug>
 #include <QTcpSocket>
+#include <QTimer>
 
 EchoService::EchoService(int &argc, char **argv) :
 	Service(argc, argv)
@@ -13,7 +14,7 @@ bool EchoService::preStart()
 	return true;
 }
 
-void EchoService::onStart()
+QtService::Service::CommandMode EchoService::onStart()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server = new QTcpServer(this);
@@ -35,13 +36,29 @@ void EchoService::onStart()
 		qCritical().noquote() << "Failed to start server with error" << _server->errorString();
 		qApp->exit(EXIT_FAILURE);
 	}
+
+	return Synchronous;
 }
 
-void EchoService::onStop()
+QtService::Service::CommandMode EchoService::onStop(int &exitCode)
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
-	stopCompleted();
+	return Synchronous;
+}
+
+QtService::Service::CommandMode EchoService::onReload()
+{
+	qDebug() << Q_FUNC_INFO;
+	_server->close();
+	if(_server->listen())
+		qInfo() << "Restarted echo server on port" << _server->serverPort();
+	else {
+		qCritical().noquote() << "Failed to restart server with error" << _server->errorString();
+		qApp->exit(EXIT_FAILURE);
+	}
+
+	return Synchronous;
 }
 
 void EchoService::onPause()
@@ -54,18 +71,6 @@ void EchoService::onResume()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->resumeAccepting();
-}
-
-void EchoService::onReload()
-{
-	qDebug() << Q_FUNC_INFO;
-	_server->close();
-	if(_server->listen())
-		qInfo() << "Restarted echo server on port" << _server->serverPort();
-	else {
-		qCritical().noquote() << "Failed to restart server with error" << _server->errorString();
-		qApp->exit(EXIT_FAILURE);
-	}
 }
 
 void EchoService::newConnection()

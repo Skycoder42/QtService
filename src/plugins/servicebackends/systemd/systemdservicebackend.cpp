@@ -7,6 +7,7 @@
 #include <systemd/sd-journal.h>
 #include <systemd/sd-daemon.h>
 
+#include <QThread>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 #include <QtService/private/logging_p.h>
@@ -36,17 +37,17 @@ int SystemdServiceBackend::runService(QtService::Service *service, int &argc, ch
 void SystemdServiceBackend::quitService()
 {
 	connect(_service, &Service::stopped,
-			qApp, &QCoreApplication::exit,
-			Qt::UniqueConnection); //TODO close socket connection to signale completition + stop watchdog
+			this, &SystemdServiceBackend::onStopped,
+			Qt::UniqueConnection);
 	sd_notify(false, "STOPPING=1");
-	stopService(_service);
+	processServiceCommand(_service, StopCommand);
 }
 
 void SystemdServiceBackend::reloadService()
 {
 	sd_notify(false, "RELOADING=1");
-	processServiceCommand(_service, Service::ReloadCode);
-	sd_notify(false, "READY=1"); //TODO make async
+	QThread::sleep(3);
+	processServiceCommand(_service, ReloadCommand);
 }
 
 QHash<int, QByteArray> SystemdServiceBackend::getActivatedSockets()
@@ -75,19 +76,19 @@ void SystemdServiceBackend::signalTriggered(int signal)
 {
 	qCWarning(logQtService) << "Systemd service should not be controlled via signals!";
 	switch(signal) {
-	case SIGHUP:
-		reloadService();
-		break;
-	case SIGTSTP:
-		processServiceCommand(_service, Service::PauseCode);
-		break;
-	case SIGCONT:
-		processServiceCommand(_service, Service::ResumeCode);
-		break;
 	case SIGINT:
 	case SIGTERM:
 	case SIGQUIT:
 		quitService();
+		break;
+	case SIGHUP:
+		reloadService();
+		break;
+	case SIGTSTP:
+		processServiceCommand(_service, PauseCommand);
+		break;
+	case SIGCONT:
+		processServiceCommand(_service, ResumeCommand);
 		break;
 	default:
 		ServiceBackend::signalTriggered(signal);
@@ -118,8 +119,7 @@ void SystemdServiceBackend::performStart()
 		qCCritical(logQtService).noquote() << "Failed to start daemon socket with error:" << _commandServer->errorString();
 
 	// perform the actual service start
-	startService(_service);
-	sd_notify(false, "READY=1");
+	processServiceCommand(_service, StartCommand);
 }
 
 void SystemdServiceBackend::sendWatchdog()
@@ -138,12 +138,31 @@ void SystemdServiceBackend::newConnection()
 	}
 }
 
+void SystemdServiceBackend::onReady()
+{
+	sd_notify(false, "READY=1");
+	//TODO signal socket done
+}
+
+void SystemdServiceBackend::onStopped(int exitCode)
+{
+	if(_watchdogTimer)
+		_watchdogTimer->stop();
+	//TODO signal socket done
+	qApp->exit(exitCode);
+}
+
 int SystemdServiceBackend::run()
 {
 	//prepare the app
 	prepareWatchdog(); //do as early as possible
 	if(!preStartService(_service))
 		return EXIT_FAILURE;
+
+	connect(_service, &Service::started,
+			this, &SystemdServiceBackend::onReady);
+	connect(_service, &Service::reloaded,
+			this, &SystemdServiceBackend::onReady);
 
 	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT})
 		registerForSignal(signal);
