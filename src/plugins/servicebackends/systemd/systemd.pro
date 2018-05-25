@@ -8,13 +8,11 @@ PKGCONFIG += libsystemd
 
 HEADERS += \
 		systemdserviceplugin.h \
-	systemdservicebackend.h \
-    systemdcommandclient.h
+	systemdservicebackend.h
 
 SOURCES += \
 		systemdserviceplugin.cpp \
-	systemdservicebackend.cpp \
-    systemdcommandclient.cpp
+	systemdservicebackend.cpp
 
 DISTFILES += systemd.json
 

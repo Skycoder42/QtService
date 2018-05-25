@@ -3,7 +3,6 @@
 
 #include <QtCore/QPointer>
 #include <QtCore/QTimer>
-#include <QtNetwork/QLocalServer>
 #include <QtService/ServiceBackend>
 
 class SystemdServiceBackend : public QtService::ServiceBackend
@@ -22,10 +21,7 @@ protected Q_SLOTS:
 	void signalTriggered(int signal) override;
 
 private Q_SLOTS:
-	void performStart();
 	void sendWatchdog();
-
-	void newConnection();
 
 	void onReady();
 	void onStopped(int exitCode);
@@ -33,14 +29,13 @@ private Q_SLOTS:
 private:
 	QPointer<QtService::Service> _service;
 	QTimer *_watchdogTimer = nullptr;
-	QLocalServer *_commandServer = nullptr;
 
-	int run();
-	int stop();
-	int reload();
+	int run(int &argc, char **argv, int flags);
+	int stop(int pid);
+	int reload(int pid);
 
 	void prepareWatchdog();
-	QString getSocketName();
+	bool findArg(const char *command, int argc, char **argv, int &pid);
 
 	static void systemdMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };
