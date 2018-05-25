@@ -114,6 +114,11 @@ void Service::onCommand(int code)
 }
 
 #ifdef Q_OS_ANDROID
+void Service::onStartCommand(const QAndroidIntent &intent)
+{
+	Q_UNUSED(intent)
+}
+
 QAndroidBinder *Service::onBind(const QAndroidIntent &intent)
 {
 	Q_UNUSED(intent)

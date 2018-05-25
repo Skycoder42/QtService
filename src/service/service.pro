@@ -1,13 +1,14 @@
 TARGET = QtService
 
 QT = core network
+android: QT += androidextras
 
 HEADERS += \
 	qtservice_global.h \
 	service.h \
 	service_p.h \
 	serviceplugin.h \
-    logging_p.h
+	logging_p.h
 
 SOURCES += \
 	service.cpp \

@@ -43,6 +43,11 @@ protected:
 	bool unregisterFromSignal(int signal);
 
 	bool preStartService(Service *service);
+
+#ifdef Q_OS_ANDROID
+	static void onStartCommand(Service *service, const QAndroidIntent &intent);
+	static QAndroidBinder *onBind(Service *service, const QAndroidIntent &intent);
+#endif
 };
 
 class Q_SERVICE_EXPORT ServicePlugin

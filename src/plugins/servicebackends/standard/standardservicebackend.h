@@ -19,7 +19,7 @@ protected Q_SLOTS:
 	void signalTriggered(int signal) override;
 
 private:
-	QPointer<QtService::Service> _service;
+	QPointer<QtService::Service> _service; //TODO move to baseclass with "pre-start-setter" + simplify methods
 };
 
 #endif // STANDARDSERVICEBACKEND_H

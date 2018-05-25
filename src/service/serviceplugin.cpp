@@ -71,3 +71,15 @@ bool ServiceBackend::preStartService(Service *service)
 {
 	return service->preStart();
 }
+
+#ifdef Q_OS_ANDROID
+void ServiceBackend::onStartCommand(Service *service, const QAndroidIntent &intent)
+{
+	return service->onStartCommand(intent);
+}
+
+QAndroidBinder *ServiceBackend::onBind(Service *service, const QAndroidIntent &intent)
+{
+	return service->onBind(intent);
+}
+#endif

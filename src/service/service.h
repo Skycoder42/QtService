@@ -66,6 +66,7 @@ protected:
 	virtual void onCommand(int code);
 
 #ifdef Q_OS_ANDROID
+	virtual void onStartCommand(const QAndroidIntent &intent);
 	virtual QAndroidBinder *onBind(const QAndroidIntent &intent);
 #endif
 
