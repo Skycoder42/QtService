@@ -5,11 +5,10 @@ After=network-online.target echoservice.socket
 
 [Service]
 Type=notify
-NotifyAccess=main
+NotifyAccess=exec
 ExecStart=/path/to/echoservice --backend systemd
-ExecReload=/bin/kill -HUP $MAINPID
-#ExecReload=/path/to/echoservice --backend systemd reload $MAINPID
-#ExecStop=/path/to/echoservice --backend systemd stop $MAINPID
+ExecReload=/path/to/echoservice --backend systemd reload $MAINPID
+ExecStop=/path/to/echoservice --backend systemd stop $MAINPID
 WatchdogSec=10
 Restart=on-abnormal
 RuntimeDirectory=echoservice
