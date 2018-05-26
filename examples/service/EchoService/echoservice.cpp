@@ -2,6 +2,9 @@
 #include <QDebug>
 #include <QTcpSocket>
 #include <QTimer>
+#ifdef Q_OS_ANDROID
+#include <QtAndroidExtras>
+#endif
 
 EchoService::EchoService(int &argc, char **argv) :
 	Service(argc, argv)
@@ -11,6 +14,20 @@ bool EchoService::preStart()
 {
 	qDebug() << Q_FUNC_INFO;
 	qInfo() << "Service running with backend:" << backend();
+
+	addCallback("SIGUSR1", [](){
+		qDebug() << "SIGUSR1";
+	});
+	addCallback("SIGUSR2", [](){
+		qDebug() << "SIGUSR2";
+		return 42;
+	});
+#ifdef Q_OS_ANDROID
+	addCallback("onBind", [](const QAndroidIntent &intent) -> QAndroidBinder* {
+		return nullptr;
+	});
+#endif
+
 	return true;
 }
 
@@ -71,12 +88,6 @@ void EchoService::onResume()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->resumeAccepting();
-}
-
-QVariant EchoService::onCallback(const QByteArray &kind, const QVariantList &args)
-{
-	qDebug() << Q_FUNC_INFO << kind << args;
-	return {};
 }
 
 void EchoService::newConnection()

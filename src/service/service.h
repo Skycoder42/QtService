@@ -11,6 +11,7 @@
 #include <QtCore/qvariant.h>
 
 #include "QtService/qtservice_global.h"
+#include "QtService/qtservice_helpertypes.h"
 
 namespace QtService {
 
@@ -62,12 +63,21 @@ protected:
 	virtual void onResume();
 
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
-	//TODO add subclasses per platform with appropriate callbacks?
+
+	void addCallback(const QByteArray &kind, const std::function<QVariant(QVariantList)> &fn);
+	template <typename TFunction>
+	void addCallback(const QByteArray &kind, const TFunction &fn);
 
 private:
 	friend class QtService::ServiceBackend;
 	QScopedPointer<ServicePrivate> d;
 };
+
+template<typename TFunction>
+void Service::addCallback(const QByteArray &kind, const TFunction &fn)
+{
+	addCallback(kind, __helpertypes::pack_function(fn));
+}
 
 }
 

@@ -21,6 +21,7 @@ public:
 
 	QString backendProvider;
 	ServiceBackend *backend = nullptr;
+	QHash<QByteArray, std::function<QVariant(QVariantList)>> callbacks;
 
 	bool wasPaused = false;
 };

@@ -8,7 +8,8 @@ HEADERS += \
 	service.h \
 	service_p.h \
 	serviceplugin.h \
-	logging_p.h
+	logging_p.h \
+    qtservice_helpertypes.h
 
 SOURCES += \
 	service.cpp \

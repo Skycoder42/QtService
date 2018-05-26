@@ -110,14 +110,18 @@ void Service::onResume() {}
 
 QVariant Service::onCallback(const QByteArray &kind, const QVariantList &args)
 {
-	Q_UNUSED(args);
-	qCWarning(logQtService) << "Unhandeled callback of kind" << kind;
-	return {};
+	if(d->callbacks.contains(kind))
+		return d->callbacks[kind](args);
+	else {
+		qCWarning(logQtService) << "Unhandeled callback of kind" << kind;
+		return {};
+	}
 }
 
 void Service::addCallback(const QByteArray &kind, const std::function<QVariant (QVariantList)> &fn)
 {
-	Q_UNIMPLEMENTED();
+	Q_ASSERT_X(fn, Q_FUNC_INFO, "fn must be a valid function");
+	d->callbacks.insert(kind, fn);
 }
 
 Service::~Service() = default;
