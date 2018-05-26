@@ -1,18 +1,16 @@
 #ifndef QTSERVICE_SERVICE_H
 #define QTSERVICE_SERVICE_H
 
+#include <functional>
+
 #include <QtCore/qobject.h>
 #include <QtCore/qcoreapplication.h>
 #include <QtCore/qscopedpointer.h>
 #include <QtCore/qvector.h>
 #include <QtCore/qhash.h>
+#include <QtCore/qvariant.h>
 
 #include "QtService/qtservice_global.h"
-
-#ifdef Q_OS_ANDROID
-class QAndroidBinder;
-class QAndroidIntent;
-#endif
 
 namespace QtService {
 
@@ -63,12 +61,8 @@ protected:
 	virtual void onPause();
 	virtual void onResume();
 
-	virtual void onCommand(int code);
-
-#ifdef Q_OS_ANDROID
-	virtual void onStartCommand(const QAndroidIntent &intent);
-	virtual QAndroidBinder *onBind(const QAndroidIntent &intent);
-#endif
+	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
+	//TODO add subclasses per platform with appropriate callbacks?
 
 private:
 	friend class QtService::ServiceBackend;

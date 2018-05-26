@@ -2,7 +2,6 @@
 #include <QtCore/QEventLoop>
 #include <QtAndroidExtras/QAndroidService>
 #include <QtAndroidExtras/QtAndroid>
-#include <QtAndroidExtras/QAndroidIntent>
 #include <QtAndroidExtras/QAndroidJniExceptionCleaner>
 using namespace QtService;
 
@@ -13,9 +12,9 @@ AndroidServiceBackend::AndroidServiceBackend(QObject *parent) :
 int AndroidServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
 {
 	QAndroidService app(argc, argv,
-						std::bind(&ServiceBackend::onBind, service, std::placeholders::_1),
+						std::bind(&AndroidServiceBackend::onBind, this, std::placeholders::_1),
 						flags);
-	//TODO handle start commands (intents) as well
+	//TODO handle onStartCommand intents? -> copy from onbind
 	_service = service;
 	_javaService = QtAndroid::androidService();
 	if(!preStartService(_service))
@@ -28,22 +27,14 @@ int AndroidServiceBackend::runService(Service *service, int &argc, char **argv, 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::Service*, _service),
-							  Q_ARG(int, StartCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
 	return app.exec();
 }
 
 void AndroidServiceBackend::quitService()
 {
-	//TODO move to java class
 	QAndroidJniExceptionCleaner cleaner {QAndroidJniExceptionCleaner::OutputMode::Verbose};
-	_javaService.callMethod<void>("stopForeground", "(Z)V",
-								  static_cast<jboolean>(true));
-	auto svcClass = _javaService.callObjectMethod("getClass", "()Ljava/lang/Class;");
-	auto svcName = svcClass.callObjectMethod("getCanonicalName", "()Ljava/lang/String;");
-	auto svcNameData = svcName.toString().toUtf8();
-	QAndroidIntent intent { _javaService, svcNameData.constData()};
-	_javaService.callMethod<jboolean>("stopService", "(Landroid/content/Intent;)Z",
-									  intent.handle().object());
+	_javaService.callMethod<void>("stopSelf");
 }
 
 void AndroidServiceBackend::reloadService()
@@ -53,12 +44,18 @@ void AndroidServiceBackend::reloadService()
 
 void AndroidServiceBackend::onExit()
 {
+	QAndroidJniExceptionCleaner cleaner {QAndroidJniExceptionCleaner::OutputMode::Verbose};
 	QEventLoop exitLoop;
 	connect(_service, &Service::stopped,
 			&exitLoop, &QEventLoop::exit);
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::Service*, _service),
-							  Q_ARG(int, StopCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));
 	auto subRes = exitLoop.exec();
-	//TODO pass result to java class
+	_javaService.setField<jint>("_exitCode", subRes);
+}
+
+QAndroidBinder *AndroidServiceBackend::onBind(const QAndroidIntent &intent)
+{
+	return processServiceCallback<QAndroidBinder*>(_service, "onBind", intent);
 }

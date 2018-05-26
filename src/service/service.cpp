@@ -108,23 +108,17 @@ void Service::onPause() {}
 
 void Service::onResume() {}
 
-void Service::onCommand(int code)
+QVariant Service::onCallback(const QByteArray &kind, const QVariantList &args)
 {
-	qCWarning(logQtService) << "Unhandled command received:" << code;
+	Q_UNUSED(args);
+	qCWarning(logQtService) << "Unhandeled callback of kind" << kind;
+	return {};
 }
 
-#ifdef Q_OS_ANDROID
-void Service::onStartCommand(const QAndroidIntent &intent)
+void Service::addCallback(const QByteArray &kind, const std::function<QVariant (QVariantList)> &fn)
 {
-	Q_UNUSED(intent)
+	Q_UNIMPLEMENTED();
 }
-
-QAndroidBinder *Service::onBind(const QAndroidIntent &intent)
-{
-	Q_UNUSED(intent)
-	return nullptr;
-}
-#endif
 
 Service::~Service() = default;
 

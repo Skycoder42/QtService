@@ -19,6 +19,8 @@ protected:
 	void onPause() override;
 	void onResume() override;
 
+	QVariant onCallback(const QByteArray &kind, const QVariantList &args) override;
+
 private Q_SLOTS:
 	void newConnection();
 

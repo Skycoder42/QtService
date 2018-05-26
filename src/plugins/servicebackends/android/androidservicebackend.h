@@ -3,6 +3,8 @@
 
 #include <QtService/ServiceBackend>
 #include <QtAndroidExtras/QAndroidJniObject>
+#include <QtAndroidExtras/QAndroidBinder>
+#include <QtAndroidExtras/QAndroidIntent>
 
 class AndroidServiceBackend : public QtService::ServiceBackend
 {
@@ -21,6 +23,11 @@ private Q_SLOTS:
 private:
 	QtService::Service *_service = nullptr;
 	QAndroidJniObject _javaService;
+
+	QAndroidBinder* onBind(const QAndroidIntent &intent);
 };
+
+Q_DECLARE_METATYPE(QAndroidBinder*)
+Q_DECLARE_METATYPE(QAndroidIntent)
 
 #endif // ANDROIDSERVICEBACKEND_H

@@ -89,10 +89,10 @@ void SystemdServiceBackend::signalTriggered(int signal)
 		processServiceCommand(_service, ResumeCommand);
 		break;
 	case SIGUSR1:
-		processServiceCommand(_service, UserCommand + 1);
+		processServiceCallback(_service, "SIGUSR1");
 		break;
 	case SIGUSR2:
-		processServiceCommand(_service, UserCommand + 2);
+		processServiceCallback(_service, "SIGUSR2");
 		break;
 	default:
 		ServiceBackend::signalTriggered(signal);
@@ -136,7 +136,7 @@ int SystemdServiceBackend::run(int &argc, char **argv, int flags)
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::Service*, _service),
-							  Q_ARG(int, StartCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
 	return QCoreApplication::exec();
 }
 

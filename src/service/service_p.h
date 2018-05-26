@@ -21,6 +21,8 @@ public:
 
 	QString backendProvider;
 	ServiceBackend *backend = nullptr;
+
+	bool wasPaused = false;
 };
 
 }

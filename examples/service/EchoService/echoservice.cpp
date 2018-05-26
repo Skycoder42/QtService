@@ -73,6 +73,12 @@ void EchoService::onResume()
 	_server->resumeAccepting();
 }
 
+QVariant EchoService::onCallback(const QByteArray &kind, const QVariantList &args)
+{
+	qDebug() << Q_FUNC_INFO << kind << args;
+	return {};
+}
+
 void EchoService::newConnection()
 {
 	while(_server->hasPendingConnections()) {

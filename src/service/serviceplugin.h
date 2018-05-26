@@ -19,9 +19,7 @@ public:
 		StopCommand,
 		ReloadCommand,
 		PauseCommand,
-		ResumeCommand,
-
-		UserCommand = 0x1000
+		ResumeCommand
 	};
 	Q_ENUM(ServiceCommand)
 
@@ -36,18 +34,20 @@ public:
 protected Q_SLOTS:
 	virtual void signalTriggered(int signal);
 
-	void processServiceCommand(QtService::Service *service, int code);
+	void processServiceCommand(QtService::Service *service, QtService::ServiceBackend::ServiceCommand code);
+	QVariant processServiceCallbackImpl(QtService::Service *service, const QByteArray &kind, const QVariantList &args = {});
 
 protected:
+	template <typename TRet, typename... TArgs>
+	TRet processServiceCallback(QtService::Service *service, const QByteArray &kind, TArgs... args);
+	template <typename... TArgs>
+	void processServiceCallback(QtService::Service *service, const QByteArray &kind, TArgs... args);
+
 	bool registerForSignal(int signal);
 	bool unregisterFromSignal(int signal);
 
 	bool preStartService(Service *service);
-
-#ifdef Q_OS_ANDROID
-	static void onStartCommand(Service *service, const QAndroidIntent &intent);
-	static QAndroidBinder *onBind(Service *service, const QAndroidIntent &intent);
-#endif
+private:
 };
 
 class Q_SERVICE_EXPORT ServicePlugin
@@ -61,8 +61,22 @@ public:
 	virtual ServiceBackend *createInstance(const QString &provider, QObject *parent = nullptr) = 0;
 };
 
+template<typename TRet, typename... TArgs>
+TRet ServiceBackend::processServiceCallback(Service *service, const QByteArray &kind, TArgs... args)
+{
+	return processServiceCallbackImpl(service, kind, {QVariant::fromValue(args)...}).template value<TRet>();
 }
 
+template<typename... TArgs>
+void ServiceBackend::processServiceCallback(Service *service, const QByteArray &kind, TArgs... args)
+{
+	processServiceCallbackImpl(service, kind, {QVariant::fromValue(args)...});
+}
+
+
+}
+
+Q_DECLARE_METATYPE(QtService::ServiceBackend::ServiceCommand)
 #define QtService_ServicePlugin_Iid "de.skycoder42.QtService.ServicePlugin"
 Q_DECLARE_INTERFACE(QtService::ServicePlugin, QtService_ServicePlugin_Iid)
 
