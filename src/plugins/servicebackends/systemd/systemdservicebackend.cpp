@@ -203,7 +203,7 @@ void SystemdServiceBackend::systemdMessageHandler(QtMsgType type, const QMessage
 {
 	auto formattedMessage = qFormatLogMessage(type, context, message);
 
-	int priority = LOG_INFO; // Informational
+	int priority; // Informational
 	switch (type) {
 	case QtDebugMsg:
 		priority = LOG_DEBUG; // Debug-level messages
@@ -219,6 +219,9 @@ void SystemdServiceBackend::systemdMessageHandler(QtMsgType type, const QMessage
 		break;
 	case QtFatalMsg:
 		priority = LOG_ALERT; // Action must be taken immediately
+		break;
+	default:
+		Q_UNREACHABLE();
 		break;
 	}
 
