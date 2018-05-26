@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 SUBDIRS += standard
 unix:!android:!ios:system(pkg-config --exists libsystemd): SUBDIRS += systemd
 android: SUBDIRS += android
+windows: SUBDIRS += windows
 
 message("Building plugins: $$SUBDIRS")
 
