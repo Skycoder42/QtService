@@ -1,4 +1,5 @@
 #include "launchdservicebackend.h"
+#include <QtService/private/logging_p.h>
 #include <csignal>
 #include <unistd.h>
 #include <launch.h>
@@ -49,12 +50,25 @@ void LaunchdServiceBackend::reloadService()
 	processServiceCommand(ReloadCommand);
 }
 
-QHash<int, QByteArray> LaunchdServiceBackend::getActivatedSockets()
+QList<int> LaunchdServiceBackend::getActivatedSockets(const QByteArray &name)
 {
-//	int *fds;
-//	size_t cnt;
+	auto mName = name.isNull() ? QByteArrayLiteral("Listeners") : name;
+	if(!_socketCache.contains(mName)) {
+		int *fds = nullptr;
+		size_t cnt = 0;
+		int err = launch_activate_socket(mName.constData(), &fds, &cnt);
+		if(err != 0)
+			qCWarning(logQtService) << "Failed to get sockets with error:" << strerror(err);
+		else {
+			_socketCache.reserve(_socketCache.size() + static_cast<int>(cnt));
+			for(size_t i = 0; i < cnt; i++)
+				_socketCache.insert(mName, fds[i]);
+		}
+		if(fds)
+			free(fds);
+	}
 
-//	int err = launch_activate_socket(*handleName, &fds, &cnt);
+	return _socketCache.values(mName);
 }
 
 void LaunchdServiceBackend::signalTriggered(int signal)

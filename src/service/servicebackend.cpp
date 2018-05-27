@@ -20,12 +20,13 @@ ServiceBackend::ServiceBackend(Service *service) :
 			this, &ServiceBackend::onSvcPaused);
 }
 
-ServiceBackend::~ServiceBackend() = default;
-
-QHash<int, QByteArray> ServiceBackend::getActivatedSockets()
+QList<int> ServiceBackend::getActivatedSockets(const QByteArray &name)
 {
+	Q_UNUSED(name)
 	return {};
 }
+
+ServiceBackend::~ServiceBackend() = default;
 
 void ServiceBackend::signalTriggered(int signal)
 {

@@ -37,9 +37,8 @@ public:
 
 	static Service *instance();
 
+	QList<int> getSockets(const QByteArray &socketName);
 	int getSocket();
-	QList<int> getAllSockets();
-	QHash<int, QByteArray> getAllSocketsNamed();
 
 	QString backend() const;
 

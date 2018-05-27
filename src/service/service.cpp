@@ -54,24 +54,19 @@ Service *Service::instance()
 	return ServicePrivate::instance;
 }
 
+QList<int> Service::getSockets(const QByteArray &socketName)
+{
+	return d->backend->getActivatedSockets(socketName);
+}
+
 int Service::getSocket()
 {
-	const auto sockets = getAllSockets();
+	const auto sockets = getSockets({});
 	if(sockets.isEmpty())
 		return -1;
 	else if(sockets.size() > 1)
-		qCWarning(logQtService) << "Found" << sockets.size() << "activated sockets instead of just 1";
+		qCWarning(logQtService) << "Found" << sockets.size() << "default sockets - returning the first one only";
 	return sockets.first();
-}
-
-QList<int> Service::getAllSockets()
-{
-	return getAllSocketsNamed().keys();
-}
-
-QHash<int, QByteArray> Service::getAllSocketsNamed()
-{
-	return d->backend->getActivatedSockets();
 }
 
 QString Service::backend() const

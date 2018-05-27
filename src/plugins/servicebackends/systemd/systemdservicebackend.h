@@ -14,7 +14,7 @@ public:
 	int runService(int &argc, char **argv, int flags) override;
 	void quitService() override;
 	void reloadService() override;
-	QHash<int, QByteArray> getActivatedSockets() override;
+	QList<int> getActivatedSockets(const QByteArray &name) override;
 
 protected Q_SLOTS:
 	void signalTriggered(int signal) override;
@@ -28,6 +28,7 @@ private Q_SLOTS:
 
 private:
 	QTimer *_watchdogTimer = nullptr;
+	QMultiHash<QByteArray, int> _sockets;
 
 	int run(int &argc, char **argv, int flags);
 	int stop(int pid);

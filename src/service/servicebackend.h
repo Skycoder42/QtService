@@ -32,7 +32,7 @@ public:
 	virtual void quitService() = 0;
 	virtual void reloadService() = 0;
 
-	virtual QHash<int, QByteArray> getActivatedSockets();
+	virtual QList<int> getActivatedSockets(const QByteArray &name);
 
 protected Q_SLOTS:
 	virtual void signalTriggered(int signal);

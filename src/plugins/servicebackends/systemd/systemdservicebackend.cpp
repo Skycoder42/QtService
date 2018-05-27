@@ -47,26 +47,28 @@ void SystemdServiceBackend::reloadService()
 	processServiceCommand(ReloadCommand);
 }
 
-QHash<int, QByteArray> SystemdServiceBackend::getActivatedSockets()
+QList<int> SystemdServiceBackend::getActivatedSockets(const QByteArray &name)
 {
-	char **names = nullptr;
-	auto cnt = sd_listen_fds_with_names(false, &names);
-	if(cnt <= 0) {
+	if(_sockets.isEmpty()) {
+		char **names = nullptr;
+		auto cnt = sd_listen_fds_with_names(false, &names);
+		if(cnt > 0) {
+			_sockets.reserve(cnt);
+			for(auto i = 0; i < cnt; i++) {
+				QByteArray sockName;
+				if(names[i])
+					sockName = names[i];
+				_sockets.insert(sockName, SD_LISTEN_FDS_START + i);
+			}
+		}
 		if(names)
 			free(names);
-		return {};
 	}
 
-	QHash<int, QByteArray> sockets;
-	sockets.reserve(cnt);
-	for(auto i = 0; i < cnt; i++) {
-		QByteArray name;
-		if(names[i])
-			name = names[i];
-		sockets.insert(SD_LISTEN_FDS_START + i, name);
-	}
-	free(names);
-	return sockets;
+	if(name.isNull())
+		return _sockets.isEmpty() ? QList<int>{} : QList<int>{SD_LISTEN_FDS_START};
+	else
+		return _sockets.values(name);
 }
 
 void SystemdServiceBackend::signalTriggered(int signal)
