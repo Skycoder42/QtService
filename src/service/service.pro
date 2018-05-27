@@ -9,11 +9,13 @@ HEADERS += \
 	service_p.h \
 	serviceplugin.h \
 	logging_p.h \
-    qtservice_helpertypes.h
+	qtservice_helpertypes.h \
+    servicebackend.h \
+    servicebackend_p.h
 
 SOURCES += \
 	service.cpp \
-	serviceplugin.cpp
+    servicebackend.cpp
 
 MODULE_PLUGIN_TYPES = servicebackends
 load(qt_module)
@@ -28,3 +30,5 @@ win32 {
 
 !ReleaseBuild:!DebugBuild:!system(qpmx -d $$shell_quote($$_PRO_FILE_PWD_) --qmake-run init $$QPMX_EXTRA_OPTIONS $$shell_quote($$QMAKE_QMAKE) $$shell_quote($$OUT_PWD)): error(qpmx initialization failed. Check the compilation log for details.)
 else: include($$OUT_PWD/qpmx_generated.pri)
+
+mingw: LIBS_PRIVATE += -lQt5Network -lQt5Core

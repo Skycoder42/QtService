@@ -12,7 +12,7 @@ class SystemdServicePlugin : public QObject, public QtService::ServicePlugin
 public:
 	SystemdServicePlugin(QObject *parent = nullptr);
 
-	QtService::ServiceBackend *createInstance(const QString &provider, QObject *parent) override;
+	QtService::ServiceBackend *createInstance(const QString &provider, QtService::Service *service) override;
 };
 
 #endif // SYSTEMDSERVICEPLUGIN_H

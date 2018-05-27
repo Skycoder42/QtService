@@ -23,6 +23,7 @@ struct fn_info<TRet(TClass::*)(TArgs...) const>
 	template <typename TFunctor, std::size_t... Is>
 	static inline std::function<QVariant(QVariantList)> pack(const std::index_sequence<Is...> &, const TFunctor &fn) {
 		return [fn](const QVariantList &args) {
+			Q_UNUSED(args)
 			return QVariant::fromValue<TRet>(fn(args[Is].template value<TArgs>()...));
 		};
 	}
@@ -39,6 +40,7 @@ struct fn_info<void(TClass::*)(TArgs...) const>
 	template <typename TFunctor, std::size_t... Is>
 	static inline std::function<QVariant(QVariantList)> pack(const std::index_sequence<Is...> &, const TFunctor &fn) {
 		return [fn](const QVariantList &args) {
+			Q_UNUSED(args)
 			fn(args[Is].template value<TArgs>()...);
 			return QVariant{};
 		};

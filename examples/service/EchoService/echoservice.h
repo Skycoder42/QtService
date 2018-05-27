@@ -16,8 +16,8 @@ protected:
 	CommandMode onStart() override;
 	CommandMode onStop(int &exitCode) override;
 	CommandMode onReload() override;
-	void onPause() override;
-	void onResume() override;
+	CommandMode onPause() override;
+	CommandMode onResume() override;
 
 private Q_SLOTS:
 	void newConnection();

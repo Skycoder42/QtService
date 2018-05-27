@@ -12,7 +12,7 @@ class StandardServicePlugin : public QObject, public QtService::ServicePlugin
 public:
 	StandardServicePlugin(QObject *parent = nullptr);
 
-	QtService::ServiceBackend *createInstance(const QString &provider, QObject *parent) override;
+	QtService::ServiceBackend *createInstance(const QString &provider, QtService::Service *service) override;
 };
 
 #endif // STANDARDSERVICEPLUGIN_H

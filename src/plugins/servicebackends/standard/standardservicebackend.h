@@ -9,17 +9,17 @@ class StandardServiceBackend : public QtService::ServiceBackend
 	Q_OBJECT
 
 public:
-	explicit StandardServiceBackend(QObject *parent = nullptr);
+	explicit StandardServiceBackend(QtService::Service *service);
 
-	int runService(QtService::Service *service, int &argc, char **argv, int flags) override;
+	int runService(int &argc, char **argv, int flags) override;
 	void quitService() override;
 	void reloadService() override;
 
 protected Q_SLOTS:
 	void signalTriggered(int signal) override;
 
-private:
-	QPointer<QtService::Service> _service; //TODO move to baseclass with "pre-start-setter" + simplify methods
+private Q_SLOTS:
+	void onPaused();
 };
 
 #endif // STANDARDSERVICEBACKEND_H

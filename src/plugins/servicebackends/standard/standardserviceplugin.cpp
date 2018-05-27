@@ -5,10 +5,10 @@ StandardServicePlugin::StandardServicePlugin(QObject *parent) :
 	QObject{parent}
 {}
 
-QtService::ServiceBackend *StandardServicePlugin::createInstance(const QString &provider, QObject *parent)
+QtService::ServiceBackend *StandardServicePlugin::createInstance(const QString &provider, QtService::Service *service)
 {
 	if(provider == QStringLiteral("standard"))
-		return new StandardServiceBackend(parent);
+		return new StandardServiceBackend{service};
 	else
 		return nullptr;
 }

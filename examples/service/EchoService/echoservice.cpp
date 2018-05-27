@@ -78,16 +78,18 @@ QtService::Service::CommandMode EchoService::onReload()
 	return Synchronous;
 }
 
-void EchoService::onPause()
+QtService::Service::CommandMode EchoService::onPause()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->pauseAccepting();
+	return Synchronous;
 }
 
-void EchoService::onResume()
+QtService::Service::CommandMode EchoService::onResume()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->resumeAccepting();
+	return Synchronous;
 }
 
 void EchoService::newConnection()

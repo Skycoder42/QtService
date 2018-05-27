@@ -42,7 +42,7 @@ int Service::exec()
 			qCCritical(logQtService) << "No backend found for the name" << provider;
 			return EXIT_FAILURE;
 		}
-		return d->backend->runService(this, d->argc, d->argv, d->flags);
+		return d->backend->runService(d->argc, d->argv, d->flags);
 	} catch(QPluginLoadException &e) {
 		qCCritical(logQtService) << "Failed to load backend" << provider << "with error:" << e.what();
 		return EXIT_FAILURE;
@@ -104,9 +104,15 @@ Service::CommandMode Service::onReload()
 	return Synchronous;
 }
 
-void Service::onPause() {}
+Service::CommandMode Service::onPause()
+{
+	return Synchronous;
+}
 
-void Service::onResume() {}
+Service::CommandMode Service::onResume()
+{
+	return Synchronous;
+}
 
 QVariant Service::onCallback(const QByteArray &kind, const QVariantList &args)
 {

@@ -41,15 +41,16 @@
 ****************************************************************************/
 #include "windowsservicebackend.h"
 #include <iostream>
+#include <QtCore/QFileInfo>
 #include <QtService/private/logging_p.h>
 using namespace QtService;
 
-#define SERVICE_CONTROL_START 256
+#define SVCNAME const_cast<wchar_t*>(reinterpret_cast<const wchar_t*>(QCoreApplication::applicationName().utf16()))
 
 QPointer<WindowsServiceBackend> WindowsServiceBackend::_backendInstance;
 
-WindowsServiceBackend::WindowsServiceBackend(QObject *parent) :
-	ServiceBackend(parent)
+WindowsServiceBackend::WindowsServiceBackend(Service *service) :
+	ServiceBackend{service}
 {
 	Q_ASSERT_X(!_backendInstance, Q_FUNC_INFO, "There can always be only a single backend!");
 	_backendInstance = this;
@@ -62,12 +63,15 @@ WindowsServiceBackend::WindowsServiceBackend(QObject *parent) :
 	_status.dwServiceSpecificExitCode = EXIT_SUCCESS;
 }
 
-int WindowsServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
+int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	Q_UNUSED(argc)
 	Q_UNUSED(argv)
 	qInstallMessageHandler(WindowsServiceBackend::winsvcMessageHandler);
-	_service = service;
+
+	// if not set: get the app name from it's basename
+	if(!QCoreApplication::applicationName().isEmpty())
+		QCoreApplication::setApplicationName(QFileInfo{QString::fromUtf8(argv[0])}.completeBaseName());
 
 	// start handler and wait for service init
 	SvcControlThread controlThread{this};
@@ -88,13 +92,15 @@ int WindowsServiceBackend::runService(Service *service, int &argc, char **argv, 
 	// create and prepare the coreapp
 	QCoreApplication app(sArgc, sArgv.data(), flags);
 	app.installNativeEventFilter(new SvcEventFilter{});
-	if(!preStartService(_service))
+	if(!preStartService())
 		return EXIT_FAILURE; //TODO implement correctly
-	connect(_service, &Service::started,
-			this, [this](){
-		setStatus(SERVICE_RUNNING);
-	});
-	connect(_service, &Service::stopped,
+	connect(service(), &Service::started,
+			this, &WindowsServiceBackend::onRunning);
+	connect(service(), &Service::paused,
+			this, &WindowsServiceBackend::onPaused);
+	connect(service(), &Service::resumed,
+			this, &WindowsServiceBackend::onRunning);
+	connect(service(), &Service::stopped,
 			qApp, &QCoreApplication::exit);
 
 	lock.relock();
@@ -123,13 +129,22 @@ void WindowsServiceBackend::quitService()
 {
 	setStatus(SERVICE_STOP_PENDING);
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::Service*, _service),
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));
 }
 
 void WindowsServiceBackend::reloadService()
 {
-	processServiceCommand(_service, ReloadCommand);
+	processServiceCommand(ReloadCommand);
+}
+
+void WindowsServiceBackend::onRunning()
+{
+	setStatus(SERVICE_RUNNING);
+}
+
+void WindowsServiceBackend::onPaused()
+{
+	setStatus(SERVICE_PAUSED);
 }
 
 void WindowsServiceBackend::setStatus(DWORD status)
@@ -157,12 +172,14 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 	// wait for the mainthread to finish startup, then register the service handler
 	lock.relock();
 	_backendInstance->_startCondition.wakeAll();
-	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(_backendInstance->_svcName, WindowsServiceBackend::handler);
+	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(SVCNAME, WindowsServiceBackend::handler);
 	lock.unlock();
 
 	// handle the start event
 	Q_ASSERT(_backendInstance->_statusHandle);
-	handler(SERVICE_CONTROL_START);
+	_backendInstance->setStatus(SERVICE_START_PENDING);
+	QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
 }
 
 void WindowsServiceBackend::handler(DWORD dwOpcode)
@@ -172,12 +189,6 @@ void WindowsServiceBackend::handler(DWORD dwOpcode)
 		return;
 
 	switch (dwOpcode) {
-	case SERVICE_CONTROL_START:
-		_backendInstance->setStatus(SERVICE_START_PENDING);
-		QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
-								  Q_ARG(QtService::Service*, _backendInstance->_service),
-								  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
-		break;
 	case SERVICE_CONTROL_STOP:
 	case SERVICE_CONTROL_SHUTDOWN:
 		_backendInstance->quitService();
@@ -185,16 +196,12 @@ void WindowsServiceBackend::handler(DWORD dwOpcode)
 	case SERVICE_CONTROL_PAUSE:
 		_backendInstance->setStatus(SERVICE_PAUSE_PENDING);
 		QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
-								  Q_ARG(QtService::Service*, _backendInstance->_service),
 								  Q_ARG(QtService::ServiceBackend::ServiceCommand, PauseCommand));
-		//TODO update status after done
 		break;
 	case SERVICE_CONTROL_CONTINUE:
 		_backendInstance->setStatus(SERVICE_CONTINUE_PENDING);
 		QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
-								  Q_ARG(QtService::Service*, _backendInstance->_service),
 								  Q_ARG(QtService::ServiceBackend::ServiceCommand, ResumeCommand));
-		//TODO update status after done
 		break;
 	default:
 		if (dwOpcode >= 128 && dwOpcode <= 255) {
@@ -209,7 +216,7 @@ void WindowsServiceBackend::handler(DWORD dwOpcode)
 void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
 {
 	auto msg = qFormatLogMessage(type, context, message);
-	auto h = RegisterEventSourceW(0, _backendInstance->_svcName);
+	auto h = RegisterEventSourceW(0, SVCNAME);
 	if(h) {
 		WORD wType;
 		switch (type) {
@@ -258,12 +265,14 @@ void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageL
 WindowsServiceBackend::SvcControlThread::SvcControlThread(WindowsServiceBackend *backend) :
 	QThread(),
 	_backend{backend}
-{}
+{
+	setTerminationEnabled(true);
+}
 
 void WindowsServiceBackend::SvcControlThread::run()
 {
 	SERVICE_TABLE_ENTRYW st[2];
-	st[0].lpServiceName = _backend->_svcName; //TODO use real name (!!!). also: set description!!!
+	st[0].lpServiceName = SVCNAME;
 	st[0].lpServiceProc = WindowsServiceBackend::serviceMain;
 	st[1].lpServiceName = 0;
 	st[1].lpServiceProc = 0;

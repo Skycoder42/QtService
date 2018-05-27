@@ -5,19 +5,18 @@
 #include <QtAndroidExtras/QAndroidJniExceptionCleaner>
 using namespace QtService;
 
-AndroidServiceBackend::AndroidServiceBackend(QObject *parent) :
-	ServiceBackend{parent}
+AndroidServiceBackend::AndroidServiceBackend(Service *service) :
+	ServiceBackend{service}
 {}
 
-int AndroidServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
+int AndroidServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	QAndroidService app(argc, argv,
 						std::bind(&AndroidServiceBackend::onBind, this, std::placeholders::_1),
 						flags);
 	//TODO handle onStartCommand intents? -> copy from onbind
-	_service = service;
 	_javaService = QtAndroid::androidService();
-	if(!preStartService(_service))
+	if(!preStartService())
 		return EXIT_FAILURE;
 
 	connect(qApp, &QCoreApplication::aboutToQuit,
@@ -26,7 +25,6 @@ int AndroidServiceBackend::runService(Service *service, int &argc, char **argv, 
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::Service*, _service),
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
 	return app.exec();
 }
@@ -39,17 +37,16 @@ void AndroidServiceBackend::quitService()
 
 void AndroidServiceBackend::reloadService()
 {
-	processServiceCommand(_service, ReloadCommand);
+	processServiceCommand(ReloadCommand);
 }
 
 void AndroidServiceBackend::onExit()
 {
 	QAndroidJniExceptionCleaner cleaner {QAndroidJniExceptionCleaner::OutputMode::Verbose};
 	QEventLoop exitLoop;
-	connect(_service, &Service::stopped,
+	connect(service(), &Service::stopped,
 			&exitLoop, &QEventLoop::exit);
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::Service*, _service),
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));
 	auto subRes = exitLoop.exec();
 	_javaService.setField<jint>("_exitCode", subRes);
@@ -57,5 +54,5 @@ void AndroidServiceBackend::onExit()
 
 QAndroidBinder *AndroidServiceBackend::onBind(const QAndroidIntent &intent)
 {
-	return processServiceCallback<QAndroidBinder*>(_service, "onBind", intent);
+	return processServiceCallback<QAndroidBinder*>("onBind", intent);
 }

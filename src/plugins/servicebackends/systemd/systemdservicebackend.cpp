@@ -11,15 +11,13 @@
 
 using namespace QtService;
 
-SystemdServiceBackend::SystemdServiceBackend(QObject *parent) :
-	ServiceBackend{parent}
+SystemdServiceBackend::SystemdServiceBackend(Service *service) :
+	ServiceBackend{service}
 {}
 
-int SystemdServiceBackend::runService(QtService::Service *service, int &argc, char **argv, int flags)
+int SystemdServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	qInstallMessageHandler(SystemdServiceBackend::systemdMessageHandler);
-	_service = service;
-
 	try {
 		auto pid = 0;
 		if(findArg("stop", argc, argv, pid))
@@ -36,17 +34,17 @@ int SystemdServiceBackend::runService(QtService::Service *service, int &argc, ch
 
 void SystemdServiceBackend::quitService()
 {
-	connect(_service, &Service::stopped,
+	connect(service(), &Service::stopped,
 			this, &SystemdServiceBackend::onStopped,
 			Qt::UniqueConnection);
 	sd_notify(false, "STOPPING=1");
-	processServiceCommand(_service, StopCommand);
+	processServiceCommand(StopCommand);
 }
 
 void SystemdServiceBackend::reloadService()
 {
 	sd_notify(false, "RELOADING=1");
-	processServiceCommand(_service, ReloadCommand);
+	processServiceCommand(ReloadCommand);
 }
 
 QHash<int, QByteArray> SystemdServiceBackend::getActivatedSockets()
@@ -83,16 +81,16 @@ void SystemdServiceBackend::signalTriggered(int signal)
 		reloadService();
 		break;
 	case SIGTSTP:
-		processServiceCommand(_service, PauseCommand);
+		processServiceCommand(PauseCommand);
 		break;
 	case SIGCONT:
-		processServiceCommand(_service, ResumeCommand);
+		processServiceCommand(ResumeCommand);
 		break;
 	case SIGUSR1:
-		processServiceCallback(_service, "SIGUSR1");
+		processServiceCallback("SIGUSR1");
 		break;
 	case SIGUSR2:
-		processServiceCallback(_service, "SIGUSR2");
+		processServiceCallback("SIGUSR2");
 		break;
 	default:
 		ServiceBackend::signalTriggered(signal);
@@ -117,25 +115,32 @@ void SystemdServiceBackend::onStopped(int exitCode)
 	qApp->exit(exitCode);
 }
 
+void SystemdServiceBackend::onPaused()
+{
+	kill(getpid(), SIGSTOP); //now actually stop
+}
+
 int SystemdServiceBackend::run(int &argc, char **argv, int flags)
 {
 	//prepare the app
 	QCoreApplication app{argc, argv, flags};
 	prepareWatchdog(); //do as early as possible
-	if(!preStartService(_service))
+	if(!preStartService())
 		return EXIT_FAILURE;
 
-	connect(_service, &Service::started,
+	connect(service(), &Service::started,
 			this, &SystemdServiceBackend::onReady);
-	connect(_service, &Service::reloaded,
+	connect(service(), &Service::reloaded,
 			this, &SystemdServiceBackend::onReady);
+	connect(service(), &Service::paused,
+			this, &SystemdServiceBackend::onPaused,
+			Qt::QueuedConnection);
 
 	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2})
 		registerForSignal(signal);
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::Service*, _service),
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
 	return QCoreApplication::exec();
 }

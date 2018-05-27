@@ -3,14 +3,15 @@
 #include <qt_windows.h>
 #else
 #include <csignal>
+#include <unistd.h>
 #endif
 using namespace QtService;
 
-StandardServiceBackend::StandardServiceBackend(QObject *parent) :
-	ServiceBackend(parent)
+StandardServiceBackend::StandardServiceBackend(Service *service) :
+	ServiceBackend{service}
 {}
 
-int StandardServiceBackend::runService(Service *service, int &argc, char **argv, int flags)
+int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	//setup logging
 #ifdef Q_OS_WIN
@@ -34,9 +35,12 @@ int StandardServiceBackend::runService(Service *service, int &argc, char **argv,
 #endif
 
 	QCoreApplication app(argc, argv, flags);
-	_service = service;
-	if(!preStartService(_service))
+	if(!preStartService())
 		return EXIT_FAILURE;
+
+	connect(service(), &Service::paused,
+			this, &StandardServiceBackend::onPaused,
+			Qt::QueuedConnection);
 
 #ifdef Q_OS_WIN
 	for(const auto signal : {CTRL_C_EVENT, CTRL_BREAK_EVENT}) {
@@ -48,22 +52,21 @@ int StandardServiceBackend::runService(Service *service, int &argc, char **argv,
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::Service*, _service),
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
 	return app.exec();
 }
 
 void StandardServiceBackend::quitService()
 {
-	connect(_service, &Service::stopped,
+	connect(service(), &Service::stopped,
 			qApp, &QCoreApplication::exit,
 			Qt::UniqueConnection);
-	processServiceCommand(_service, StopCommand);
+	processServiceCommand(StopCommand);
 }
 
 void StandardServiceBackend::reloadService()
 {
-	processServiceCommand(_service, ReloadCommand);
+	processServiceCommand(ReloadCommand);
 }
 
 void StandardServiceBackend::signalTriggered(int signal)
@@ -84,16 +87,16 @@ void StandardServiceBackend::signalTriggered(int signal)
 		reloadService();
 		break;
 	case SIGTSTP:
-		processServiceCommand(_service, PauseCommand);
+		processServiceCommand(PauseCommand);
 		break;
 	case SIGCONT:
-		processServiceCommand(_service, ResumeCommand);
+		processServiceCommand(ResumeCommand);
 		break;
 	case SIGUSR1:
-		processServiceCallback(_service, "SIGUSR1");
+		processServiceCallback("SIGUSR1");
 		break;
 	case SIGUSR2:
-		processServiceCallback(_service, "SIGUSR2");
+		processServiceCallback("SIGUSR2");
 		break;
 #endif
 	default:
@@ -101,3 +104,11 @@ void StandardServiceBackend::signalTriggered(int signal)
 		break;
 	}
 }
+
+void StandardServiceBackend::onPaused()
+{
+#ifdef Q_OS_UNIX
+	kill(getpid(), SIGSTOP); //now actually stop
+#endif
+}
+

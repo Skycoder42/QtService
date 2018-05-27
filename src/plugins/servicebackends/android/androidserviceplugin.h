@@ -12,7 +12,7 @@ class AndroidServicePlugin : public QObject, public QtService::ServicePlugin
 public:
 	AndroidServicePlugin(QObject *parent = nullptr);
 
-	QtService::ServiceBackend *createInstance(const QString &provider, QObject *parent) override;
+	QtService::ServiceBackend *createInstance(const QString &provider, QtService::Service *service) override;
 };
 
 #endif // ANDROIDSERVICEPLUGIN_H

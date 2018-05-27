@@ -51,6 +51,8 @@ Q_SIGNALS:
 	void started();
 	void stopped(int exitCode);
 	void reloaded();
+	void paused();
+	void resumed();
 
 protected:
 	virtual bool preStart();
@@ -58,9 +60,8 @@ protected:
 	virtual CommandMode onStart() = 0;
 	virtual CommandMode onStop(int &exitCode);
 	virtual CommandMode onReload();
-
-	virtual void onPause();
-	virtual void onResume();
+	virtual CommandMode onPause();
+	virtual CommandMode onResume();
 
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
 

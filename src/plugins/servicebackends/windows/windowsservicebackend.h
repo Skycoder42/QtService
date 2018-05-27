@@ -16,11 +16,15 @@ class WindowsServiceBackend : public QtService::ServiceBackend
 	Q_OBJECT
 
 public:
-	explicit WindowsServiceBackend(QObject *parent = nullptr);
+	explicit WindowsServiceBackend(QtService::Service *service);
 
-	int runService(QtService::Service *service, int &argc, char **argv, int flags) override;
+	int runService(int &argc, char **argv, int flags) override;
 	void quitService() override;
 	void reloadService() override;
+
+private Q_SLOTS:
+	void onRunning();
+	void onPaused();
 
 private:
 	class SvcControlThread : public QThread
@@ -42,8 +46,6 @@ private:
 
 	static QPointer<WindowsServiceBackend> _backendInstance;
 
-	QtService::Service *_service;
-
 	QMutex _svcLock;
 	QWaitCondition _startCondition;
 
@@ -51,7 +53,6 @@ private:
 	SERVICE_STATUS_HANDLE _statusHandle = nullptr;
 
 	//temporary stuff
-	wchar_t *_svcName = const_cast<wchar_t*>(L"QtService");
 	QByteArrayList _svcArgs;
 
 	void setStatus(DWORD status);

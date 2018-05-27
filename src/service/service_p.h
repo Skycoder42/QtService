@@ -4,7 +4,7 @@
 #include <QtCore/QPointer>
 
 #include "service.h"
-#include "serviceplugin.h"
+#include "servicebackend.h"
 
 namespace QtService {
 
