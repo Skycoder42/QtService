@@ -23,4 +23,6 @@ mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../lib\''
 
 DISTFILES += \
 	echoservice.service \
-	echoservice.socket
+	echoservice.socket \
+    scinstall.bat \
+    echoservice.plist
