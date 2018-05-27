@@ -7,7 +7,7 @@ LaunchdServicePlugin::LaunchdServicePlugin(QObject *parent) :
 
 QtService::ServiceBackend *LaunchdServicePlugin::createInstance(const QString &provider, QtService::Service *service)
 {
-	if(provider == QStringLiteral("standard"))
+	if(provider == QStringLiteral("launchd"))
 		return new LaunchdServiceBackend{service};
 	else
 		return nullptr;
