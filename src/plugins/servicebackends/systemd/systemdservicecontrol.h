@@ -14,7 +14,7 @@ public:
 	SupportFlags supportFlags() const override;
 	bool serviceExists() const override;
 	ServiceStatus status() const override;
-	bool isEnabled() const override;
+	bool isAutostartEnabled() const override;
 
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
 
@@ -22,8 +22,8 @@ public slots:
 	bool start() override;
 	bool stop() override;
 	bool reload() override;
-	bool enable() override;
-	bool disable() override;
+	bool enableAutostart() override;
+	bool disableAutostart() override;
 
 protected:
 	QString serviceName() const override;

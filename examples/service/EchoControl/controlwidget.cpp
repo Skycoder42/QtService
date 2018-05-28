@@ -58,9 +58,10 @@ void ControlWidget::on_loadButton_clicked()
 		ui->bLockingCheckBox->setChecked(false);
 	else
 		ui->bLockingCheckBox->setCheckState(Qt::PartiallyChecked);
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsEnableDisable))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportsGetAutostart))
+		ui->enabledCheckBox->setChecked(_control->isAutostartEnabled());
+	if(_control->supportFlags().testFlag(ServiceControl::SupportsSetAutostart))
 		ui->enabledCheckBox->setEnabled(true);
-	ui->enabledCheckBox->setChecked(_control->isEnabled());
 
 	if(_control->supportFlags().testFlag(ServiceControl::SupportsStatus)) {
 		ui->actionReload->setEnabled(true);
@@ -113,6 +114,8 @@ void ControlWidget::setStatus()
 		return;
 	auto metaEnum = QMetaEnum::fromType<ServiceControl::ServiceStatus>();
 	ui->statusLineEdit->setText(QString::fromUtf8(metaEnum.valueToKey(static_cast<int>(_control->status()))));
+	if(_control->supportFlags().testFlag(ServiceControl::SupportsGetAutostart))
+		ui->enabledCheckBox->setChecked(_control->isAutostartEnabled());
 }
 
 void ControlWidget::on_bLockingCheckBox_clicked(bool checked)
@@ -126,7 +129,7 @@ void ControlWidget::on_enabledCheckBox_clicked(bool checked)
 {
 	if(!_control)
 		return;
-	_control->setEnabled(checked);
+	_control->setAutostartEnabled(checked);
 }
 
 void ControlWidget::on_startButton_clicked()

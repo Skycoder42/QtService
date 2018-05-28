@@ -23,7 +23,7 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 
 	Q_PROPERTY(bool serviceExists READ serviceExists)
 	Q_PROPERTY(ServiceStatus status READ status)
-	Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled)
+	Q_PROPERTY(bool autostartEnabled READ isAutostartEnabled WRITE setAutostartEnabled)
 
 public:
 	enum SupportFlag {
@@ -32,8 +32,8 @@ public:
 		SupportsPause = 0x0004,
 		SupportsResume = 0x0008,
 		SupportsReload = 0x0010,
-		SupportsEnable = 0x0020,
-		SupportsDisable = 0x0040,
+		SupportsGetAutostart = 0x0020,
+		SupportsSetAutostart = 0x0040,
 		SupportsBlocking = 0x0080,
 		SupportsNonBlocking = 0x0100,
 
@@ -42,7 +42,7 @@ public:
 
 		SupportsStartStop = (SupportsStart | SupportsStop),
 		SupportsPauseResume = (SupportsPause | SupportsResume),
-		SupportsEnableDisable = (SupportsEnable | SupportsDisable),
+		SupportsAutostart = (SupportsGetAutostart | SupportsSetAutostart),
 		SupportsBlockingNonBlocking = (SupportsBlocking | SupportsNonBlocking)
 	};
 	Q_DECLARE_FLAGS(SupportFlags, SupportFlag)
@@ -75,7 +75,7 @@ public:
 	bool isBlocking() const;
 	virtual bool serviceExists() const = 0;
 	virtual ServiceStatus status() const;
-	virtual bool isEnabled() const;
+	virtual bool isAutostartEnabled() const;
 
 	virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args);
 	template <typename TRet, typename... TArgs>
@@ -92,11 +92,11 @@ public Q_SLOTS:
 
 	virtual bool reload();
 
-	virtual bool enable();
-	virtual bool disable();
+	virtual bool enableAutostart();
+	virtual bool disableAutostart();
 
 	void setBlocking(bool blocking);
-	bool setEnabled(bool enabled);
+	bool setAutostartEnabled(bool enabled);
 
 Q_SIGNALS:
 	void blockingChanged(bool blocking, QPrivateSignal);

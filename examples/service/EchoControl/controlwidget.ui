@@ -95,7 +95,7 @@
    <item row="5" column="0">
     <widget class="QLabel" name="enabledLabel">
      <property name="text">
-      <string>&amp;Enabled:</string>
+      <string>&amp;Autostart:</string>
      </property>
      <property name="buddy">
       <cstring>enabledCheckBox</cstring>

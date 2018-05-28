@@ -20,7 +20,7 @@ ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 {
 	return SupportsStartStop |
 			SupportsReload |
-			SupportsEnableDisable |
+			SupportsAutostart |
 			SupportsStatus |
 			SupportsCustomCommands |
 			SupportsBlockingNonBlocking;
@@ -87,7 +87,7 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 	return ServiceStatusUnknown;
 }
 
-bool SystemdServiceControl::isEnabled() const
+bool SystemdServiceControl::isAutostartEnabled() const
 {
 	return runSystemctl("is-enabled") == EXIT_SUCCESS;
 }
@@ -116,12 +116,12 @@ bool SystemdServiceControl::reload()
 	return runSystemctl("reload") == EXIT_SUCCESS;
 }
 
-bool SystemdServiceControl::enable()
+bool SystemdServiceControl::enableAutostart()
 {
 	return runSystemctl("enable") == EXIT_SUCCESS;
 }
 
-bool SystemdServiceControl::disable()
+bool SystemdServiceControl::disableAutostart()
 {
 	return runSystemctl("disable") == EXIT_SUCCESS;
 }

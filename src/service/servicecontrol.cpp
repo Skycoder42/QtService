@@ -34,7 +34,7 @@ ServiceControl::ServiceStatus ServiceControl::status() const
 	return ServiceStatusUnknown;
 }
 
-bool ServiceControl::isEnabled() const
+bool ServiceControl::isAutostartEnabled() const
 {
 	return false;
 }
@@ -77,13 +77,13 @@ bool ServiceControl::reload()
 	return false;
 }
 
-bool ServiceControl::enable()
+bool ServiceControl::enableAutostart()
 {
 	qCWarning(logQtService) << "Operation enable is not implemented with backend" << backend();
 	return false;
 }
 
-bool ServiceControl::disable()
+bool ServiceControl::disableAutostart()
 {
 	qCWarning(logQtService) << "Operation disable is not implemented with backend" << backend();
 	return false;
@@ -98,12 +98,12 @@ void ServiceControl::setBlocking(bool blocking)
 	emit blockingChanged(d->blocking, {});
 }
 
-bool ServiceControl::setEnabled(bool enabled)
+bool ServiceControl::setAutostartEnabled(bool enabled)
 {
 	if(enabled)
-		return enable();
+		return enableAutostart();
 	else
-		return disable();
+		return disableAutostart();
 }
 
 QString ServiceControl::serviceName() const
