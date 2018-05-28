@@ -5,13 +5,17 @@ QT -= gui
 
 HEADERS += \
 	standardservicebackend.h \
-	standardserviceplugin.h
+	standardserviceplugin.h \
+	standardservicecontrol.h
 
 SOURCES += \
 	standardservicebackend.cpp \
-	standardserviceplugin.cpp
+	standardserviceplugin.cpp \
+	standardservicecontrol.cpp
 
 DISTFILES += standard.json
+
+win32: LIBS += kernel32
 
 PLUGIN_TYPE = servicebackends
 PLUGIN_EXTENDS = service

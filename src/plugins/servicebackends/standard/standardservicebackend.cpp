@@ -42,9 +42,11 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 
 	// create lock
 	QLockFile lock{service()->runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock"))};
+	lock.setStaleLockTime(std::numeric_limits<int>::max()); //disable stale locks
 	if(!lock.tryLock(5000)) {
-		qCCritical(logQtService).noquote() << "Failed to create service lock in:"
-										   << service()->runtimeDir().absolutePath();
+		qCCritical(logQtService) << "Failed to create service lock in"
+								 << service()->runtimeDir().absolutePath()
+								 << "with error code:" << lock.error();
 		qint64 pid = 0;
 		QString hostname, appname;
 		if(lock.getLockInfo(&pid, &hostname, &appname)) {

@@ -12,7 +12,8 @@ class WindowsServicePlugin : public QObject, public QtService::ServicePlugin
 public:
 	WindowsServicePlugin(QObject *parent = nullptr);
 
-	QtService::ServiceBackend *createInstance(const QString &provider, QtService::Service *service) override;
+	QtService::ServiceBackend *createServiceBackend(const QString &provider, QtService::Service *service) override;
+	QtService::ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) override;
 };
 
 #endif // WINDOWSSERVICEPLUGIN_H

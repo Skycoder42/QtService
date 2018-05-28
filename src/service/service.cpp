@@ -8,10 +8,39 @@
 #ifdef Q_OS_UNIX
 #include <unistd.h>
 #endif
+
+namespace {
+
+class PluginObjectFactory : public QPluginFactory<QtService::ServicePlugin>
+{
+public:
+	PluginObjectFactory(const QString &pluginType, QObject *parent = nullptr)  :
+		QPluginFactory{pluginType, parent}
+	{}
+
+	QtService::ServiceBackend *createServiceBackend(const QString &provider, QtService::Service *service) {
+		auto plg = plugin(provider);
+		if(plg)
+			return plg->createServiceBackend(provider, service);
+		else
+			return nullptr;
+	}
+
+	QtService::ServiceControl *createServiceControl(const QString &provider, QString &&serviceId, QObject *parent) {
+		auto plg = plugin(provider);
+		if(plg)
+			return plg->createServiceControl(provider, std::move(serviceId), parent);
+		else
+			return nullptr;
+	}
+};
+Q_GLOBAL_STATIC_WITH_ARGS(PluginObjectFactory, factory, (QString::fromUtf8("servicebackends")))
+
+}
+
 using namespace QtService;
 
 Q_LOGGING_CATEGORY(logQtService, "qtservice"); //TODO, QtInfoMsg);
-Q_GLOBAL_PLUGIN_OBJECT_FACTORY(ServicePlugin, ServiceBackend, "servicebackends", factory)
 
 Service::Service(int &argc, char **argv, int flags) :
 	QObject{},
@@ -39,7 +68,7 @@ int Service::exec()
 
 	try {
 		d->backendProvider = QString::fromUtf8(provider);
-		d->backend = factory->createInstance(d->backendProvider, this);
+		d->backend = factory->createServiceBackend(d->backendProvider, this);
 		if(!d->backend) {
 			qCCritical(logQtService) << "No backend found for the name" << provider;
 			return EXIT_FAILURE;
@@ -78,31 +107,7 @@ QString Service::backend() const
 
 QDir Service::runtimeDir() const
 {
-	QString runRoot;
-#ifdef Q_OS_UNIX
-	if(::geteuid() == 0)
-		runRoot = QStringLiteral("/run");
-	else
-#endif
-		runRoot = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
-	if(runRoot.isEmpty())
-		runRoot = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	if(runRoot.isEmpty())
-		return QDir::current();
-
-	auto subDir = QCoreApplication::applicationName();
-	QDir runDir {runRoot};
-	if(!runDir.exists(subDir)) {
-		if(!runDir.mkpath(subDir))
-			return QDir::current();
-		if(!QFile::setPermissions(runDir.absoluteFilePath(subDir),
-								  QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner))
-			qCWarning(logQtService) << "Failed to set permissions on runtime dir";
-	}
-	if(runDir.cd(subDir))
-		return runDir;
-	else
-		return QDir::current();
+	return ServicePrivate::runtimeDir(QCoreApplication::applicationName());
 }
 
 void Service::quit()
@@ -167,3 +172,36 @@ ServicePrivate::ServicePrivate(int &argc, char **argv, int flags) :
 	argv{argv},
 	flags{flags}
 {}
+
+ServiceControl *ServicePrivate::createControl(const QString &provider, QString &&serviceId, QObject *parent)
+{
+	return factory->createServiceControl(provider, std::move(serviceId), parent);
+}
+
+QDir ServicePrivate::runtimeDir(const QString &serviceName)
+{
+	QString runRoot;
+#ifdef Q_OS_UNIX
+	if(::geteuid() == 0)
+		runRoot = QStringLiteral("/run");
+	else
+#endif
+		runRoot = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+	if(runRoot.isEmpty())
+		runRoot = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+	if(runRoot.isEmpty())
+		return QDir::current();
+
+	QDir runDir {runRoot};
+	if(!runDir.exists(serviceName)) {
+		if(!runDir.mkpath(serviceName))
+			return QDir::current();
+		if(!QFile::setPermissions(runDir.absoluteFilePath(serviceName),
+								  QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner))
+			qCWarning(logQtService) << "Failed to set permissions on runtime dir";
+	}
+	if(runDir.cd(serviceName))
+		return runDir;
+	else
+		return QDir::current();
+}

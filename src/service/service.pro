@@ -11,11 +11,14 @@ HEADERS += \
 	logging_p.h \
 	qtservice_helpertypes.h \
     servicebackend.h \
-    servicebackend_p.h
+    servicebackend_p.h \
+    servicecontrol.h \
+    servicecontrol_p.h
 
 SOURCES += \
 	service.cpp \
-    servicebackend.cpp
+    servicebackend.cpp \
+    servicecontrol.cpp
 
 MODULE_PLUGIN_TYPES = servicebackends
 load(qt_module)

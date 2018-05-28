@@ -9,6 +9,7 @@ namespace QtService {
 
 class Service;
 class ServiceBackend;
+class ServiceControl;
 class Q_SERVICE_EXPORT ServicePlugin
 {
 	Q_DISABLE_COPY(ServicePlugin)
@@ -17,7 +18,8 @@ public:
 	inline ServicePlugin() = default;
 	virtual inline ~ServicePlugin() = default;
 
-	virtual ServiceBackend *createInstance(const QString &provider, Service *service) = 0;
+	virtual ServiceBackend *createServiceBackend(const QString &provider, Service *service) = 0;
+	virtual ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) = 0;
 };
 
 }
