@@ -19,6 +19,11 @@ StandardServiceControl::StandardServiceControl(QString &&serviceId, QObject *par
 	_statusLock.setStaleLockTime(std::numeric_limits<int>::max()); //disable stale locks
 }
 
+QString StandardServiceControl::backend() const
+{
+	return QStringLiteral("standard");
+}
+
 ServiceControl::SupportFlags StandardServiceControl::supportFlags() const
 {
 	SupportFlags flags = SupportsStatus | SupportsStop;
@@ -26,6 +31,11 @@ ServiceControl::SupportFlags StandardServiceControl::supportFlags() const
 	flags |= SupportsStart;
 #endif
 	return flags;
+}
+
+bool StandardServiceControl::serviceExists() const
+{
+	return !QStandardPaths::findExecutable(serviceId()).isEmpty();
 }
 
 ServiceControl::ServiceStatus StandardServiceControl::status() const
@@ -37,11 +47,6 @@ ServiceControl::ServiceStatus StandardServiceControl::status() const
 		return ServiceRunning;
 	else
 		return ServiceStatusUnknown;
-}
-
-QString StandardServiceControl::backend() const
-{
-	return QStringLiteral("standard");
 }
 
 bool StandardServiceControl::start()

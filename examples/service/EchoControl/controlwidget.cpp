@@ -1,6 +1,7 @@
 #include "controlwidget.h"
 #include "ui_controlwidget.h"
 
+#include <QMessageBox>
 #include <QMetaEnum>
 using namespace QtService;
 
@@ -29,6 +30,16 @@ void ControlWidget::on_loadButton_clicked()
 	_control = ServiceControl::create(ui->backendComboBox->currentText(),
 									  ui->nameLineEdit->text(),
 									  this);
+	if(!_control->serviceExists()) {
+		QMessageBox::critical(this,
+							  tr("Error"),
+							  tr("Unable to find a service of name \"%1\" with backend \"%2\"")
+							  .arg(_control->serviceId(), _control->backend()));
+		_control->deleteLater();
+		_control = nullptr;
+		return;
+	}
+
 	auto metaEnum = QMetaEnum::fromType<ServiceControl::SupportFlags>();
 	ui->supportsLineEdit->setText(QString::fromUtf8(metaEnum.valueToKeys(static_cast<int>(_control->supportFlags()))));
 
@@ -72,6 +83,7 @@ void ControlWidget::on_unloadButton_clicked()
 {
 	if(_control)
 		_control->deleteLater();
+	_control = nullptr;
 
 	ui->loadButton->setVisible(true);
 	ui->unloadButton->setVisible(false);
@@ -97,6 +109,57 @@ void ControlWidget::on_unloadButton_clicked()
 
 void ControlWidget::setStatus()
 {
+	if(!_control)
+		return;
 	auto metaEnum = QMetaEnum::fromType<ServiceControl::ServiceStatus>();
 	ui->statusLineEdit->setText(QString::fromUtf8(metaEnum.valueToKey(static_cast<int>(_control->status()))));
+}
+
+void ControlWidget::on_bLockingCheckBox_clicked(bool checked)
+{
+	if(!_control)
+		return;
+	_control->setBlocking(checked);
+}
+
+void ControlWidget::on_enabledCheckBox_clicked(bool checked)
+{
+	if(!_control)
+		return;
+	_control->setEnabled(checked);
+}
+
+void ControlWidget::on_startButton_clicked()
+{
+	if(!_control)
+		return;
+	_control->start();
+}
+
+void ControlWidget::on_stopButton_clicked()
+{
+	if(!_control)
+		return;
+	_control->stop();
+}
+
+void ControlWidget::on_pauseButton_clicked()
+{
+	if(!_control)
+		return;
+	_control->pause();
+}
+
+void ControlWidget::on_resumeButton_clicked()
+{
+	if(!_control)
+		return;
+	_control->resume();
+}
+
+void ControlWidget::on_reloadButton_clicked()
+{
+	if(!_control)
+		return;
+	_control->reload();
 }

@@ -11,9 +11,10 @@ class StandardServiceControl : public QtService::ServiceControl
 public:
 	explicit StandardServiceControl(QString &&serviceId, QObject *parent = nullptr);
 
-	SupportFlags supportFlags() const override;
-	ServiceStatus status() const override;
 	QString backend() const override;
+	SupportFlags supportFlags() const override;
+	bool serviceExists() const override;
+	ServiceStatus status() const override;
 
 public Q_SLOTS:
 	bool start() override;

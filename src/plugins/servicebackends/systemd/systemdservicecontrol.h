@@ -10,10 +10,11 @@ class SystemdServiceControl : public QtService::ServiceControl
 public:
 	explicit SystemdServiceControl(QString &&serviceId, QObject *parent = nullptr);
 
+	QString backend() const override;
 	SupportFlags supportFlags() const override;
+	bool serviceExists() const override;
 	ServiceStatus status() const override;
 	bool isEnabled() const override;
-	QString backend() const override;
 
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
 

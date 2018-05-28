@@ -11,6 +11,11 @@ SystemdServiceControl::SystemdServiceControl(QString &&serviceId, QObject *paren
 	ServiceControl{std::move(serviceId), parent}
 {}
 
+QString SystemdServiceControl::backend() const
+{
+	return QStringLiteral("systemd");
+}
+
 ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 {
 	return SupportsStartStop |
@@ -19,6 +24,11 @@ ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 			SupportsStatus |
 			SupportsCustomCommands |
 			SupportsBlockingNonBlocking;
+}
+
+bool SystemdServiceControl::serviceExists() const
+{
+	return runSystemctl("status", {QStringLiteral("--no-pager"), QStringLiteral("--lines=0")}) == EXIT_SUCCESS;
 }
 
 ServiceControl::ServiceStatus SystemdServiceControl::status() const
@@ -31,7 +41,7 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 	}
 
 	QByteArray data;
-	if(runSystemctl("list-units", QStringList {
+	if(runSystemctl("list-units", {
 						QStringLiteral("--all"),
 						QStringLiteral("--full"),
 						QStringLiteral("--no-pager"),
@@ -79,12 +89,7 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 
 bool SystemdServiceControl::isEnabled() const
 {
-	return false; //TODO implement
-}
-
-QString SystemdServiceControl::backend() const
-{
-	return QStringLiteral("systemd");
+	return runSystemctl("is-enabled") == EXIT_SUCCESS;
 }
 
 QVariant SystemdServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
@@ -167,12 +172,9 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 	if(process.waitForFinished(isBlocking() ? -1 : 2500)) {//non-blocking calls should finish within two seconds
 		if(outData)
 			*outData = process.readAllStandardOutput();
-		if(process.exitStatus() == QProcess::NormalExit) {
-			auto code = process.exitCode();
-			if(code != EXIT_SUCCESS)
-				qCWarning(logQtService) << "systemctl failed with exit code:" << code;
-			return code;
-		} else {
+		if(process.exitStatus() == QProcess::NormalExit)
+			return process.exitCode();
+		else {
 			qCWarning(logQtService).noquote() << "systemctl crashed with error:" << process.errorString();
 			return 128 + process.error();
 		}

@@ -15,12 +15,14 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QString backend READ backend CONSTANT)
 	Q_PROPERTY(QString serviceId READ serviceId CONSTANT)
-	Q_PROPERTY(bool blocking READ isBlocking WRITE setBlocking NOTIFY blockingChanged)
 
 	Q_PROPERTY(SupportFlags supportFlags READ supportFlags CONSTANT)
-	Q_PROPERTY(ServiceStatus status READ status)
+	Q_PROPERTY(bool blocking READ isBlocking WRITE setBlocking NOTIFY blockingChanged)
 
+	Q_PROPERTY(bool serviceExists READ serviceExists)
+	Q_PROPERTY(ServiceStatus status READ status)
 	Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled)
 
 public:
@@ -67,15 +69,13 @@ public:
 	explicit ServiceControl(QString &&serviceId, QObject *parent = nullptr);
 	~ServiceControl() override;
 
+	virtual QString backend() const = 0;
 	QString serviceId() const;
-	bool isBlocking() const;
 	virtual SupportFlags supportFlags() const = 0;
+	bool isBlocking() const;
+	virtual bool serviceExists() const = 0;
 	virtual ServiceStatus status() const;
 	virtual bool isEnabled() const;
-
-	//TODO add service exists?
-
-	virtual QString backend() const = 0;
 
 	virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args);
 	template <typename TRet, typename... TArgs>
