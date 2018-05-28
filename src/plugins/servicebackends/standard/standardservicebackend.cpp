@@ -1,4 +1,6 @@
 #include "standardservicebackend.h"
+#include <QtCore/QLockFile>
+#include <QtService/private/logging_p.h>
 #ifdef Q_OS_WIN
 #include <qt_windows.h>
 #else
@@ -35,9 +37,30 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 #endif
 
 	QCoreApplication app(argc, argv, flags);
-	if(!preStartService())
+	if(!preStartService()) //TODO exec early everywhere
 		return EXIT_FAILURE;
 
+	// create lock
+	QLockFile lock{service()->runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock"))};
+	if(!lock.tryLock(5000)) {
+		qCCritical(logQtService).noquote() << "Failed to create service lock in:"
+										   << service()->runtimeDir().absolutePath();
+		qint64 pid = 0;
+		QString hostname, appname;
+		if(lock.getLockInfo(&pid, &hostname, &appname)) {
+			qCCritical(logQtService).noquote() << "Lock information:"
+											   << "\n\tPID:" << pid
+											   << "\n\tHostname:" << hostname
+											   << "\n\tAppname:" << appname;
+		}
+		return EXIT_FAILURE;
+	}
+
+	//ensure unlocking always works
+	connect(qApp, &QCoreApplication::aboutToQuit,
+			this, [&]() {
+		lock.unlock();
+	});
 	connect(service(), &Service::paused,
 			this, &StandardServiceBackend::onPaused,
 			Qt::QueuedConnection);

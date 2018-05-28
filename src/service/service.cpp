@@ -2,10 +2,12 @@
 #include "service_p.h"
 #include "serviceplugin.h"
 #include "logging_p.h"
-#include <QFileInfo>
-#include <QDir>
-
+#include <QtCore/QFileInfo>
+#include <QtCore/QStandardPaths>
 #include <qpluginfactory.h>
+#ifdef Q_OS_UNIX
+#include <unistd.h>
+#endif
 using namespace QtService;
 
 Q_LOGGING_CATEGORY(logQtService, "qtservice"); //TODO, QtInfoMsg);
@@ -72,6 +74,35 @@ int Service::getSocket()
 QString Service::backend() const
 {
 	return d->backendProvider;
+}
+
+QDir Service::runtimeDir() const
+{
+	QString runRoot;
+#ifdef Q_OS_UNIX
+	if(::geteuid() == 0)
+		runRoot = QStringLiteral("/run");
+	else
+#endif
+		runRoot = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+	if(runRoot.isEmpty())
+		runRoot = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+	if(runRoot.isEmpty())
+		return QDir::current();
+
+	auto subDir = QCoreApplication::applicationName();
+	QDir runDir {runRoot};
+	if(!runDir.exists(subDir)) {
+		if(!runDir.mkpath(subDir))
+			return QDir::current();
+		if(!QFile::setPermissions(runDir.absoluteFilePath(subDir),
+								  QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner))
+			qCWarning(logQtService) << "Failed to set permissions on runtime dir";
+	}
+	if(runDir.cd(subDir))
+		return runDir;
+	else
+		return QDir::current();
 }
 
 void Service::quit()

@@ -5,6 +5,7 @@
 
 #include <QtCore/qobject.h>
 #include <QtCore/qcoreapplication.h>
+#include <QtCore/qdir.h>
 #include <QtCore/qscopedpointer.h>
 #include <QtCore/qvector.h>
 #include <QtCore/qhash.h>
@@ -41,6 +42,7 @@ public:
 	int getSocket();
 
 	QString backend() const;
+	QDir runtimeDir() const;
 
 public Q_SLOTS:
 	void quit();
