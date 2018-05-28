@@ -15,7 +15,7 @@ SOURCES += \
 
 DISTFILES += standard.json
 
-win32: LIBS += kernel32
+win32: LIBS += -lkernel32
 
 PLUGIN_TYPE = servicebackends
 PLUGIN_EXTENDS = service

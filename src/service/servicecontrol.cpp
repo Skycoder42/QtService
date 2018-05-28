@@ -19,6 +19,11 @@ QString ServiceControl::serviceId() const
 	return d->serviceId;
 }
 
+bool ServiceControl::isBlocking() const
+{
+	return d->blocking;
+}
+
 ServiceControl::ServiceStatus ServiceControl::status() const
 {
 	return ServiceStatusUnknown;
@@ -37,47 +42,63 @@ QVariant ServiceControl::callGenericCommand(const QByteArray &kind, const QVaria
 	return {};
 }
 
-void ServiceControl::start()
+bool ServiceControl::start()
 {
 	qCWarning(logQtService) << "Operation start is not implemented with backend" << backend();
+	return false;
 }
 
-void ServiceControl::stop()
+bool ServiceControl::stop()
 {
 	qCWarning(logQtService) << "Operation stop is not implemented with backend" << backend();
+	return false;
 }
 
-void ServiceControl::pause()
+bool ServiceControl::pause()
 {
 	qCWarning(logQtService) << "Operation pause is not implemented with backend" << backend();
+	return false;
 }
 
-void ServiceControl::resume()
+bool ServiceControl::resume()
 {
 	qCWarning(logQtService) << "Operation resume is not implemented with backend" << backend();
+	return false;
 }
 
-void ServiceControl::reload()
+bool ServiceControl::reload()
 {
 	qCWarning(logQtService) << "Operation reload is not implemented with backend" << backend();
+	return false;
 }
 
-void ServiceControl::enable()
+bool ServiceControl::enable()
 {
 	qCWarning(logQtService) << "Operation enable is not implemented with backend" << backend();
+	return false;
 }
 
-void ServiceControl::disable()
+bool ServiceControl::disable()
 {
 	qCWarning(logQtService) << "Operation disable is not implemented with backend" << backend();
+	return false;
 }
 
-void ServiceControl::setEnabled(bool enabled)
+void ServiceControl::setBlocking(bool blocking)
+{
+	if (d->blocking == blocking)
+		return;
+
+	d->blocking = blocking;
+	emit blockingChanged(d->blocking, {});
+}
+
+bool ServiceControl::setEnabled(bool enabled)
 {
 	if(enabled)
-		enable();
+		return enable();
 	else
-		disable();
+		return disable();
 }
 
 QString ServiceControl::serviceName() const

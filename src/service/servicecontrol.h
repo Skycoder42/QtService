@@ -16,6 +16,7 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString serviceId READ serviceId CONSTANT)
+	Q_PROPERTY(bool blocking READ isBlocking WRITE setBlocking NOTIFY blockingChanged)
 
 	Q_PROPERTY(SupportFlags supportFlags READ supportFlags CONSTANT)
 	Q_PROPERTY(ServiceStatus status READ status)
@@ -62,6 +63,7 @@ public:
 	~ServiceControl() override;
 
 	QString serviceId() const;
+	bool isBlocking() const;
 	virtual SupportFlags supportFlags() const = 0;
 	virtual ServiceStatus status() const;
 	virtual bool isEnabled() const;
@@ -75,18 +77,22 @@ public:
 	void callCommand(const QByteArray &kind, TArgs... args);
 
 public Q_SLOTS:
-	virtual void start();
-	virtual void stop();
+	virtual bool start();
+	virtual bool stop();
 
-	virtual void pause();
-	virtual void resume();
+	virtual bool pause();
+	virtual bool resume();
 
-	virtual void reload();
+	virtual bool reload();
 
-	virtual void enable();
-	virtual void disable();
+	virtual bool enable();
+	virtual bool disable();
 
-	void setEnabled(bool enabled);
+	void setBlocking(bool blocking);
+	bool setEnabled(bool enabled);
+
+Q_SIGNALS:
+	void blockingChanged(bool blocking, QPrivateSignal);
 
 protected:
 	virtual QString serviceName() const;

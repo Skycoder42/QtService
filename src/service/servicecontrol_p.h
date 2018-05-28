@@ -12,6 +12,7 @@ public:
 	ServiceControlPrivate(QString &&serviceId);
 
 	QString serviceId;
+	bool blocking = true;
 };
 
 }

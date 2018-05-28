@@ -44,18 +44,18 @@ QString StandardServiceControl::backend() const
 	return QStringLiteral("standard");
 }
 
-void StandardServiceControl::start()
+bool StandardServiceControl::start()
 {
 #if QT_CONFIG(process)
 	if(status() == ServiceRunning) {
 		qCDebug(logQtService) << "Service already running with PID" << getPid();
-		return;
+		return true;
 	}
 
 	auto bin = QStandardPaths::findExecutable(serviceId());
 	if(bin.isEmpty()) {
 		qCWarning(logQtService).noquote() << "Unabled to find executable for service with id:" << serviceId();
-		return;
+		return false;
 	}
 
 	QProcess svcProc;
@@ -66,32 +66,34 @@ void StandardServiceControl::start()
 	svcProc.setStandardOutputFile(QProcess::nullDevice());
 	svcProc.setStandardErrorFile(QProcess::nullDevice());
 	qint64 pid = 0;
-	if(svcProc.startDetached(&pid))
+	auto ok = svcProc.startDetached(&pid);
+	if(ok)
 		qCDebug(logQtService) << "Started service process with PID" << pid;
 	else
 		qCWarning(logQtService).noquote() << "Failed to start service process with error:" << svcProc.errorString();
+	return ok;
 #else
 	return ServiceControl::start();
 #endif
 }
 
-void StandardServiceControl::stop()
+bool StandardServiceControl::stop()
 {
 	if(status() == ServiceStopped) {
 		qCDebug(logQtService) << "Service already stopped ";
-		return;
+		return true;
 	}
 
 	auto pid = getPid();
 	if(pid == -1) {
 		qCWarning(logQtService).noquote() << "Failed to get pid of running service";
-		return;
+		return false;
 	}
 #ifdef Q_OS_WIN
+	auto ok = false;
 	if(AttachConsole(static_cast<DWORD>(pid))) {
 		if(SetConsoleCtrlHandler(nullptr, true)) {
 			if(GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) {
-				auto ok = false;
 				for(auto i = 0; i < 10; i++) {
 					if(status() == ServiceRunning)
 						QThread::msleep(500);
@@ -110,8 +112,9 @@ void StandardServiceControl::stop()
 		FreeConsole();
 	} else
 		qCWarning(logQtService).noquote() << qt_error_string(GetLastError());
+	return ok;
 #else
-	kill(static_cast<__pid_t>(pid), SIGTERM);
+	return kill(static_cast<pid_t>(pid), SIGTERM) == 0;
 #endif
 }
 

@@ -16,8 +16,8 @@ public:
 	QString backend() const override;
 
 public Q_SLOTS:
-	void start() override;
-	void stop() override;
+	bool start() override;
+	bool stop() override;
 
 protected:
 	QString serviceName() const override;
