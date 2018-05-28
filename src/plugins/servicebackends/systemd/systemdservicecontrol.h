@@ -30,7 +30,8 @@ protected:
 private:
 	int runSystemctl(const QByteArray &command,
 					 const QStringList &extraArgs = {},
-					 QByteArray *outData = nullptr) const;
+					 QByteArray *outData = nullptr,
+					 bool noPrepare = false) const;
 };
 
 #endif // SYSTEMDSERVICECONTROL_H

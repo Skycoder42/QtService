@@ -15,5 +15,5 @@ QtService::ServiceBackend *WindowsServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *WindowsServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-
+	return nullptr;
 }

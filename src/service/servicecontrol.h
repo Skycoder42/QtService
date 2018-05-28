@@ -32,13 +32,16 @@ public:
 		SupportsReload = 0x0010,
 		SupportsEnable = 0x0020,
 		SupportsDisable = 0x0040,
+		SupportsBlocking = 0x0080,
+		SupportsNonBlocking = 0x0100,
 
-		SupportsStatus = 0x0080,
-		SupportsCustomCommands = 0x0100,
+		SupportsStatus = 0x0200,
+		SupportsCustomCommands = 0x0400,
 
 		SupportsStartStop = (SupportsStart | SupportsStop),
 		SupportsPauseResume = (SupportsPause | SupportsResume),
-		SupportsEnableDisable = (SupportsEnable | SupportsDisable)
+		SupportsEnableDisable = (SupportsEnable | SupportsDisable),
+		SupportsBlockingNonBlocking = (SupportsBlocking | SupportsNonBlocking)
 	};
 	Q_DECLARE_FLAGS(SupportFlags, SupportFlag)
 	Q_FLAG(SupportFlags)
@@ -53,10 +56,12 @@ public:
 		ServicePaused,
 		ServiceResuming,
 		ServiceReloading,
-		ServiceStopping
+		ServiceStopping,
+		ServiceErrored
 	};
 	Q_ENUM(ServiceStatus)
 
+	static QStringList listBackends();
 	static ServiceControl *create(const QString &backend, QString serviceId, QObject *parent = nullptr);
 
 	explicit ServiceControl(QString &&serviceId, QObject *parent = nullptr);
@@ -67,6 +72,8 @@ public:
 	virtual SupportFlags supportFlags() const = 0;
 	virtual ServiceStatus status() const;
 	virtual bool isEnabled() const;
+
+	//TODO add service exists?
 
 	virtual QString backend() const = 0;
 

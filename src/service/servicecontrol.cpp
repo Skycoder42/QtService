@@ -4,6 +4,11 @@
 #include "service_p.h"
 using namespace QtService;
 
+QStringList ServiceControl::listBackends()
+{
+	return ServicePrivate::listBackends();
+}
+
 ServiceControl *ServiceControl::create(const QString &backend, QString serviceId, QObject *parent)
 {
 	return ServicePrivate::createControl(backend, std::move(serviceId), parent);

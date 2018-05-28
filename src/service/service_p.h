@@ -14,6 +14,7 @@ class ServicePrivate
 public:
 	ServicePrivate(int &argc, char **argv, int flags);
 
+	static QStringList listBackends();
 	static ServiceControl *createControl(const QString &provider, QString &&serviceId, QObject *parent);
 	static QDir runtimeDir(const QString &serviceName);
 

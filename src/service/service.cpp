@@ -173,6 +173,11 @@ ServicePrivate::ServicePrivate(int &argc, char **argv, int flags) :
 	flags{flags}
 {}
 
+QStringList ServicePrivate::listBackends()
+{
+	return factory->allKeys();
+}
+
 ServiceControl *ServicePrivate::createControl(const QString &provider, QString &&serviceId, QObject *parent)
 {
 	return factory->createServiceControl(provider, std::move(serviceId), parent);

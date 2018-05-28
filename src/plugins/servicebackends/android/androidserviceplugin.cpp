@@ -15,5 +15,5 @@ QtService::ServiceBackend *AndroidServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *AndroidServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-
+	return nullptr;
 }

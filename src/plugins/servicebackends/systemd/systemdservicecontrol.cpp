@@ -1,5 +1,6 @@
 #include "systemdservicecontrol.h"
 #include <unistd.h>
+#include <QtCore/QBuffer>
 #include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QRegularExpression>
@@ -16,17 +17,69 @@ ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 			SupportsReload |
 			SupportsEnableDisable |
 			SupportsStatus |
-			SupportsCustomCommands;
+			SupportsCustomCommands |
+			SupportsBlockingNonBlocking;
 }
 
 ServiceControl::ServiceStatus SystemdServiceControl::status() const
 {
+	auto svcName = serviceId().toUtf8();
+	auto svcType = serviceId().mid(serviceName().size() + 1);
+	if(svcType.isEmpty()) {
+		svcType = QStringLiteral("service");
+		svcName += '.' + svcType.toUtf8();
+	}
+
+	QByteArray data;
+	if(runSystemctl("list-units", QStringList {
+						QStringLiteral("--all"),
+						QStringLiteral("--full"),
+						QStringLiteral("--no-pager"),
+						QStringLiteral("--plain"),
+						QStringLiteral("--all"),
+						QStringLiteral("--no-legend"),
+						QStringLiteral("--type=") + svcType
+					}, &data, true) != EXIT_SUCCESS)
+		return ServiceStatusUnknown;
+
+	QBuffer buffer{&data};
+	buffer.open(QIODevice::ReadOnly);
+	while(!buffer.atEnd()) {
+		// read the line and check if it is this service, and if yes "parse" the line and verify again
+		auto line = buffer.readLine();
+		if(!line.startsWith(svcName))
+			continue;
+		auto lineData = line.simplified().split(' ');
+		if(lineData.size() < 3 || lineData[0] != svcName)
+			continue;
+
+		// found correct service! now read the status
+		const auto &svcState = lineData[2];
+		if(svcState == "active")
+			return ServiceRunning;
+		else if(svcState == "reloading")
+			return ServiceReloading;
+		else if(svcState == "inactive")
+			return ServiceStopped;
+		else if(svcState == "failed")
+			return ServiceErrored;
+		else if(svcState == "activating")
+			return ServiceStarting;
+		else if(svcState == "deactivating")
+			return ServiceStopping;
+		else {
+			qCWarning(logQtService) << "Unknown service state" << svcState << "for service" << svcName;
+			return ServiceStatusUnknown;
+		}
+	}
+
+	qCWarning(logQtService) << "Service" << svcName << "was not found as systemd service";
 	return ServiceStatusUnknown;
 }
 
 bool SystemdServiceControl::isEnabled() const
 {
-	return false;
+	return false; //TODO implement
 }
 
 QString SystemdServiceControl::backend() const
@@ -79,12 +132,12 @@ QString SystemdServiceControl::serviceName() const
 		return svcId;
 }
 
-int SystemdServiceControl::runSystemctl(const QByteArray &command, const QStringList &extraArgs, QByteArray *outData) const
+int SystemdServiceControl::runSystemctl(const QByteArray &command, const QStringList &extraArgs, QByteArray *outData, bool noPrepare) const
 {
 	const auto systemctl = QStandardPaths::findExecutable(QStringLiteral("systemctl"));
 	if(systemctl.isEmpty()) {
 		qCWarning(logQtService) << "Failed to find systemctl executable";
-		return EXIT_FAILURE;
+		return -1;
 	}
 
 	QProcess process;
@@ -97,11 +150,13 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 	else
 		args.append(QStringLiteral("--user"));
 	args.append(QString::fromUtf8(command));
-	args.append(serviceId());
-	if(!isBlocking())
-		args.append(QStringLiteral("--no-block"));
+	if(!noPrepare) {
+		args.append(serviceId());
+		if(!isBlocking())
+			args.append(QStringLiteral("--no-block"));
+	}
 	args.append(extraArgs);
-	process.setArguments(extraArgs);
+	process.setArguments(args);
 
 	process.setStandardInputFile(QProcess::nullDevice());
 	if(!outData)
@@ -110,6 +165,8 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 
 	process.start(QProcess::ReadOnly);
 	if(process.waitForFinished(isBlocking() ? -1 : 2500)) {//non-blocking calls should finish within two seconds
+		if(outData)
+			*outData = process.readAllStandardOutput();
 		if(process.exitStatus() == QProcess::NormalExit) {
 			auto code = process.exitCode();
 			if(code != EXIT_SUCCESS)
@@ -121,6 +178,6 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 		}
 	} else {
 		qCWarning(logQtService).noquote() << "systemctl did not exit in time";
-		return EXIT_FAILURE;
+		return -1;
 	}
 }
