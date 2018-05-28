@@ -1,6 +1,6 @@
 #include "standardservicecontrol.h"
-#if QT_CONFIG(process)
 #include <QtCore/QStandardPaths>
+#if QT_CONFIG(process)
 #include <QtCore/QProcess>
 #endif
 #ifdef Q_OS_WIN

@@ -1,6 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    TestBasicService \
-    TestStandardService \
-    TestService
+	TestBasicService \
+	TestService \
+	TestStandardService
+
+TestStandardService.depends += TestBasicService

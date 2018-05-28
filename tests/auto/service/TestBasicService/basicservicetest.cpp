@@ -14,6 +14,7 @@ void BasicServiceTest::initTestCase()
 #endif
 	init();
 	control = ServiceControl::create(backend(), name(), this);
+	QVERIFY(control);
 	QVERIFY(control->serviceExists());
 }
 
