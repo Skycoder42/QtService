@@ -47,6 +47,11 @@ QVariant ServiceControl::callGenericCommand(const QByteArray &kind, const QVaria
 	return {};
 }
 
+QDir ServiceControl::runtimeDir() const
+{
+	return ServicePrivate::runtimeDir(serviceName());
+}
+
 bool ServiceControl::start()
 {
 	qCWarning(logQtService) << "Operation start is not implemented with backend" << backend();
@@ -109,11 +114,6 @@ bool ServiceControl::setAutostartEnabled(bool enabled)
 QString ServiceControl::serviceName() const
 {
 	return serviceId();
-}
-
-QDir ServiceControl::runtimeDir() const
-{
-	return ServicePrivate::runtimeDir(serviceName());
 }
 
 ServiceControl::~ServiceControl() = default;

@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-	TestBasicService \
+	TestBaseLib \
 	TestService \
 	TestStandardService
 
-TestStandardService.depends += TestBasicService
+TestStandardService.depends += TestBaseLib

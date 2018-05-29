@@ -1,3 +1,4 @@
 TEMPLATE = subdirs
 
-SUBDIRS += cmake service
+SUBDIRS += cmake \
+	service

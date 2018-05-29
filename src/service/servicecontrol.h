@@ -83,6 +83,8 @@ public:
 	template <typename... TArgs>
 	void callCommand(const QByteArray &kind, TArgs... args);
 
+	QDir runtimeDir() const;
+
 public Q_SLOTS:
 	virtual bool start();
 	virtual bool stop();
@@ -103,7 +105,6 @@ Q_SIGNALS:
 
 protected:
 	virtual QString serviceName() const;
-	QDir runtimeDir() const;
 
 private:
 	QScopedPointer<ServiceControlPrivate> d;
