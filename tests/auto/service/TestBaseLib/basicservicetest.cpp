@@ -55,6 +55,28 @@ void BasicServiceTest::testStart()
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 }
 
+void BasicServiceTest::testReload()
+{
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+
+	testFeature(ServiceControl::SupportsReload);
+	QVERIFY(control->reload());
+
+	QByteArray msg;
+	READ_LOOP(msg);
+	QCOMPARE(msg, QByteArray("reloading"));
+
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+}
+
+void BasicServiceTest::testCustom()
+{
+	testFeature(ServiceControl::SupportsCustomCommands);
+	testCustomImpl();
+}
+
 void BasicServiceTest::testStop()
 {
 	testFeature(ServiceControl::SupportsStatus);
@@ -77,6 +99,17 @@ void BasicServiceTest::testStop()
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 }
 
+void BasicServiceTest::testAutostart()
+{
+	QVERIFY(!control->isAutostartEnabled());
+
+	testFeature(ServiceControl::SupportsSetAutostart);
+	QVERIFY(control->enableAutostart());
+	QVERIFY(control->isAutostartEnabled());
+	QVERIFY(control->disableAutostart());
+	QVERIFY(!control->isAutostartEnabled());
+}
+
 QString BasicServiceTest::name()
 {
 	return QStringLiteral("testservice");
@@ -86,16 +119,50 @@ void BasicServiceTest::init() {}
 
 void BasicServiceTest::cleanup() {}
 
+void BasicServiceTest::testCustomImpl()
+{
+	QVERIFY2(false, "testCustomImpl not implemented");
+}
+
+void BasicServiceTest::performSocketTest()
+{
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
+
+	auto socket = new QTcpSocket(this);
+	socket->connectToHost(QStringLiteral("127.0.0.1"), 15843);
+	QVERIFY(socket->waitForConnected(5000));
+	while(control->status() == ServiceControl::ServiceStarting)
+		QThread::msleep(500);
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+
+	QByteArray msg = "hello world";
+	socket->write(msg);
+
+	QByteArray resMsg;
+	do {
+		QVERIFY(socket->waitForReadyRead(5000));
+		resMsg += socket->readAll();
+	} while(resMsg.size() < msg.size());
+	QCOMPARE(resMsg, msg);
+
+	testFeature(ServiceControl::SupportsStop);
+	QVERIFY(control->stop());
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
+}
+
 void BasicServiceTest::testFeature(ServiceControl::SupportFlag flag)
 {
-	if(control->supportFlags().testFlag(flag)) {
+	if(!control->supportFlags().testFlag(flag)) {
 		auto meta = QMetaEnum::fromType<ServiceControl::SupportFlags>();
 		if(flag == ServiceControl::SupportsStatus) {
-			QEXPECT_FAIL(qUtf8Printable(control->backend()),
+			QEXPECT_FAIL("",
 						 QByteArray(QByteArrayLiteral("feature ") + meta.valueToKey(flag) + QByteArrayLiteral(" not supported by backend")).constData(),
 						 Continue);
 		} else {
-			QEXPECT_FAIL(qUtf8Printable(control->backend()),
+			QEXPECT_FAIL("",
 						 QByteArray(QByteArrayLiteral("feature ") + meta.valueToKey(flag) + QByteArrayLiteral(" not supported by backend")).constData(),
 						 Abort);
 		}

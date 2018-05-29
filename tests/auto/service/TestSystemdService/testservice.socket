@@ -1,0 +1,11 @@
+[Unit]
+Description=QtService Test Service Socket
+Documentation=https://github.com/Skycoder42/QtService
+After=network.target
+PartOf=testservice.service
+
+[Socket]
+ListenStream=15843
+
+[Install]
+WantedBy=sockets.target

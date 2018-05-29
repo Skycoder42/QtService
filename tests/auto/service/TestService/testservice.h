@@ -4,6 +4,7 @@
 #include <QtService/Service>
 #include <QtNetwork/QLocalServer>
 #include <QtNetwork/QLocalSocket>
+#include <QtNetwork/QTcpServer>
 #include <QtCore/QDataStream>
 
 class TestService : public QtService::Service
@@ -26,6 +27,8 @@ private:
 	QLocalServer *_server = nullptr;
 	QLocalSocket *_socket = nullptr;
 	QDataStream _stream;
+
+	QTcpServer *_activatedServer = nullptr;
 };
 
 #endif // TESTSERVICE_H

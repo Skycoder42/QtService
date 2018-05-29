@@ -29,6 +29,7 @@ QString TestStandardService::name()
 	return QCoreApplication::applicationDirPath() + QStringLiteral("/../TestService/testservice");
 #endif
 }
+
 QTEST_MAIN(TestStandardService)
 
 #include "tst_standardservice.moc"

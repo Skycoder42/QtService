@@ -18,7 +18,10 @@ private Q_SLOTS:
 	void cleanupTestCase();
 
 	void testStart();
+	void testReload();
+	void testCustom();
 	void testStop();
+	void testAutostart();
 
 protected:
 	QtService::ServiceControl *control = nullptr;
@@ -30,6 +33,9 @@ protected:
 	virtual void init();
 	virtual void cleanup();
 
+	virtual void testCustomImpl();
+
+	void performSocketTest();
 	void testFeature(QtService::ServiceControl::SupportFlag flag);
 };
 

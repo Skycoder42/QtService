@@ -29,6 +29,9 @@ protected:
 	QString serviceName() const override;
 
 private:
+	mutable bool _existsRefBase = false;
+	mutable bool *_exists = nullptr;
+
 	int runSystemctl(const QByteArray &command,
 					 const QStringList &extraArgs = {},
 					 QByteArray *outData = nullptr,

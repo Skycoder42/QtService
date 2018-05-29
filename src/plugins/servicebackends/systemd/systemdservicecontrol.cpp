@@ -28,7 +28,42 @@ ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 
 bool SystemdServiceControl::serviceExists() const
 {
-	return runSystemctl("status", {QStringLiteral("--no-pager"), QStringLiteral("--lines=0")}) == EXIT_SUCCESS;
+	_exists = &_existsRefBase;
+	_existsRefBase = false;
+	auto svcName = serviceId().toUtf8();
+	auto svcType = serviceId().mid(serviceName().size() + 1);
+	if(svcType.isEmpty()) {
+		svcType = QStringLiteral("service");
+		svcName += '.' + svcType.toUtf8();
+	}
+
+	QByteArray data;
+	if(runSystemctl("list-unit-files", {
+						QStringLiteral("--all"),
+						QStringLiteral("--full"),
+						QStringLiteral("--no-pager"),
+						QStringLiteral("--plain"),
+						QStringLiteral("--all"),
+						QStringLiteral("--no-legend"),
+						QStringLiteral("--type=") + svcType
+					}, &data, true) != EXIT_SUCCESS)
+		return false;
+
+	QBuffer buffer{&data};
+	buffer.open(QIODevice::ReadOnly);
+	while(!buffer.atEnd()) {
+		// read the line and check if it is this service, and if yes "parse" the line and verify again
+		auto line = buffer.readLine();
+		if(!line.startsWith(svcName))
+			continue;
+		auto lineData = line.simplified().split(' ');
+		if(lineData[0] != svcName)
+			continue;
+		_existsRefBase = true;
+		return true;
+	}
+
+	return false;
 }
 
 ServiceControl::ServiceStatus SystemdServiceControl::status() const
@@ -83,8 +118,14 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 		}
 	}
 
-	qCWarning(logQtService) << "Service" << svcName << "was not found as systemd service";
-	return ServiceStatusUnknown;
+	if(!_exists)
+		serviceExists();
+	if(_exists)
+		return ServiceStopped;
+	else {
+		qCWarning(logQtService) << "Service" << svcName << "was not found as systemd service";
+		return ServiceStatusUnknown;
+	}
 }
 
 bool SystemdServiceControl::isAutostartEnabled() const
