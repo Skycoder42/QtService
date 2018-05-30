@@ -3,4 +3,5 @@ QT_FOR_CONFIG += core
 
 SUBDIRS += \
 	EchoService \
-    EchoControl
+    EchoControl \
+    TerminalService

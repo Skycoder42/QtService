@@ -75,11 +75,12 @@ Q_SIGNALS:
 	void paused();
 	void resumed();
 
-	void terminalConnected(Terminal *terminal);
-
 	void terminalActiveChanged(bool terminalActive, QPrivateSignal);
 	void terminalModeChanged(TerminalMode terminalMode, QPrivateSignal);
 	void globalTerminalChanged(bool globalTerminal, QPrivateSignal);
+
+protected Q_SLOTS:
+	virtual void terminalConnected(Terminal *terminal);
 
 protected:
 	virtual bool preStart();
@@ -98,6 +99,8 @@ protected:
 
 private:
 	friend class QtService::ServiceBackend;
+	friend class QtService::ServicePrivate;
+
 	QScopedPointer<ServicePrivate> d;
 };
 

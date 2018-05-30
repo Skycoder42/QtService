@@ -8,7 +8,10 @@ TerminalServer::TerminalServer(Service *service) :
 	QObject{service},
 	_service{service},
 	_server{new QLocalServer{this}}
-{}
+{
+	connect(_server, &QLocalServer::newConnection,
+			this, &TerminalServer::newConnection);
+}
 
 QString TerminalServer::serverName()
 {

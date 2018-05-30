@@ -23,6 +23,8 @@ public:
 	int exec(int &argc, char **argv, int flags);
 
 private Q_SLOTS:
+	void doConnect();
+
 	void connected();
 	void disconnected();
 	void error(QLocalSocket::LocalSocketError socketError);

@@ -176,6 +176,12 @@ void Service::setGlobalTerminal(bool globalTerminal)
 	emit globalTerminalChanged(d->terminalGlobal, {});
 }
 
+void Service::terminalConnected(Terminal *terminal)
+{
+	qCWarning(logQtService) << "Terminal connected but was not handled - disconnecting it again";
+	terminal->disconnectTerminal();
+}
+
 bool Service::preStart()
 {
 	return true;

@@ -69,8 +69,13 @@ int TerminalClient::exec(int &argc, char **argv, int flags)
 			Qt::QueuedConnection); //queued connection, because of "socket not ready" errors on win
 
 	qCDebug(logQtService) << "Created terminal, waiting for service connection...";
-	_socket->connectToServer(TerminalServer::serverName());
+	QMetaObject::invokeMethod(this, "doConnect", Qt::QueuedConnection);
 	return app.exec();
+}
+
+void TerminalClient::doConnect()
+{
+	_socket->connectToServer(TerminalServer::serverName());
 }
 
 void TerminalClient::connected()
