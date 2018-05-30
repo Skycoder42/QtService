@@ -16,6 +16,7 @@
 
 namespace QtService {
 
+class Terminal;
 class ServiceBackend;
 class ServicePrivate;
 class Q_SERVICE_EXPORT Service : public QObject
@@ -25,6 +26,7 @@ class Q_SERVICE_EXPORT Service : public QObject
 	Q_PROPERTY(QString backend READ backend CONSTANT)
 	Q_PROPERTY(QDir runtimeDir READ runtimeDir CONSTANT)
 	Q_PROPERTY(bool terminalActive READ isTerminalActive WRITE setTerminalActive NOTIFY terminalActiveChanged)
+	Q_PROPERTY(bool globalTerminal READ globalTerminal WRITE setGlobalTerminal NOTIFY globalTerminalChanged)
 
 public:
 	enum CommandMode {
@@ -54,12 +56,14 @@ public:
 	QString backend() const;
 	QDir runtimeDir() const;
 	bool isTerminalActive() const;
+	bool globalTerminal() const;
 
 public Q_SLOTS:
 	void quit();
 	void reload();
 
 	void setTerminalActive(bool terminalActive);
+	void setGlobalTerminal(bool globalTerminal);
 
 Q_SIGNALS:
 	void started();
@@ -68,7 +72,10 @@ Q_SIGNALS:
 	void paused();
 	void resumed();
 
+	void terminalConnected(Terminal *terminal);
+
 	void terminalActiveChanged(bool terminalActive, QPrivateSignal);
+	void globalTerminalChanged(bool globalTerminal, QPrivateSignal);
 
 protected:
 	virtual bool preStart();

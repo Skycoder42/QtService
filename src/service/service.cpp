@@ -44,7 +44,7 @@ Q_LOGGING_CATEGORY(logQtService, "qtservice"); //TODO, QtInfoMsg);
 
 Service::Service(int &argc, char **argv, int flags) :
 	QObject{},
-	d{new ServicePrivate{argc, argv, flags}}
+	d{new ServicePrivate{this, argc, argv, flags}}
 {
 	Q_ASSERT_X(!ServicePrivate::instance, Q_FUNC_INFO, "There can always be only 1 QtService::Service instance at a time");
 	ServicePrivate::instance = this;
@@ -115,6 +115,11 @@ bool Service::isTerminalActive() const
 	return d->terminalActive;
 }
 
+bool Service::globalTerminal() const
+{
+	return d->terminalGlobal;
+}
+
 void Service::quit()
 {
 	d->backend->quitService();
@@ -130,7 +135,22 @@ void Service::setTerminalActive(bool terminalActive)
 		return;
 
 	d->terminalActive = terminalActive;
+	if(terminalActive)
+		d->startTerminals();
+	else
+		d->stopTerminals();
 	emit terminalActiveChanged(d->terminalActive, {});
+}
+
+void Service::setGlobalTerminal(bool globalTerminal)
+{
+	if (d->terminalGlobal == globalTerminal)
+		return;
+
+	if(d->termServer && d->termServer->isRunning())
+		qCWarning(logQtService) << "Chaning the globalTerminal property will not have any effect until you disable and reenable the terminal server";
+	d->terminalGlobal = globalTerminal;
+	emit globalTerminalChanged(d->terminalGlobal, {});
 }
 
 bool Service::preStart()
@@ -181,10 +201,11 @@ Service::~Service() = default;
 
 QPointer<Service> ServicePrivate::instance{nullptr};
 
-ServicePrivate::ServicePrivate(int &argc, char **argv, int flags) :
+ServicePrivate::ServicePrivate(Service *q_ptr, int &argc, char **argv, int flags) :
 	argc{argc},
 	argv{argv},
-	flags{flags}
+	flags{flags},
+	q{q_ptr}
 {}
 
 QStringList ServicePrivate::listBackends()
@@ -223,4 +244,23 @@ QDir ServicePrivate::runtimeDir(const QString &serviceName)
 		return runDir;
 	else
 		return QDir::current();
+}
+
+void ServicePrivate::startTerminals()
+{
+	if(!terminalActive || !isRunning)
+		return;
+
+	if(!termServer) {
+		termServer = new TerminalServer{q};
+		QObject::connect(termServer, &TerminalServer::terminalConnected,
+						 q, &Service::terminalConnected);
+	}
+	terminalActive = termServer->start(terminalGlobal);
+}
+
+void ServicePrivate::stopTerminals()
+{
+	if(!isRunning)
+		return;
 }

@@ -200,7 +200,7 @@ void TerminalPrivate::disconnected()
 {
 	if(isLoading) {
 		isLoading = false;
-		emit statusLoadComplete(this, false);
+		emit terminalReady(this, false);
 		socket->close();
 	} else if(autoDelete && parent())
 		parent()->deleteLater();
@@ -215,7 +215,7 @@ void TerminalPrivate::error()
 			socket->disconnectFromServer();
 		else {
 			isLoading = false;
-			emit statusLoadComplete(this, false);
+			emit terminalReady(this, false);
 			socket->close();
 		}
 	}
@@ -235,7 +235,7 @@ void TerminalPrivate::readyRead()
 					   this, &TerminalPrivate::error);
 			disconnect(socket, &QLocalSocket::readyRead,
 					   this, &TerminalPrivate::readyRead);
-			emit statusLoadComplete(this, true);
+			emit terminalReady(this, true);
 		}
 	}
 }

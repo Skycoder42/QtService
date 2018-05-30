@@ -9,6 +9,7 @@
 
 namespace QtService {
 
+class TerminalPrivate;
 class TerminalServer : public QObject
 {
 	Q_OBJECT
@@ -19,15 +20,22 @@ public:
 	bool start(bool globally);
 	void stop();
 
+	bool isRunning() const;
+
 Q_SIGNALS:
 	void terminalConnected(QtService::Terminal *terminal);
 
 private Q_SLOTS:
 	void newConnection();
 
+	void terminalReady(TerminalPrivate *terminal, bool success);
+
 private:
 	Service *_service;
 	QLocalServer *_server;
+	bool _activated = false;
+
+	bool setSocketDescriptor(int socket);
 };
 
 }

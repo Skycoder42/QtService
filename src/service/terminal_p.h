@@ -26,7 +26,7 @@ public:
 	TerminalPrivate(QLocalSocket *socket, QObject *parent = nullptr);
 
 Q_SIGNALS:
-	void statusLoadComplete(TerminalPrivate *terminal, bool successful);
+	void terminalReady(TerminalPrivate *terminal, bool successful);
 
 private Q_SLOTS:
 	void disconnected();

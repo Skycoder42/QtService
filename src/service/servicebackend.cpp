@@ -104,10 +104,12 @@ bool ServiceBackend::preStartService()
 void ServiceBackend::onSvcStarted()
 {
 	d->service->d->isRunning = true;
+	d->service->d->startTerminals();
 }
 
 void ServiceBackend::onSvcStopped()
 {
+	d->service->d->stopTerminals();
 	d->service->d->isRunning = false;
 }
 

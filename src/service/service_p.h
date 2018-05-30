@@ -5,6 +5,7 @@
 
 #include "service.h"
 #include "servicebackend.h"
+#include "terminalserver_p.h"
 
 namespace QtService {
 
@@ -12,7 +13,7 @@ class ServiceControl;
 class ServicePrivate
 {
 public:
-	ServicePrivate(int &argc, char **argv, int flags);
+	ServicePrivate(Service *q_ptr, int &argc, char **argv, int flags);
 
 	static QStringList listBackends();
 	static ServiceControl *createControl(const QString &provider, QString &&serviceId, QObject *parent);
@@ -31,6 +32,15 @@ public:
 	bool isRunning = false;
 	bool wasPaused = false;
 	bool terminalActive = false;
+	bool terminalGlobal = false;
+
+	TerminalServer *termServer = nullptr;
+
+	void startTerminals();
+	void stopTerminals();
+
+private:
+	Service *q;
 };
 
 }
