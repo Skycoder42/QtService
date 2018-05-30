@@ -28,7 +28,9 @@ public:
 	ServiceBackend *backend = nullptr;
 	QHash<QByteArray, std::function<QVariant(QVariantList)>> callbacks;
 
+	bool isRunning = false;
 	bool wasPaused = false;
+	bool terminalActive = false;
 };
 
 }

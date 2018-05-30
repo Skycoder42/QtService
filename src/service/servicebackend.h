@@ -54,6 +54,8 @@ protected:
 	bool preStartService();
 
 private Q_SLOTS:
+	void onSvcStarted();
+	void onSvcStopped();
 	void onSvcResumed();
 	void onSvcPaused();
 

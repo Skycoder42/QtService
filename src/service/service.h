@@ -23,6 +23,8 @@ class Q_SERVICE_EXPORT Service : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString backend READ backend CONSTANT)
+	Q_PROPERTY(QDir runtimeDir READ runtimeDir CONSTANT)
+	Q_PROPERTY(bool terminalActive READ isTerminalActive WRITE setTerminalActive NOTIFY terminalActiveChanged)
 
 public:
 	enum CommandMode {
@@ -43,10 +45,13 @@ public:
 
 	QString backend() const;
 	QDir runtimeDir() const;
+	bool isTerminalActive() const;
 
 public Q_SLOTS:
 	void quit();
 	void reload();
+
+	void setTerminalActive(bool terminalActive);
 
 Q_SIGNALS:
 	void started();
@@ -54,6 +59,8 @@ Q_SIGNALS:
 	void reloaded();
 	void paused();
 	void resumed();
+
+	void terminalActiveChanged(bool terminalActive, QPrivateSignal);
 
 protected:
 	virtual bool preStart();

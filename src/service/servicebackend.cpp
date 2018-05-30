@@ -14,6 +14,10 @@ ServiceBackend::ServiceBackend(Service *service) :
 	QObject{service},
 	d{new ServiceBackendPrivate{service}}
 {
+	connect(d->service, &Service::started,
+			this, &ServiceBackend::onSvcStarted);
+	connect(d->service, &Service::stopped,
+			this, &ServiceBackend::onSvcStopped);
 	connect(d->service, &Service::resumed,
 			this, &ServiceBackend::onSvcResumed);
 	connect(d->service, &Service::paused,
@@ -95,6 +99,16 @@ bool ServiceBackend::unregisterFromSignal(int signal)
 bool ServiceBackend::preStartService()
 {
 	return d->service->preStart();
+}
+
+void ServiceBackend::onSvcStarted()
+{
+	d->service->d->isRunning = true;
+}
+
+void ServiceBackend::onSvcStopped()
+{
+	d->service->d->isRunning = false;
 }
 
 void ServiceBackend::onSvcResumed()

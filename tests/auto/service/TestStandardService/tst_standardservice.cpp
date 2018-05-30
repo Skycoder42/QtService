@@ -21,9 +21,9 @@ QString TestStandardService::name()
 {
 #ifdef Q_OS_WIN
 #ifdef QT_NO_DEBUG
-	return QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/release/testservice");
+	return QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/release/testservice.exe");
 #else
-	return QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/debug/testservice");
+	return QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/debug/testservice.exe");
 #endif
 #else
 	return QCoreApplication::applicationDirPath() + QStringLiteral("/../TestService/testservice");

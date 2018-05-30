@@ -110,6 +110,11 @@ QDir Service::runtimeDir() const
 	return ServicePrivate::runtimeDir(QCoreApplication::applicationName());
 }
 
+bool Service::isTerminalActive() const
+{
+	return d->terminalActive;
+}
+
 void Service::quit()
 {
 	d->backend->quitService();
@@ -117,6 +122,15 @@ void Service::quit()
 void Service::reload()
 {
 	d->backend->reloadService();
+}
+
+void Service::setTerminalActive(bool terminalActive)
+{
+	if (d->terminalActive == terminalActive)
+		return;
+
+	d->terminalActive = terminalActive;
+	emit terminalActiveChanged(d->terminalActive, {});
 }
 
 bool Service::preStart()
