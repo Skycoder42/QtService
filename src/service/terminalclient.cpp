@@ -51,7 +51,7 @@ int TerminalClient::exec(int &argc, char **argv, int flags)
 	_socket = new QLocalSocket{this};
 	_outFile = QConsole::qStdOut(this);
 	if(_mode == Service::ReadWriteActive)
-		;//TODO _inFile = QConsole::qStdIn(this);
+		_inFile = QConsole::qStdIn(this);
 	else {
 		_inConsole = new QConsole{this};
 		connect(_inConsole, &QConsole::readyRead,
