@@ -37,7 +37,7 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 #endif
 
 	QCoreApplication app(argc, argv, flags);
-	if(!preStartService()) //TODO exec early everywhere
+	if(!preStartService())
 		return EXIT_FAILURE;
 
 	// create lock

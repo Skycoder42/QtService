@@ -26,6 +26,7 @@ class Q_SERVICE_EXPORT Service : public QObject
 	Q_PROPERTY(QString backend READ backend CONSTANT)
 	Q_PROPERTY(QDir runtimeDir READ runtimeDir CONSTANT)
 	Q_PROPERTY(bool terminalActive READ isTerminalActive WRITE setTerminalActive NOTIFY terminalActiveChanged)
+	Q_PROPERTY(TerminalMode terminalMode READ terminalMode WRITE setTerminalMode NOTIFY terminalModeChanged)
 	Q_PROPERTY(bool globalTerminal READ globalTerminal WRITE setGlobalTerminal NOTIFY globalTerminalChanged)
 
 public:
@@ -56,6 +57,7 @@ public:
 	QString backend() const;
 	QDir runtimeDir() const;
 	bool isTerminalActive() const;
+	TerminalMode terminalMode() const;
 	bool globalTerminal() const;
 
 public Q_SLOTS:
@@ -63,6 +65,7 @@ public Q_SLOTS:
 	void reload();
 
 	void setTerminalActive(bool terminalActive);
+	void setTerminalMode(TerminalMode terminalMode);
 	void setGlobalTerminal(bool globalTerminal);
 
 Q_SIGNALS:
@@ -75,6 +78,7 @@ Q_SIGNALS:
 	void terminalConnected(Terminal *terminal);
 
 	void terminalActiveChanged(bool terminalActive, QPrivateSignal);
+	void terminalModeChanged(TerminalMode terminalMode, QPrivateSignal);
 	void globalTerminalChanged(bool globalTerminal, QPrivateSignal);
 
 protected:

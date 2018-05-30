@@ -1,6 +1,7 @@
 #include "service.h"
 #include "service_p.h"
 #include "serviceplugin.h"
+#include "terminalclient_p.h"
 #include "logging_p.h"
 #include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
@@ -52,31 +53,39 @@ Service::Service(int &argc, char **argv, int flags) :
 
 int Service::exec()
 {
-	QByteArray provider {"standard"};
+	QByteArray provider{"standard"};
+	auto backendFound = false;
+	auto asTerminal = false;
 	for(auto i = 1; i < d->argc; i++) {
 		QByteArray arg {d->argv[i]};
-		if(arg == "--backend") {
+		if(!backendFound && arg == "--backend") {
 			if(i+1 < d->argc) {
+				backendFound = true;
 				provider = d->argv[i+1];
-				break;
 			} else {
 				qCCritical(logQtService) << "You must specify the backend name after the \"--backend\" parameter";
 				return EXIT_FAILURE;
 			}
-		}
+		} else if(!asTerminal && arg == "--terminal")
+			asTerminal = true;
 	}
 
-	try {
-		d->backendProvider = QString::fromUtf8(provider);
-		d->backend = factory->createServiceBackend(d->backendProvider, this);
-		if(!d->backend) {
-			qCCritical(logQtService) << "No backend found for the name" << provider;
+	if(asTerminal && d->terminalActive) {
+		TerminalClient client{d->terminalMode};
+		return client.exec(d->argc, d->argv, d->flags);
+	} else {
+		try {
+			d->backendProvider = QString::fromUtf8(provider);
+			d->backend = factory->createServiceBackend(d->backendProvider, this);
+			if(!d->backend) {
+				qCCritical(logQtService) << "No backend found for the name" << provider;
+				return EXIT_FAILURE;
+			}
+			return d->backend->runService(d->argc, d->argv, d->flags);
+		} catch(QPluginLoadException &e) {
+			qCCritical(logQtService) << "Failed to load backend" << provider << "with error:" << e.what();
 			return EXIT_FAILURE;
 		}
-		return d->backend->runService(d->argc, d->argv, d->flags);
-	} catch(QPluginLoadException &e) {
-		qCCritical(logQtService) << "Failed to load backend" << provider << "with error:" << e.what();
-		return EXIT_FAILURE;
 	}
 }
 
@@ -107,12 +116,17 @@ QString Service::backend() const
 
 QDir Service::runtimeDir() const
 {
-	return ServicePrivate::runtimeDir(QCoreApplication::applicationName());
+	return ServicePrivate::runtimeDir();
 }
 
 bool Service::isTerminalActive() const
 {
 	return d->terminalActive;
+}
+
+Service::TerminalMode Service::terminalMode() const
+{
+	return d->terminalMode;
 }
 
 bool Service::globalTerminal() const
@@ -140,6 +154,15 @@ void Service::setTerminalActive(bool terminalActive)
 	else
 		d->stopTerminals();
 	emit terminalActiveChanged(d->terminalActive, {});
+}
+
+void Service::setTerminalMode(Service::TerminalMode terminalMode)
+{
+	if (d->terminalMode == terminalMode)
+		return;
+
+	d->terminalMode = terminalMode;
+	emit terminalModeChanged(d->terminalMode, {});
 }
 
 void Service::setGlobalTerminal(bool globalTerminal)

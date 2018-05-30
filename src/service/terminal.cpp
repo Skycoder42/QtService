@@ -8,7 +8,22 @@ Terminal::Terminal(TerminalPrivate *d_ptr, QObject *parent) :
 	d{d_ptr}
 {
 	d->setParent(this);
-	QIODevice::open(d->socket->openMode() | QIODevice::Unbuffered); //TODO use terminal mode
+
+	QIODevice::OpenMode mode;
+	switch(d->terminalMode) {
+	case QtService::Service::ReadOnly:
+		mode = QIODevice::WriteOnly; // a read only terminal means the service can only write
+		break;
+	case QtService::Service::WriteOnly:
+		mode = QIODevice::ReadOnly; // a write only terminal means the service can only read
+		break;
+	case QtService::Service::ReadWritePassive:
+	case QtService::Service::ReadWriteActive:
+		mode = QIODevice::ReadWrite;
+		break;
+	}
+	// open as combination of theoretical mode, limited to actual mode, but unbuffered
+	QIODevice::open((mode & d->socket->openMode()) | QIODevice::Unbuffered);
 
 	connect(d->socket, &QLocalSocket::disconnected,
 			this, &Terminal::terminalDisconnected);

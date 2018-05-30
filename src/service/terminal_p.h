@@ -17,6 +17,8 @@ class Q_SERVICE_EXPORT TerminalPrivate : public QObject
 
 public:
 	enum RequestType {
+		InvalidRequest = 0,
+
 		CharRequest = 1,
 		MultiCharRequest = 2,
 		LineRequest = 3

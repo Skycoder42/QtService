@@ -1,6 +1,7 @@
 #include "terminalserver_p.h"
 #include "terminal_p.h"
 #include "logging_p.h"
+#include "service_p.h"
 using namespace QtService;
 
 TerminalServer::TerminalServer(Service *service) :
@@ -9,17 +10,22 @@ TerminalServer::TerminalServer(Service *service) :
 	_server{new QLocalServer{this}}
 {}
 
+QString TerminalServer::serverName()
+{
+#ifdef Q_OS_WIN
+	return QStringLiteral("\\.\pipe\de.skycoder42.QtService.%1.terminal")
+				.arg(QCoreApplication::applicationName());
+#else
+	return ServicePrivate::runtimeDir().absoluteFilePath(QStringLiteral("terminal.socket"));
+#endif
+}
+
 bool TerminalServer::start(bool globally)
 {
 	_server->setSocketOptions(globally ? QLocalServer::WorldAccessOption : QLocalServer::UserAccessOption);
 	auto activeSockets = _service->getSockets("terminal");
 	if(activeSockets.isEmpty()) {
-#ifdef Q_OS_WIN
-		auto name = QStringLiteral("\\.\pipe\de.skycoder42.QtService.%1.terminal")
-				.arg(QCoreApplication::applicationName());
-#else
-		auto name = _service->runtimeDir().absoluteFilePath(QStringLiteral("terminal.socket"));
-#endif
+		auto name = serverName();
 		if(!_server->listen(name)) {
 			if(_server->serverError() == QAbstractSocket::AddressInUseError) {
 				if(QLocalServer::removeServer(name))

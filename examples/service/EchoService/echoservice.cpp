@@ -59,6 +59,7 @@ QtService::Service::CommandMode EchoService::onStart()
 
 QtService::Service::CommandMode EchoService::onStop(int &exitCode)
 {
+	Q_UNUSED(exitCode)
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
 	return Synchronous;

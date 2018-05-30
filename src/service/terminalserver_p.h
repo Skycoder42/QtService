@@ -17,6 +17,8 @@ class TerminalServer : public QObject
 public:
 	explicit TerminalServer(Service *service);
 
+	static QString serverName();
+
 	bool start(bool globally);
 	void stop();
 

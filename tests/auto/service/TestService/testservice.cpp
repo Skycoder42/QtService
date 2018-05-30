@@ -84,8 +84,3 @@ Service::CommandMode TestService::onResume()
 	_stream << QByteArray("resuming");
 	return Synchronous;
 }
-
-QVariant TestService::onCallback(const QByteArray &kind, const QVariantList &args)
-{
-	return {};
-}
