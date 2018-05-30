@@ -15,13 +15,15 @@ HEADERS += \
     servicecontrol.h \
     servicecontrol_p.h \
     terminal.h \
-    terminal_p.h
+    terminal_p.h \
+    terminalserver_p.h
 
 SOURCES += \
 	service.cpp \
     servicebackend.cpp \
     servicecontrol.cpp \
-    terminal.cpp
+    terminal.cpp \
+    terminalserver.cpp
 
 MODULE_PLUGIN_TYPES = servicebackends
 load(qt_module)
