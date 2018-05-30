@@ -16,6 +16,13 @@ class Q_SERVICE_EXPORT TerminalPrivate : public QObject
 	friend class QtService::Terminal;
 
 public:
+	enum RequestType {
+		CharRequest = 1,
+		MultiCharRequest = 2,
+		LineRequest = 3
+	};
+	Q_ENUM(RequestType)
+
 	TerminalPrivate(QLocalSocket *socket, QObject *parent = nullptr);
 
 Q_SIGNALS:
@@ -29,6 +36,7 @@ private Q_SLOTS:
 private:
 	QLocalSocket *socket;
 
+	Service::TerminalMode terminalMode = Service::ReadWriteActive;
 	QStringList command;
 	bool autoDelete = true;
 

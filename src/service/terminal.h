@@ -4,6 +4,7 @@
 #include <QtCore/qiodevice.h>
 
 #include "QtService/qtservice_global.h"
+#include "QtService/service.h"
 
 namespace QtService {
 
@@ -12,6 +13,7 @@ class Q_SERVICE_EXPORT Terminal : public QIODevice //TODO copy doc from backproc
 {
 	Q_OBJECT
 
+	Q_PROPERTY(QtService::Service::TerminalMode terminalMode READ terminalMode CONSTANT)
 	Q_PROPERTY(QStringList command READ command CONSTANT)
 	Q_PROPERTY(bool autoDelete READ isAutoDelete WRITE setAutoDelete NOTIFY autoDeleteChanged)
 
@@ -28,11 +30,16 @@ public:
 	bool waitForReadyRead(int msecs) override;
 	bool waitForBytesWritten(int msecs) override;
 
+	Service::TerminalMode terminalMode() const;
 	QStringList command() const;
 	bool isAutoDelete() const;
 
 public Q_SLOTS:
 	void disconnectTerminal();
+
+	void requestChar();
+	void requestChars(qint64 num);
+	void requestLine();
 
 	void writeLine(const QByteArray &line, bool flush = true);
 	void flush();

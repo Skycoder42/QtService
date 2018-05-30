@@ -33,6 +33,14 @@ public:
 	};
 	Q_ENUM(CommandMode)
 
+	enum TerminalMode {
+		ReadOnly,
+		WriteOnly,
+		ReadWritePassive,
+		ReadWriteActive
+	};
+	Q_ENUM(TerminalMode)
+
 	explicit Service(int &argc, char **argv, int = QCoreApplication::ApplicationFlags);
 	~Service() override;
 

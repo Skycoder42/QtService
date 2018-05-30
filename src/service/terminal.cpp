@@ -8,7 +8,7 @@ Terminal::Terminal(TerminalPrivate *d_ptr, QObject *parent) :
 	d{d_ptr}
 {
 	d->setParent(this);
-	QIODevice::open(d->socket->openMode() | QIODevice::Unbuffered);
+	QIODevice::open(d->socket->openMode() | QIODevice::Unbuffered); //TODO use terminal mode
 
 	connect(d->socket, &QLocalSocket::disconnected,
 			this, &Terminal::terminalDisconnected);
@@ -69,6 +69,11 @@ bool Terminal::waitForBytesWritten(int msecs)
 	return d->socket->waitForBytesWritten(msecs);
 }
 
+Service::TerminalMode Terminal::terminalMode() const
+{
+	return d->terminalMode;
+}
+
 QStringList Terminal::command() const
 {
 	return d->command;
@@ -84,11 +89,45 @@ void Terminal::disconnectTerminal()
 	d->socket->disconnectFromServer();
 }
 
+void Terminal::requestChar()
+{
+	if(d->terminalMode != Service::ReadWriteActive) {
+		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
+		return;
+	}
+	d->commandStream << true
+					 << TerminalPrivate::CharRequest;
+	d->socket->flush();
+}
+
+void Terminal::requestChars(qint64 num)
+{
+	if(d->terminalMode != Service::ReadWriteActive) {
+		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
+		return;
+	}
+	d->commandStream << true
+					 << TerminalPrivate::MultiCharRequest
+					 << num;
+	d->socket->flush();
+}
+
+void Terminal::requestLine()
+{
+	if(d->terminalMode != Service::ReadWriteActive) {
+		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
+		return;
+	}
+	d->commandStream << true
+					 << TerminalPrivate::LineRequest;
+	d->socket->flush();
+}
+
 void Terminal::writeLine(const QByteArray &line, bool flush)
 {
-	d->socket->write(line + '\n');
+	write(line + '\n');
 	if(flush)
-		d->socket->flush();
+		this->flush();
 }
 
 void Terminal::flush()
@@ -117,7 +156,20 @@ qint64 Terminal::readLineData(char *data, qint64 maxlen)
 
 qint64 Terminal::writeData(const char *data, qint64 len)
 {
-	return d->socket->write(data, len);
+	if(d->terminalMode == Service::ReadWriteActive) {
+		if(len > std::numeric_limits<int>::max()) {
+			for(qint64 lIndex = 0; lIndex < len; lIndex += std::numeric_limits<int>::max()) {
+				auto writeData = data + lIndex;
+				auto writeLen = (len - lIndex) > std::numeric_limits<int>::max() ?
+									std::numeric_limits<int>::max() :
+									static_cast<int>(len - lIndex);
+				d->commandStream << false << QByteArray::fromRawData(writeData, writeLen);
+			}
+		} else
+			d->commandStream << false << QByteArray::fromRawData(data, static_cast<int>(len));
+		return len;
+	} else
+		return d->socket->write(data, len);
 }
 
 bool Terminal::open(QIODevice::OpenMode mode)
@@ -173,8 +225,10 @@ void TerminalPrivate::readyRead()
 {
 	if(isLoading) {
 		commandStream.startTransaction();
-		commandStream >> command;
+		int tMode;
+		commandStream >> tMode >> command;
 		if(commandStream.commitTransaction()) {
+			terminalMode = static_cast<Service::TerminalMode>(tMode);
 			isLoading = false;
 			//disconnect all but "disconencted" - that one is needed for auto-delete
 			disconnect(socket, QOverload<QLocalSocket::LocalSocketError>::of(&QLocalSocket::error),
