@@ -16,7 +16,7 @@ TerminalServer::TerminalServer(Service *service) :
 QString TerminalServer::serverName()
 {
 #ifdef Q_OS_WIN
-	return QStringLiteral("\\.\pipe\de.skycoder42.QtService.%1.terminal")
+	return QStringLiteral(R"__(\\.\pipe\de.skycoder42.QtService.%1.terminal)__")
 				.arg(QCoreApplication::applicationName());
 #else
 	return ServicePrivate::runtimeDir().absoluteFilePath(QStringLiteral("terminal.socket"));

@@ -85,9 +85,11 @@ void BasicServiceTest::testStop()
 	testFeature(ServiceControl::SupportsStop);
 	QVERIFY(control->stop());
 
+#ifndef Q_OS_WIN
 	QByteArray msg;
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("stopping"));
+#endif
 	QVERIFY(socket->waitForDisconnected(5000));
 
 	testFeature(ServiceControl::SupportsStatus);

@@ -27,6 +27,7 @@ Service::CommandMode TestService::onStart()
 
 		emit started();
 		_stream << QByteArray("started");
+		_socket->flush();
 	});
 	_server->listen(runtimeDir().absoluteFilePath(QStringLiteral("__qtservice_testservice")));
 	qDebug() << "listening:" << _server->isListening();
@@ -61,20 +62,23 @@ Service::CommandMode TestService::onStart()
 Service::CommandMode TestService::onStop(int &exitCode)
 {
 	_stream << QByteArray("stopping");
+	_socket->flush();
 	if(_socket)
-		exitCode = _socket->waitForBytesWritten(5000) ? EXIT_SUCCESS : EXIT_FAILURE;
+		exitCode = _socket->waitForBytesWritten(2500) ? EXIT_SUCCESS : EXIT_FAILURE;
 	return Synchronous;
 }
 
 Service::CommandMode TestService::onReload()
 {
 	_stream << QByteArray("reloading");
+	_socket->flush();
 	return Synchronous;
 }
 
 Service::CommandMode TestService::onPause()
 {
 	_stream << QByteArray("pausing");
+	_socket->flush();
 	_socket->waitForBytesWritten(5000);
 	return Synchronous;
 }
@@ -82,5 +86,6 @@ Service::CommandMode TestService::onPause()
 Service::CommandMode TestService::onResume()
 {
 	_stream << QByteArray("resuming");
+	_socket->flush();
 	return Synchronous;
 }

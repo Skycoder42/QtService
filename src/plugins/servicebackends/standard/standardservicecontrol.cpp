@@ -96,6 +96,7 @@ bool StandardServiceControl::stop()
 	}
 #ifdef Q_OS_WIN
 	auto ok = false;
+	auto hadConsole = FreeConsole();
 	if(AttachConsole(static_cast<DWORD>(pid))) {
 		if(SetConsoleCtrlHandler(nullptr, true)) {
 			if(GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) {
@@ -117,6 +118,8 @@ bool StandardServiceControl::stop()
 		FreeConsole();
 	} else
 		qCWarning(logQtService).noquote() << qt_error_string(GetLastError());
+	if(hadConsole)
+		AllocConsole();
 	return ok;
 #else
 	return kill(static_cast<pid_t>(pid), SIGTERM) == 0;
