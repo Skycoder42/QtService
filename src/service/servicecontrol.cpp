@@ -128,7 +128,7 @@ void ServiceControl::setError(QString error) const
 	if (d->error == error)
 		return;
 
-	d->error = error;
+	d->error = std::move(error);
 	emit const_cast<ServiceControl*>(this)->errorChanged(d->error, {});
 }
 

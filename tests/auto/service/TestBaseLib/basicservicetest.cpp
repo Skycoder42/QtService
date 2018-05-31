@@ -15,7 +15,7 @@ void BasicServiceTest::initTestCase()
 	init();
 	control = ServiceControl::create(backend(), name(), this);
 	QVERIFY(control);
-	QVERIFY(control->serviceExists());
+	QVERIFY2(control->serviceExists(), qUtf8Printable(control->error()));
 	control->setBlocking(true);
 }
 
@@ -32,7 +32,7 @@ void BasicServiceTest::testStart()
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 
 	testFeature(ServiceControl::SupportsStart);
-	QVERIFY(control->start());
+	QVERIFY2(control->start(), qUtf8Printable(control->error()));
 	// blocking should only return after the server started, but for non blocking this may not be the case...
 	if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
 		QThread::sleep(3);
@@ -50,7 +50,7 @@ void BasicServiceTest::testStart()
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 
 	//test "double-start"
-	QVERIFY(control->start());
+	QVERIFY2(control->start(), qUtf8Printable(control->error()));
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 }
@@ -61,7 +61,7 @@ void BasicServiceTest::testReload()
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 
 	testFeature(ServiceControl::SupportsReload);
-	QVERIFY(control->reload());
+	QVERIFY2(control->reload(), qUtf8Printable(control->error()));
 
 	QByteArray msg;
 	READ_LOOP(msg);
@@ -83,7 +83,7 @@ void BasicServiceTest::testStop()
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 
 	testFeature(ServiceControl::SupportsStop);
-	QVERIFY(control->stop());
+	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
 
 #ifndef Q_OS_WIN
 	QByteArray msg;
@@ -96,20 +96,20 @@ void BasicServiceTest::testStop()
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 
 	//test "double-stop"
-	QVERIFY(control->stop());
+	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 }
 
 void BasicServiceTest::testAutostart()
 {
-	QVERIFY(!control->isAutostartEnabled());
+	QVERIFY2(!control->isAutostartEnabled(), qUtf8Printable(control->error()));
 
 	testFeature(ServiceControl::SupportsSetAutostart);
-	QVERIFY(control->enableAutostart());
-	QVERIFY(control->isAutostartEnabled());
-	QVERIFY(control->disableAutostart());
-	QVERIFY(!control->isAutostartEnabled());
+	QVERIFY2(control->enableAutostart(), qUtf8Printable(control->error()));
+	QVERIFY2(control->isAutostartEnabled(), qUtf8Printable(control->error()));
+	QVERIFY2(control->disableAutostart(), qUtf8Printable(control->error()));
+	QVERIFY2(!control->isAutostartEnabled(), qUtf8Printable(control->error()));
 }
 
 QString BasicServiceTest::name()
@@ -131,26 +131,26 @@ void BasicServiceTest::performSocketTest()
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 
-	auto socket = new QTcpSocket(this);
-	socket->connectToHost(QStringLiteral("127.0.0.1"), 15843);
-	QVERIFY(socket->waitForConnected(5000));
+	auto tcpSocket = new QTcpSocket(this);
+	tcpSocket->connectToHost(QStringLiteral("127.0.0.1"), 15843);
+	QVERIFY(tcpSocket->waitForConnected(5000));
 	while(control->status() == ServiceControl::ServiceStarting)
 		QThread::msleep(500);
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 
 	QByteArray msg = "hello world";
-	socket->write(msg);
+	tcpSocket->write(msg);
 
 	QByteArray resMsg;
 	do {
-		QVERIFY(socket->waitForReadyRead(5000));
-		resMsg += socket->readAll();
+		QVERIFY(tcpSocket->waitForReadyRead(5000));
+		resMsg += tcpSocket->readAll();
 	} while(resMsg.size() < msg.size());
 	QCOMPARE(resMsg, msg);
 
 	testFeature(ServiceControl::SupportsStop);
-	QVERIFY(control->stop());
+	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 }

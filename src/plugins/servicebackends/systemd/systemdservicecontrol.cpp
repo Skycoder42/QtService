@@ -113,7 +113,8 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 		else if(svcState == "deactivating")
 			return ServiceStopping;
 		else {
-			qCWarning(logQtService) << "Unknown service state" << svcState << "for service" << svcName;
+			setError(QStringLiteral("Unknown service state %1 for service %2")
+					 .arg(QString::fromUtf8(svcState), QString::fromUtf8(svcName)));
 			return ServiceStatusUnknown;
 		}
 	}
@@ -123,7 +124,8 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 	if(_exists)
 		return ServiceStopped;
 	else {
-		qCWarning(logQtService) << "Service" << svcName << "was not found as systemd service";
+		setError(QStringLiteral("Service %1 was not found as systemd service")
+				 .arg(QString::fromUtf8(svcName)));
 		return ServiceStatusUnknown;
 	}
 }
@@ -182,7 +184,7 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 {
 	const auto systemctl = QStandardPaths::findExecutable(QStringLiteral("systemctl"));
 	if(systemctl.isEmpty()) {
-		qCWarning(logQtService) << "Failed to find systemctl executable";
+		setError(QStringLiteral("Failed to find systemctl executable"));
 		return -1;
 	}
 
@@ -216,11 +218,11 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 		if(process.exitStatus() == QProcess::NormalExit)
 			return process.exitCode();
 		else {
-			qCWarning(logQtService).noquote() << "systemctl crashed with error:" << process.errorString();
+			setError(QStringLiteral("systemctl crashed with error: %1").arg(process.errorString()));
 			return 128 + process.error();
 		}
 	} else {
-		qCWarning(logQtService).noquote() << "systemctl did not exit in time";
+		setError(QStringLiteral("systemctl did not exit in time"));
 		return -1;
 	}
 }
