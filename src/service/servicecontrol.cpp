@@ -19,6 +19,8 @@ ServiceControl::ServiceControl(QString &&serviceId, QObject *parent) :
 	d{new ServiceControlPrivate{std::move(serviceId)}}
 {}
 
+ServiceControl::~ServiceControl() = default;
+
 QString ServiceControl::serviceId() const
 {
 	return d->serviceId;
@@ -37,6 +39,11 @@ ServiceControl::ServiceStatus ServiceControl::status() const
 bool ServiceControl::isAutostartEnabled() const
 {
 	return false;
+}
+
+QString ServiceControl::error() const
+{
+	return d->error;
 }
 
 QVariant ServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
@@ -116,7 +123,16 @@ QString ServiceControl::serviceName() const
 	return serviceId();
 }
 
-ServiceControl::~ServiceControl() = default;
+void ServiceControl::setError(QString error) const
+{
+	if (d->error == error)
+		return;
+
+	d->error = error;
+	emit const_cast<ServiceControl*>(this)->errorChanged(d->error, {});
+}
+
+// ------------- Private Implementation -------------
 
 ServiceControlPrivate::ServiceControlPrivate(QString &&serviceId) :
 	serviceId{std::move(serviceId)}

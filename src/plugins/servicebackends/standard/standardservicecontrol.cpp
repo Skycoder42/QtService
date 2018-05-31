@@ -111,13 +111,16 @@ bool StandardServiceControl::stop()
 				if(!ok)
 					qCWarning(logQtService).noquote() << "Service did not stop yet";
 			} else
-				qCWarning(logQtService).noquote() << qt_error_string(GetLastError());
+				qCWarning(logQtService).noquote() << "Failed to send stop signal with error:"
+												  << qt_error_string(GetLastError());
 			SetConsoleCtrlHandler(nullptr, false);
 		} else
-			qCWarning(logQtService).noquote() << qt_error_string(GetLastError());
+			qCWarning(logQtService).noquote() << "Failed to disable local console handler with error:"
+											  << qt_error_string(GetLastError());
 		FreeConsole();
 	} else
-		qCWarning(logQtService).noquote() << qt_error_string(GetLastError());
+		qCWarning(logQtService).noquote() << "Failed to attach to service console with error:"
+										  << qt_error_string(GetLastError());
 	if(hadConsole)
 		AllocConsole();
 	return ok;

@@ -5,11 +5,13 @@ QT -= gui
 
 HEADERS += \
 	windowsserviceplugin.h \
-	windowsservicebackend.h
+	windowsservicebackend.h \
+    windowsservicecontrol.h
 
 SOURCES += \
 	windowsserviceplugin.cpp \
-	windowsservicebackend.cpp
+	windowsservicebackend.cpp \
+    windowsservicecontrol.cpp
 
 DISTFILES += windows.json
 

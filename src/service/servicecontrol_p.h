@@ -13,6 +13,7 @@ public:
 
 	QString serviceId;
 	bool blocking = true;
+	QString error;
 };
 
 }

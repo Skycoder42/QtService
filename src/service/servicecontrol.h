@@ -5,6 +5,7 @@
 #include <QtCore/qscopedpointer.h>
 #include <QtCore/qdir.h>
 #include <QtCore/qvariant.h>
+#include <QtCore/qexception.h>
 
 #include "QtService/qtservice_global.h"
 
@@ -24,6 +25,8 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 	Q_PROPERTY(bool serviceExists READ serviceExists)
 	Q_PROPERTY(ServiceStatus status READ status)
 	Q_PROPERTY(bool autostartEnabled READ isAutostartEnabled WRITE setAutostartEnabled)
+
+	Q_PROPERTY(QString error READ error NOTIFY errorChanged)
 
 public:
 	enum SupportFlag {
@@ -76,6 +79,7 @@ public:
 	virtual bool serviceExists() const = 0;
 	virtual ServiceStatus status() const;
 	virtual bool isAutostartEnabled() const;
+	QString error() const;
 
 	virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args);
 	template <typename TRet, typename... TArgs>
@@ -86,7 +90,7 @@ public:
 	QDir runtimeDir() const;
 
 public Q_SLOTS:
-	virtual bool start();
+	virtual bool start(); //TODO void and no slots, or error message instead of exception
 	virtual bool stop();
 
 	virtual bool pause();
@@ -102,13 +106,18 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void blockingChanged(bool blocking, QPrivateSignal);
+	void errorChanged(QString error, QPrivateSignal);
 
 protected:
 	virtual QString serviceName() const;
 
+	void setError(QString error) const;
+
 private:
 	QScopedPointer<ServiceControlPrivate> d;
 };
+
+// ------------- Generic Implementations -------------
 
 template<typename TRet, typename... TArgs>
 TRet ServiceControl::callCommand(const QByteArray &kind, TArgs... args)
