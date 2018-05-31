@@ -71,7 +71,7 @@ int Service::exec()
 	}
 
 	if(asTerminal && d->terminalActive) {
-		TerminalClient client{d->terminalMode};
+		TerminalClient client{d->terminalMode, this};
 		return client.exec(d->argc, d->argv, d->flags);
 	} else {
 		try {
@@ -216,6 +216,12 @@ QVariant Service::onCallback(const QByteArray &kind, const QVariantList &args)
 		qCWarning(logQtService) << "Unhandeled callback of kind" << kind;
 		return {};
 	}
+}
+
+bool Service::verifyCommand(const QStringList &arguments)
+{
+	Q_UNUSED(arguments)
+	return true;
 }
 
 void Service::addCallback(const QByteArray &kind, const std::function<QVariant (QVariantList)> &fn)

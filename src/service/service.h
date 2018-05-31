@@ -17,6 +17,7 @@
 namespace QtService {
 
 class Terminal;
+class TerminalClient;
 class ServiceBackend;
 class ServicePrivate;
 class Q_SERVICE_EXPORT Service : public QObject
@@ -25,6 +26,7 @@ class Q_SERVICE_EXPORT Service : public QObject
 
 	Q_PROPERTY(QString backend READ backend CONSTANT)
 	Q_PROPERTY(QDir runtimeDir READ runtimeDir CONSTANT)
+
 	Q_PROPERTY(bool terminalActive READ isTerminalActive WRITE setTerminalActive NOTIFY terminalActiveChanged)
 	Q_PROPERTY(TerminalMode terminalMode READ terminalMode WRITE setTerminalMode NOTIFY terminalModeChanged)
 	Q_PROPERTY(bool globalTerminal READ globalTerminal WRITE setGlobalTerminal NOTIFY globalTerminalChanged)
@@ -93,6 +95,8 @@ protected:
 
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
 
+	virtual bool verifyCommand(const QStringList &arguments);
+
 	void addCallback(const QByteArray &kind, const std::function<QVariant(QVariantList)> &fn);
 	template <typename TFunction>
 	void addCallback(const QByteArray &kind, const TFunction &fn);
@@ -100,6 +104,7 @@ protected:
 private:
 	friend class QtService::ServiceBackend;
 	friend class QtService::ServicePrivate;
+	friend class QtService::TerminalClient;
 
 	QScopedPointer<ServicePrivate> d;
 };

@@ -17,7 +17,7 @@ class TerminalClient : public QObject
 	Q_OBJECT
 
 public:
-	explicit TerminalClient(Service::TerminalMode mode, QObject *parent = nullptr);
+	explicit TerminalClient(Service::TerminalMode mode, Service *service);
 	~TerminalClient() override;
 
 	int exec(int &argc, char **argv, int flags);
@@ -33,7 +33,9 @@ private Q_SLOTS:
 	void consoleReady();
 
 private:
+	Service *_service;
 	const Service::TerminalMode _mode;
+	QStringList _cmdArgs;
 
 	QLocalSocket *_socket = nullptr;
 	QDataStream _stream;

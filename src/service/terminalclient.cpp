@@ -8,8 +8,9 @@
 #include <iostream>
 using namespace QtService;
 
-TerminalClient::TerminalClient(Service::TerminalMode mode, QObject *parent) :
-	QObject{parent},
+TerminalClient::TerminalClient(Service::TerminalMode mode, Service *service) :
+	QObject{service},
+	_service{service},
 	_mode{mode}
 {}
 
@@ -44,6 +45,18 @@ int TerminalClient::exec(int &argc, char **argv, int flags)
 	qInstallMessageHandler(TerminalClient::cerrMessageHandler);
 
 	QCoreApplication app{argc, argv, flags};
+
+	// verify args
+	_cmdArgs = QCoreApplication::arguments();
+	auto backendIndex = _cmdArgs.indexOf(QStringLiteral("--backend"));
+	if(backendIndex >= 0) {
+		// remove --backend <backend> (2 args)
+		_cmdArgs.removeAt(backendIndex);
+		_cmdArgs.removeAt(backendIndex);
+	}
+	_cmdArgs.removeOne(QStringLiteral("--terminal"));
+	if(!_service->verifyCommand(_cmdArgs))
+		return EXIT_FAILURE;
 
 	// enable signal handling for standard "quit" signals
 	QCtrlSignalHandler::instance()->setAutoQuitActive(true);
