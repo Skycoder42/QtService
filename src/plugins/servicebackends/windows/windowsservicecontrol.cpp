@@ -248,7 +248,7 @@ WindowsServiceControl::HandleHolder::~HandleHolder()
 
 bool WindowsServiceControl::HandleHolder::operator!() const
 {
-	return _handle;
+	return !_handle;
 }
 
 WindowsServiceControl::HandleHolder::operator SC_HANDLE() const

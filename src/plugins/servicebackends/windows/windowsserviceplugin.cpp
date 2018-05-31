@@ -1,5 +1,6 @@
 #include "windowsserviceplugin.h"
 #include "windowsservicebackend.h"
+#include "windowsservicecontrol.h"
 
 WindowsServicePlugin::WindowsServicePlugin(QObject *parent) :
 	QObject(parent)
@@ -15,5 +16,8 @@ QtService::ServiceBackend *WindowsServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *WindowsServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-	return nullptr;
+	if(backend == QStringLiteral("windows"))
+		return new WindowsServiceControl{std::move(serviceId), parent};
+	else
+		return nullptr;
 }

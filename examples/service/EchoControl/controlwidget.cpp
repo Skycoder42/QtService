@@ -30,6 +30,10 @@ void ControlWidget::on_loadButton_clicked()
 	_control = ServiceControl::create(ui->backendComboBox->currentText(),
 									  ui->nameLineEdit->text(),
 									  this);
+	connect(_control, &ServiceControl::errorChanged,
+			this, [this](const QString &error){
+		QMessageBox::critical(this, tr("Error"), error);
+	});
 	if(!_control->serviceExists()) {
 		QMessageBox::critical(this,
 							  tr("Error"),
