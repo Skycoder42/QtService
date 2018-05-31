@@ -19,6 +19,14 @@ public:
 		QPluginFactory{pluginType, parent}
 	{}
 
+	QString currentServiceId(const QString &provider) const {
+		auto plg = plugin(provider);
+		if(plg)
+			return plg->currentServiceId();
+		else
+			return {};
+	}
+
 	QtService::ServiceBackend *createServiceBackend(const QString &provider, QtService::Service *service) {
 		auto plg = plugin(provider);
 		if(plg)
@@ -53,7 +61,7 @@ Service::Service(int &argc, char **argv, int flags) :
 
 int Service::exec()
 {
-	QByteArray provider{"standard"};
+	d->backendProvider = QStringLiteral("standard");
 	auto backendFound = false;
 	auto asTerminal = false;
 	for(auto i = 1; i < d->argc; i++) {
@@ -61,7 +69,7 @@ int Service::exec()
 		if(!backendFound && arg == "--backend") {
 			if(i+1 < d->argc) {
 				backendFound = true;
-				provider = d->argv[i+1];
+				d->backendProvider = QString::fromUtf8(d->argv[i+1]);
 			} else {
 				qCCritical(logQtService) << "You must specify the backend name after the \"--backend\" parameter";
 				return EXIT_FAILURE;
@@ -71,19 +79,18 @@ int Service::exec()
 	}
 
 	if(asTerminal && d->terminalActive) {
-		TerminalClient client{d->terminalMode, this};
+		TerminalClient client{this};
 		return client.exec(d->argc, d->argv, d->flags);
 	} else {
 		try {
-			d->backendProvider = QString::fromUtf8(provider);
 			d->backend = factory->createServiceBackend(d->backendProvider, this);
 			if(!d->backend) {
-				qCCritical(logQtService) << "No backend found for the name" << provider;
+				qCCritical(logQtService) << "No backend found for the name" << d->backendProvider;
 				return EXIT_FAILURE;
 			}
 			return d->backend->runService(d->argc, d->argv, d->flags);
 		} catch(QPluginLoadException &e) {
-			qCCritical(logQtService) << "Failed to load backend" << provider << "with error:" << e.what();
+			qCCritical(logQtService) << "Failed to load backend" << d->backendProvider << "with error:" << e.what();
 			return EXIT_FAILURE;
 		}
 	}
@@ -134,6 +141,11 @@ bool Service::globalTerminal() const
 	return d->terminalGlobal;
 }
 
+bool Service::startWithTerminal() const
+{
+	return d->startWithTerminal;
+}
+
 void Service::quit()
 {
 	d->backend->quitService();
@@ -174,6 +186,15 @@ void Service::setGlobalTerminal(bool globalTerminal)
 		qCWarning(logQtService) << "Chaning the globalTerminal property will not have any effect until you disable and reenable the terminal server";
 	d->terminalGlobal = globalTerminal;
 	emit globalTerminalChanged(d->terminalGlobal, {});
+}
+
+void Service::setStartWithTerminal(bool startWithTerminal)
+{
+	if (d->startWithTerminal == startWithTerminal)
+		return;
+
+	d->startWithTerminal = startWithTerminal;
+	emit startWithTerminalChanged(d->startWithTerminal, {});
 }
 
 void Service::terminalConnected(Terminal *terminal)
@@ -251,6 +272,11 @@ QStringList ServicePrivate::listBackends()
 ServiceControl *ServicePrivate::createControl(const QString &provider, QString &&serviceId, QObject *parent)
 {
 	return factory->createServiceControl(provider, std::move(serviceId), parent);
+}
+
+ServiceControl *ServicePrivate::createLocalControl(const QString &provider, QObject *parent)
+{
+	return factory->createServiceControl(provider, factory->currentServiceId(provider), parent);
 }
 
 QDir ServicePrivate::runtimeDir(const QString &serviceName)

@@ -30,6 +30,7 @@ class Q_SERVICE_EXPORT Service : public QObject
 	Q_PROPERTY(bool terminalActive READ isTerminalActive WRITE setTerminalActive NOTIFY terminalActiveChanged)
 	Q_PROPERTY(TerminalMode terminalMode READ terminalMode WRITE setTerminalMode NOTIFY terminalModeChanged)
 	Q_PROPERTY(bool globalTerminal READ globalTerminal WRITE setGlobalTerminal NOTIFY globalTerminalChanged)
+	Q_PROPERTY(bool startWithTerminal READ startWithTerminal WRITE setStartWithTerminal NOTIFY startWithTerminalChanged)
 
 public:
 	enum CommandMode {
@@ -61,6 +62,7 @@ public:
 	bool isTerminalActive() const;
 	TerminalMode terminalMode() const;
 	bool globalTerminal() const;
+	bool startWithTerminal() const;
 
 public Q_SLOTS:
 	void quit();
@@ -69,6 +71,7 @@ public Q_SLOTS:
 	void setTerminalActive(bool terminalActive);
 	void setTerminalMode(TerminalMode terminalMode);
 	void setGlobalTerminal(bool globalTerminal);
+	void setStartWithTerminal(bool startWithTerminal);
 
 Q_SIGNALS:
 	void started();
@@ -80,6 +83,7 @@ Q_SIGNALS:
 	void terminalActiveChanged(bool terminalActive, QPrivateSignal);
 	void terminalModeChanged(TerminalMode terminalMode, QPrivateSignal);
 	void globalTerminalChanged(bool globalTerminal, QPrivateSignal);
+	void startWithTerminalChanged(bool startWithTerminal, QPrivateSignal);
 
 protected Q_SLOTS:
 	virtual void terminalConnected(Terminal *terminal);

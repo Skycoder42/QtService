@@ -17,7 +17,7 @@ class TerminalClient : public QObject
 	Q_OBJECT
 
 public:
-	explicit TerminalClient(Service::TerminalMode mode, Service *service);
+	explicit TerminalClient(Service *service);
 	~TerminalClient() override;
 
 	int exec(int &argc, char **argv, int flags);
@@ -34,9 +34,9 @@ private Q_SLOTS:
 
 private:
 	Service *_service;
-	const Service::TerminalMode _mode;
 	QStringList _cmdArgs;
 
+	Service::TerminalMode _mode = Service::ReadWriteActive;
 	QLocalSocket *_socket = nullptr;
 	QDataStream _stream;
 	QFile *_outFile = nullptr;
@@ -45,6 +45,10 @@ private:
 	QConsole *_inConsole = nullptr;
 
 	bool _exitFailed = false;
+
+	bool verifyArgs();
+	bool ensureServiceStarted();
+	void setupChannels();
 
 	static void cerrMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };

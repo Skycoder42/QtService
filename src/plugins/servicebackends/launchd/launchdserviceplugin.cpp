@@ -5,6 +5,12 @@ LaunchdServicePlugin::LaunchdServicePlugin(QObject *parent) :
 	QObject{parent}
 {}
 
+QString LaunchdServicePlugin::currentServiceId() const
+{
+	Q_UNIMPLEMENTED();
+	return QCoreApplication::applicationName();
+}
+
 QtService::ServiceBackend *LaunchdServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
 {
 	if(provider == QStringLiteral("launchd"))

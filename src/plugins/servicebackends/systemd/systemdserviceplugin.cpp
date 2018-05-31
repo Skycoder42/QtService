@@ -7,6 +7,11 @@ SystemdServicePlugin::SystemdServicePlugin(QObject *parent) :
 	QObject(parent)
 {}
 
+QString SystemdServicePlugin::currentServiceId() const
+{
+	return QCoreApplication::applicationName().toLower() + QStringLiteral(".service");
+}
+
 ServiceBackend *SystemdServicePlugin::createServiceBackend(const QString &provider, Service *service)
 {
 	if(provider == QStringLiteral("systemd"))

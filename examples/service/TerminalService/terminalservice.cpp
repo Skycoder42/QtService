@@ -7,6 +7,7 @@ TerminalService::TerminalService(int &argc, char **argv) :
 	Service(argc, argv)
 {
 	setTerminalActive(true);
+	setStartWithTerminal(true);
 	//setTerminalMode(Service::ReadWritePassive);
 }
 
@@ -23,6 +24,13 @@ Service::CommandMode TerminalService::onStop(int &exitCode)
 	return Synchronous;
 }
 
+bool TerminalService::verifyCommand(const QStringList &arguments)
+{
+	if(arguments.contains(QStringLiteral("--passive")))
+		setTerminalMode(Service::ReadWritePassive);
+	return true;
+}
+
 void TerminalService::terminalConnected(Terminal *terminal)
 {
 	qDebug() << "new terminal connected with args:" << terminal->command();
@@ -31,7 +39,9 @@ void TerminalService::terminalConnected(Terminal *terminal)
 		qDebug() << "A terminal just disconnected";
 	});
 
-	if(terminal->terminalMode() == Service::ReadWriteActive) {
+	if(terminal->command().startsWith(QStringLiteral("stop")))
+		quit();
+	else if(terminal->terminalMode() == Service::ReadWriteActive) {
 		connect(terminal, &Terminal::readyRead,
 				terminal, [terminal](){
 			qDebug() << "terminals name is:" << terminal->readAll();

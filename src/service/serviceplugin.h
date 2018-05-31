@@ -18,6 +18,8 @@ public:
 	inline ServicePlugin() = default;
 	virtual inline ~ServicePlugin() = default;
 
+	virtual QString currentServiceId() const = 0;
+
 	virtual ServiceBackend *createServiceBackend(const QString &provider, Service *service) = 0;
 	virtual ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) = 0;
 };

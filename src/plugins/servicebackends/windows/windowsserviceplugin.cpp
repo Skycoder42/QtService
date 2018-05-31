@@ -6,6 +6,11 @@ WindowsServicePlugin::WindowsServicePlugin(QObject *parent) :
 	QObject(parent)
 {}
 
+QString WindowsServicePlugin::currentServiceId() const
+{
+	return QCoreApplication::applicationName();
+}
+
 QtService::ServiceBackend *WindowsServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
 {
 	if(provider == QStringLiteral("windows"))

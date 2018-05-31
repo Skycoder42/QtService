@@ -17,6 +17,7 @@ public:
 
 	static QStringList listBackends();
 	static ServiceControl *createControl(const QString &provider, QString &&serviceId, QObject *parent);
+	static ServiceControl *createLocalControl(const QString &provider, QObject *parent);
 	static QDir runtimeDir(const QString &serviceName = QCoreApplication::applicationName());
 
 	static QPointer<Service> instance;
@@ -34,6 +35,7 @@ public:
 	bool terminalActive = false;
 	Service::TerminalMode terminalMode = Service::ReadWriteActive;
 	bool terminalGlobal = false;
+	bool startWithTerminal = false;
 
 	TerminalServer *termServer = nullptr;
 

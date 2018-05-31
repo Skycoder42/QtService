@@ -6,6 +6,11 @@ StandardServicePlugin::StandardServicePlugin(QObject *parent) :
 	QObject{parent}
 {}
 
+QString StandardServicePlugin::currentServiceId() const
+{
+	return QCoreApplication::applicationFilePath();
+}
+
 QtService::ServiceBackend *StandardServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
 {
 	if(provider == QStringLiteral("standard"))

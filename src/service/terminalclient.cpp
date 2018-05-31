@@ -1,17 +1,19 @@
 #include "terminalclient_p.h"
 #include "terminalserver_p.h"
 #include "terminal_p.h"
+#include "service_p.h"
+#include "servicecontrol.h"
+#include "logging_p.h"
+#include <iostream>
+#include <QtCore/QThread>
 #include <QtCore/QCoreApplication>
 #include "qconsole.h"
 #include "QCtrlSignals"
-#include "logging_p.h"
-#include <iostream>
 using namespace QtService;
 
-TerminalClient::TerminalClient(Service::TerminalMode mode, Service *service) :
+TerminalClient::TerminalClient(Service *service) :
 	QObject{service},
-	_service{service},
-	_mode{mode}
+	_service{service}
 {}
 
 TerminalClient::~TerminalClient()
@@ -47,39 +49,20 @@ int TerminalClient::exec(int &argc, char **argv, int flags)
 	QCoreApplication app{argc, argv, flags};
 
 	// verify args
-	_cmdArgs = QCoreApplication::arguments();
-	auto backendIndex = _cmdArgs.indexOf(QStringLiteral("--backend"));
-	if(backendIndex >= 0) {
-		// remove --backend <backend> (2 args)
-		_cmdArgs.removeAt(backendIndex);
-		_cmdArgs.removeAt(backendIndex);
-	}
-	_cmdArgs.removeOne(QStringLiteral("--terminal"));
-	if(!_service->verifyCommand(_cmdArgs))
+	if(!verifyArgs())
 		return EXIT_FAILURE;
 
 	// enable signal handling for standard "quit" signals
 	QCtrlSignalHandler::instance()->setAutoQuitActive(true);
 
-	_socket = new QLocalSocket{this};
-	_outFile = QConsole::qStdOut(this);
-	if(_mode == Service::ReadWriteActive)
-		_inFile = QConsole::qStdIn(this);
-	else {
-		_inConsole = new QConsole{this};
-		connect(_inConsole, &QConsole::readyRead,
-				this, &TerminalClient::consoleReady);
-	}
+	// setup the socket (not connect yet) and stdin/stderr handlers
+	setupChannels();
 
-	connect(_socket, &QLocalSocket::connected,
-			this, &TerminalClient::connected);
-	connect(_socket, &QLocalSocket::disconnected,
-			this, &TerminalClient::disconnected);
-	connect(_socket, QOverload<QLocalSocket::LocalSocketError>::of(&QLocalSocket::error),
-			this, &TerminalClient::error);
-	connect(_socket, &QLocalSocket::readyRead,
-			this, &TerminalClient::socketReady,
-			Qt::QueuedConnection); //queued connection, because of "socket not ready" errors on win
+	// if start -> use the control to ensure the service is running
+	if(_service->startWithTerminal()) {
+		if(!ensureServiceStarted())
+			return EXIT_FAILURE;
+	}
 
 	qCDebug(logQtService) << "Created terminal, waiting for service connection...";
 	QMetaObject::invokeMethod(this, "doConnect", Qt::QueuedConnection);
@@ -102,17 +85,8 @@ void TerminalClient::connected()
 		}
 	}
 
-	auto args = QCoreApplication::arguments();
-	auto backendIndex = args.indexOf(QStringLiteral("--backend"));
-	if(backendIndex >= 0) {
-		// remove --backend <backend> (2 args)
-		args.removeAt(backendIndex);
-		args.removeAt(backendIndex);
-	}
-	args.removeOne(QStringLiteral("--terminal"));
-
 	_stream.setDevice(_socket);
-	_stream << static_cast<int>(_mode) << args;
+	_stream << static_cast<int>(_mode) << _cmdArgs;
 	_socket->flush();
 	qCDebug(logQtService) << "Connected to service!";
 }
@@ -195,6 +169,83 @@ void TerminalClient::socketReady()
 void TerminalClient::consoleReady()
 {
 	_socket->write(_inConsole->read(_inConsole->bytesAvailable()));
+}
+
+bool TerminalClient::verifyArgs()
+{
+	_cmdArgs = QCoreApplication::arguments();
+	_cmdArgs.removeFirst();
+	auto backendIndex = _cmdArgs.indexOf(QStringLiteral("--backend"));
+	if(backendIndex >= 0) {
+		// remove --backend <backend> (2 args)
+		_cmdArgs.removeAt(backendIndex);
+		_cmdArgs.removeAt(backendIndex);
+	}
+	_cmdArgs.removeOne(QStringLiteral("--terminal"));
+	auto ok = _service->verifyCommand(_cmdArgs);
+	// set mode after verify, as verify can change the mode
+	_mode = _service->terminalMode();
+	return ok;
+}
+
+bool TerminalClient::ensureServiceStarted()
+{
+	auto control = ServicePrivate::createLocalControl(_service->backend(), this);
+	if(!control)
+		qCWarning(logQtService) << "Unable to create control to ensure service is running";
+	else if(!control->supportFlags().testFlag(ServiceControl::SupportsStart))
+		qCWarning(logQtService) << "Service control does not support starting - cannot start service";
+	else {
+		control->setBlocking(true);
+		auto canStatus = control->supportFlags().testFlag(ServiceControl::SupportsStatus);
+		// start the service, depending on its status (if possible)
+		if(!canStatus || control->status() == ServiceControl::ServiceStopped) {
+			if(!control->start()) {
+				qCCritical(logQtService).noquote() << control->error();
+				return false;
+			}
+		}
+		// ensure the service is running for controls that can check it
+		if(canStatus) {
+			auto waitCnt = control->supportFlags().testFlag(ServiceControl::SupportsBlocking) ? 0 : 15;
+			while(control->status() != ServiceControl::ServiceRunning && waitCnt > 0) {
+				QThread::sleep(1);
+				--waitCnt;
+			}
+			if(control->status() != ServiceControl::ServiceRunning) {
+				if(!control->error().isNull())
+					qCCritical(logQtService).noquote() << control->error();
+				else
+					qCCritical(logQtService) << "Service did not reach the running state withing 15 seconds after starting it";
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+void TerminalClient::setupChannels()
+{
+	_socket = new QLocalSocket{this};
+	_outFile = QConsole::qStdOut(this);
+	if(_mode == Service::ReadWriteActive)
+		_inFile = QConsole::qStdIn(this);
+	else {
+		_inConsole = new QConsole{this};
+		connect(_inConsole, &QConsole::readyRead,
+				this, &TerminalClient::consoleReady);
+	}
+
+	connect(_socket, &QLocalSocket::connected,
+			this, &TerminalClient::connected);
+	connect(_socket, &QLocalSocket::disconnected,
+			this, &TerminalClient::disconnected);
+	connect(_socket, QOverload<QLocalSocket::LocalSocketError>::of(&QLocalSocket::error),
+			this, &TerminalClient::error);
+	connect(_socket, &QLocalSocket::readyRead,
+			this, &TerminalClient::socketReady,
+			Qt::QueuedConnection); //queued connection, because of "socket not ready" errors on win
 }
 
 void TerminalClient::cerrMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
