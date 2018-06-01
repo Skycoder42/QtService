@@ -26,10 +26,14 @@ QString StandardServiceControl::backend() const
 
 ServiceControl::SupportFlags StandardServiceControl::supportFlags() const
 {
-	SupportFlags flags = SupportsStatus | SupportsStop;
+	SupportFlags flags = SupportsStatus;
 #if QT_CONFIG(process)
 	flags |= SupportsStart;
 #endif
+#ifdef Q_OS_WIN
+	if(!qgetenv("QT_SERVICE_STANDARD_ALLOW_TERMSTOP").isEmpty())
+#endif
+	flags |= SupportsStop;
 	return flags;
 }
 
@@ -97,6 +101,8 @@ bool StandardServiceControl::stop()
 		return false;
 	}
 #ifdef Q_OS_WIN
+	if(!supportFlags().testFlag(SupportsStop))
+		return false;
 	auto ok = false;
 	auto hadConsole = FreeConsole();
 	if(AttachConsole(static_cast<DWORD>(pid))) {

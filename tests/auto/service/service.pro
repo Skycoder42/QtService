@@ -5,7 +5,7 @@ SUBDIRS += \
 	TestService \
 	TestStandardService
 
-unix:!android:!ios:system(pkg-config --exists libsystemd): SUBDIRS += TestSystemdService
+unix:!android:!ios:system(pkg-config --exists libsystemd && systemctl --version): SUBDIRS += TestSystemdService
 
 TestStandardService.depends += TestBaseLib
 TestSystemdService.depends += TestBaseLib
