@@ -14,17 +14,12 @@ QString LaunchdServiceControl::backend() const
 
 ServiceControl::SupportFlags LaunchdServiceControl::supportFlags() const
 {
-	return SupportsStartStop | SupportsCustomCommands | SupportsStatus;
+	return SupportsStartStop | SupportsCustomCommands | SupportsNonBlocking;
 }
 
 bool LaunchdServiceControl::serviceExists() const
 {
-	return status() != ServiceStatusUnknown;
-}
-
-ServiceControl::ServiceStatus LaunchdServiceControl::status() const
-{
-
+	return runLaunchctl("list") == EXIT_SUCCESS;
 }
 
 QVariant LaunchdServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
@@ -51,7 +46,7 @@ QString LaunchdServiceControl::serviceName() const
 	return serviceId().split(QLatin1Char('.')).last();
 }
 
-int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QStringList &extraArgs, QByteArray *outData) const
+int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QStringList &extraArgs) const
 {
 	const auto launchctl = QStandardPaths::findExecutable(QStringLiteral("launchctl"));
 	if(launchctl.isEmpty()) {
@@ -70,14 +65,11 @@ int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QString
 	process.setArguments(args);
 
 	process.setStandardInputFile(QProcess::nullDevice());
-	if(!outData)
-		process.setStandardOutputFile(QProcess::nullDevice());
+	process.setStandardOutputFile(QProcess::nullDevice());
 	process.setProcessChannelMode(QProcess::ForwardedErrorChannel);
 
 	process.start(QProcess::ReadOnly);
 	if(process.waitForFinished(isBlocking() ? -1 : 2500)) {//non-blocking calls should finish within two seconds
-		if(outData)
-			*outData = process.readAllStandardOutput();
 		if(process.exitStatus() == QProcess::NormalExit)
 			return process.exitCode();
 		else {

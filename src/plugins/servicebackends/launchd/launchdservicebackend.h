@@ -24,6 +24,8 @@ private Q_SLOTS:
 
 private:
 	QMultiHash<QByteArray, int> _socketCache;
+
+	static void syslogMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };
 
 #endif // LAUNCHDSERVICEBACKEND_H

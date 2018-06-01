@@ -3,6 +3,7 @@
 #include <csignal>
 #include <unistd.h>
 #include <launch.h>
+#include <syslog.h>
 using namespace QtService;
 
 LaunchdServiceBackend::LaunchdServiceBackend(Service *service) :
@@ -11,15 +12,7 @@ LaunchdServiceBackend::LaunchdServiceBackend(Service *service) :
 
 int LaunchdServiceBackend::runService(int &argc, char **argv, int flags)
 {
-	qSetMessagePattern(QStringLiteral("[%{time} "
-									  "%{if-debug}\033[32mDebug\033[0m]    %{endif}"
-									  "%{if-info}\033[36mInfo\033[0m]     %{endif}"
-									  "%{if-warning}\033[33mWarning\033[0m]  %{endif}"
-									  "%{if-critical}\033[31mCritical\033[0m] %{endif}"
-									  "%{if-fatal}\033[35mFatal\033[0m]    %{endif}"
-									  "%{if-category}%{category}: %{endif}"
-									  "%{message}"));
-
+	qInstallMessageHandler(LaunchdServiceBackend::syslogMessageHandler);
 	QCoreApplication app(argc, argv, flags);
 	if(!preStartService())
 		return EXIT_FAILURE;
@@ -103,4 +96,33 @@ void LaunchdServiceBackend::signalTriggered(int signal)
 void LaunchdServiceBackend::onPaused()
 {
 	kill(getpid(), SIGSTOP); //now actually stop
+}
+
+void LaunchdServiceBackend::syslogMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
+{
+	auto formattedMessage = qFormatLogMessage(type, context, message);
+
+	int priority; // Informational
+	switch (type) {
+	case QtDebugMsg:
+		priority = LOG_DEBUG; // Debug-level messages
+		break;
+	case QtInfoMsg:
+		priority = LOG_INFO; // Informational conditions
+		break;
+	case QtWarningMsg:
+		priority = LOG_WARNING; // Warning conditions
+		break;
+	case QtCriticalMsg:
+		priority = LOG_CRIT; // Critical conditions
+		break;
+	case QtFatalMsg:
+		priority = LOG_ALERT; // Action must be taken immediately
+		break;
+	default:
+		Q_UNREACHABLE();
+		break;
+	}
+
+	syslog(priority, "%s", qUtf8Printable(formattedMessage));
 }
