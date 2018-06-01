@@ -71,8 +71,7 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	qInstallMessageHandler(WindowsServiceBackend::winsvcMessageHandler);
 
 	// if not set: get the app name from it's basename
-	if(!QCoreApplication::applicationName().isEmpty())
-		QCoreApplication::setApplicationName(QFileInfo{QString::fromUtf8(argv[0])}.completeBaseName());
+	Q_ASSERT_X(!QCoreApplication::applicationName().isEmpty(), Q_FUNC_INFO, "QCoreApplication::applicationName must be set before starting a windows service!");
 
 	// start handler and wait for service init
 	SvcControlThread controlThread{this};
@@ -91,10 +90,13 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	lock.unlock();
 
 	// create and prepare the coreapp
+	setStatus(SERVICE_START_PENDING);
 	QCoreApplication app(sArgc, sArgv.data(), flags);
 	app.installNativeEventFilter(new SvcEventFilter{});
+	setStatus(SERVICE_START_PENDING);
 	if(!preStartService())
 		return EXIT_FAILURE; //TODO implement correctly
+	setStatus(SERVICE_START_PENDING);
 	connect(service(), &Service::started,
 			this, &WindowsServiceBackend::onRunning);
 	connect(service(), &Service::paused,
@@ -179,6 +181,9 @@ void WindowsServiceBackend::setStatus(DWORD status)
 void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 {
 	Q_ASSERT(_backendInstance);
+
+	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(SVCNAME, WindowsServiceBackend::handler);
+	Q_ASSERT(_backendInstance->_statusHandle);
 	_backendInstance->setStatus(SERVICE_START_PENDING);
 
 	// pass the arguments to the main thread and notifiy him
@@ -194,11 +199,9 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 	// wait for the mainthread to finish startup, then register the service handler
 	lock.relock();
 	_backendInstance->_startCondition.wait(&_backendInstance->_svcLock);
-	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(SVCNAME, WindowsServiceBackend::handler);
 	lock.unlock();
 
 	// handle the start event
-	Q_ASSERT(_backendInstance->_statusHandle);
 	_backendInstance->setStatus(SERVICE_START_PENDING);
 	QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
