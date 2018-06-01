@@ -61,6 +61,7 @@ WindowsServiceBackend::WindowsServiceBackend(Service *service) :
 	_status.dwControlsAccepted = SERVICE_ACCEPT_PAUSE_CONTINUE | SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
 	_status.dwWin32ExitCode = NO_ERROR;
 	_status.dwServiceSpecificExitCode = EXIT_SUCCESS;
+	_status.dwWaitHint = 30000; //30 seconds should suffice
 }
 
 int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
@@ -102,6 +103,16 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 			this, &WindowsServiceBackend::onRunning);
 	connect(service(), &Service::stopped,
 			qApp, &QCoreApplication::exit);
+
+	_opTimer = new QTimer{this};
+	connect(_opTimer, &QTimer::timeout,
+			this, [this](){
+		setStatus(_status.dwCurrentState);
+	});
+	_opTimer->setTimerType(Qt::CoarseTimer);
+	_opTimer->setInterval(2000);
+	_opTimer->start();
+	setStatus(SERVICE_START_PENDING);
 
 	lock.relock();
 	_startCondition.wakeAll();
@@ -149,8 +160,18 @@ void WindowsServiceBackend::onPaused()
 
 void WindowsServiceBackend::setStatus(DWORD status)
 {
+	constexpr auto pendingFlags = SERVICE_START_PENDING | SERVICE_PAUSE_PENDING | SERVICE_CONTINUE_PENDING | SERVICE_STOP_PENDING;
 	QMutexLocker lock(&_svcLock);
-	_status.dwCurrentState = status;
+	if(status != _status.dwCurrentState) {
+		_status.dwCurrentState = status;
+		_status.dwCheckPoint = 0;
+		if((status & pendingFlags) != 0)
+			QMetaObject::invokeMethod(_opTimer, "start");
+		else
+			QMetaObject::invokeMethod(_opTimer, "stop");
+	} else if((status & pendingFlags) != 0)
+		_status.dwCheckPoint++;
+
 	if(_statusHandle)
 		SetServiceStatus(_statusHandle, &_status);
 }
@@ -158,6 +179,7 @@ void WindowsServiceBackend::setStatus(DWORD status)
 void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 {
 	Q_ASSERT(_backendInstance);
+	_backendInstance->setStatus(SERVICE_START_PENDING);
 
 	// pass the arguments to the main thread and notifiy him
 	QMutexLocker lock(&_backendInstance->_svcLock);
@@ -171,7 +193,7 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 
 	// wait for the mainthread to finish startup, then register the service handler
 	lock.relock();
-	_backendInstance->_startCondition.wakeAll();
+	_backendInstance->_startCondition.wait(&_backendInstance->_svcLock);
 	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(SVCNAME, WindowsServiceBackend::handler);
 	lock.unlock();
 

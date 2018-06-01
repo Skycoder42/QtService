@@ -6,6 +6,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QPointer>
 #include <QtCore/QAbstractNativeEventFilter>
+#include <QtCore/QTimer>
 
 #include <QtService/ServiceBackend>
 
@@ -54,6 +55,7 @@ private:
 
 	//temporary stuff
 	QByteArrayList _svcArgs;
+	QTimer *_opTimer = nullptr;
 
 	void setStatus(DWORD status);
 
