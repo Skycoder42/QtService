@@ -5,11 +5,13 @@ QT -= gui
 
 HEADERS += \
 		launchdserviceplugin.h \
-    launchdservicebackend.h
+    launchdservicebackend.h \
+    launchdservicecontrol.h
 
 SOURCES += \
 		launchdserviceplugin.cpp \
-    launchdservicebackend.cpp
+    launchdservicebackend.cpp \
+    launchdservicecontrol.cpp
 
 DISTFILES += launchd.json
 

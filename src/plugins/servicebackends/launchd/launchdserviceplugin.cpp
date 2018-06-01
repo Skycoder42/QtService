@@ -1,5 +1,6 @@
 #include "launchdserviceplugin.h"
 #include "launchdservicebackend.h"
+#include "launchdservicecontrol.h"
 
 LaunchdServicePlugin::LaunchdServicePlugin(QObject *parent) :
 	QObject{parent}
@@ -7,7 +8,7 @@ LaunchdServicePlugin::LaunchdServicePlugin(QObject *parent) :
 
 QString LaunchdServicePlugin::currentServiceId() const
 {
-	Q_UNIMPLEMENTED();
+	Q_UNIMPLEMENTED(); //TODO implement everywhere
 	return QCoreApplication::applicationName();
 }
 
@@ -21,5 +22,8 @@ QtService::ServiceBackend *LaunchdServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *LaunchdServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-	return nullptr;
+	if(backend == QStringLiteral("launchd"))
+		return new LaunchdServiceControl{std::move(serviceId), parent};
+	else
+		return nullptr;
 }

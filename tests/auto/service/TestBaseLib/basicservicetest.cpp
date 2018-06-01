@@ -1,5 +1,6 @@
 #include "basicservicetest.h"
 #include <QtTest/QtTest>
+#include <QDateTime>
 using namespace QtService;
 
 BasicServiceTest::BasicServiceTest(QObject *parent) :
@@ -8,6 +9,8 @@ BasicServiceTest::BasicServiceTest(QObject *parent) :
 
 void BasicServiceTest::initTestCase()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 #ifdef Q_OS_LINUX
 	if(!qgetenv("LD_PRELOAD").contains("Qt5Service"))
 		qWarning() << "No LD_PRELOAD set - this may fail on systems with multiple version of the modules";
@@ -21,6 +24,8 @@ void BasicServiceTest::initTestCase()
 
 void BasicServiceTest::cleanupTestCase()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	if(control)
 		control->stop();
 	cleanup();
@@ -28,6 +33,8 @@ void BasicServiceTest::cleanupTestCase()
 
 void BasicServiceTest::testStart()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 
@@ -52,6 +59,8 @@ void BasicServiceTest::testStart()
 
 void BasicServiceTest::testReload()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 
@@ -68,6 +77,8 @@ void BasicServiceTest::testReload()
 
 void BasicServiceTest::testPause()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 
@@ -84,6 +95,8 @@ void BasicServiceTest::testPause()
 
 void BasicServiceTest::testResume()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	testFeature(ServiceControl::SupportsStatus);
 	testFeature(ServiceControl::SupportsResume);
 	QCOMPARE(control->status(), ServiceControl::ServicePaused);
@@ -101,12 +114,16 @@ void BasicServiceTest::testResume()
 
 void BasicServiceTest::testCustom()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	testFeature(ServiceControl::SupportsCustomCommands);
 	testCustomImpl();
 }
 
 void BasicServiceTest::testStop()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 
@@ -151,6 +168,8 @@ void BasicServiceTest::testCustomImpl()
 
 void BasicServiceTest::performSocketTest()
 {
+	qDebug() << QDateTime::currentDateTime();
+
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 

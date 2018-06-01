@@ -1,0 +1,91 @@
+#include "launchdservicecontrol.h"
+#include <QtCore/QStandardPaths>
+#include <QtCore/QProcess>
+using namespace QtService;
+
+LaunchdServiceControl::LaunchdServiceControl(QString &&serviceId, QObject *parent) :
+	ServiceControl{std::move(serviceId), parent}
+{}
+
+QString LaunchdServiceControl::backend() const
+{
+	return QStringLiteral("launchd");
+}
+
+ServiceControl::SupportFlags LaunchdServiceControl::supportFlags() const
+{
+	return SupportsStartStop | SupportsCustomCommands | SupportsStatus;
+}
+
+bool LaunchdServiceControl::serviceExists() const
+{
+	return status() != ServiceStatusUnknown;
+}
+
+ServiceControl::ServiceStatus LaunchdServiceControl::status() const
+{
+
+}
+
+QVariant LaunchdServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
+{
+	QStringList sArgs;
+	sArgs.reserve(args.size());
+	for(const auto &arg : args)
+		sArgs.append(arg.toString());
+	return runLaunchctl(kind, sArgs);
+}
+
+bool LaunchdServiceControl::start()
+{
+	return runLaunchctl("start") == EXIT_SUCCESS;
+}
+
+bool LaunchdServiceControl::stop()
+{
+	return runLaunchctl("stop") == EXIT_SUCCESS;
+}
+
+QString LaunchdServiceControl::serviceName() const
+{
+	return serviceId().split(QLatin1Char('.')).last();
+}
+
+int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QStringList &extraArgs, QByteArray *outData) const
+{
+	const auto launchctl = QStandardPaths::findExecutable(QStringLiteral("launchctl"));
+	if(launchctl.isEmpty()) {
+		setError(QStringLiteral("Failed to find launchctl executable"));
+		return -1;
+	}
+
+	QProcess process;
+	process.setProgram(launchctl);
+
+	QStringList args;
+	args.reserve(extraArgs.size() + 2);
+	args.append(QString::fromUtf8(command));
+	args.append(extraArgs);
+	args.append(serviceId());
+	process.setArguments(args);
+
+	process.setStandardInputFile(QProcess::nullDevice());
+	if(!outData)
+		process.setStandardOutputFile(QProcess::nullDevice());
+	process.setProcessChannelMode(QProcess::ForwardedErrorChannel);
+
+	process.start(QProcess::ReadOnly);
+	if(process.waitForFinished(isBlocking() ? -1 : 2500)) {//non-blocking calls should finish within two seconds
+		if(outData)
+			*outData = process.readAllStandardOutput();
+		if(process.exitStatus() == QProcess::NormalExit)
+			return process.exitCode();
+		else {
+			setError(QStringLiteral("launchctl crashed with error: %1").arg(process.errorString()));
+			return 128 + process.error();
+		}
+	} else {
+		setError(QStringLiteral("launchctl did not exit in time"));
+		return -1;
+	}
+}
