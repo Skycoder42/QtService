@@ -22,6 +22,8 @@ protected:
 	CommandMode onPause() override;
 	CommandMode onResume() override;
 
+	QVariant onCallback(const QByteArray &kind, const QVariantList &args) override;
+
 private:
 	QLocalServer *_server = nullptr;
 	QLocalSocket *_socket = nullptr;

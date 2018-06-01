@@ -19,6 +19,8 @@ private Q_SLOTS:
 
 	void testStart();
 	void testReload();
+	void testPause();
+	void testResume();
 	void testCustom();
 	void testStop();
 	void testAutostart();
@@ -40,7 +42,7 @@ protected:
 };
 
 #define READ_LOOP(...) do { \
-	QVERIFY(socket->waitForReadyRead(5000)); \
+	QVERIFY(socket->waitForReadyRead(30000)); \
 	stream.startTransaction(); \
 	stream >> __VA_ARGS__; \
 } while(!stream.commitTransaction())

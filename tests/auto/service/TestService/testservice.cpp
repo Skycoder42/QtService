@@ -10,11 +10,14 @@ TestService::TestService(int &argc, char **argv) :
 
 bool TestService::preStart()
 {
+	qDebug() << Q_FUNC_INFO;
 	return true;
 }
 
 Service::CommandMode TestService::onStart()
 {
+	qDebug() << Q_FUNC_INFO;
+
 	_server = new QLocalServer(this);
 	_server->setSocketOptions(QLocalServer::WorldAccessOption);
 	connect(_server, &QLocalServer::newConnection, this, [this](){
@@ -29,13 +32,8 @@ Service::CommandMode TestService::onStart()
 		_stream << QByteArray("started");
 		_socket->flush();
 	});
-	_server->listen(runtimeDir().absoluteFilePath(QStringLiteral("__qtservice_testservice")));
+	_server->listen(QStringLiteral("__qtservice_testservice"));
 	qDebug() << "listening:" << _server->isListening();
-	QTimer::singleShot(10000, this, [this](){
-		qDebug() << "timeout";
-		if(!_socket)
-			qApp->quit();
-	});
 
 	//also: start basic TCP server if applicable
 	auto socket = getSocket();
@@ -61,6 +59,7 @@ Service::CommandMode TestService::onStart()
 
 Service::CommandMode TestService::onStop(int &exitCode)
 {
+	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("stopping");
 	_socket->flush();
 	if(_socket)
@@ -70,6 +69,7 @@ Service::CommandMode TestService::onStop(int &exitCode)
 
 Service::CommandMode TestService::onReload()
 {
+	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("reloading");
 	_socket->flush();
 	return Synchronous;
@@ -77,15 +77,25 @@ Service::CommandMode TestService::onReload()
 
 Service::CommandMode TestService::onPause()
 {
+	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("pausing");
 	_socket->flush();
-	_socket->waitForBytesWritten(5000);
+	_socket->waitForBytesWritten(2500);
 	return Synchronous;
 }
 
 Service::CommandMode TestService::onResume()
 {
+	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("resuming");
 	_socket->flush();
 	return Synchronous;
+}
+
+QVariant TestService::onCallback(const QByteArray &kind, const QVariantList &args)
+{
+	qDebug() << Q_FUNC_INFO;
+	_stream << kind << args;
+	_socket->flush();
+	return true;
 }

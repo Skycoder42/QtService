@@ -38,19 +38,14 @@ void BasicServiceTest::testStart()
 		QThread::sleep(3);
 
 	socket = new QLocalSocket(this);
-	socket->connectToServer(control->runtimeDir().absoluteFilePath(QStringLiteral("__qtservice_testservice")));
-	QVERIFY(socket->waitForConnected(5000));
+	socket->connectToServer(QStringLiteral("__qtservice_testservice"));
+	QVERIFY(socket->waitForConnected(30000));
 	stream.setDevice(socket);
 
 	QByteArray msg;
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("started"));
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
-
-	//test "double-start"
-	QVERIFY2(control->start(), qUtf8Printable(control->error()));
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
 }
@@ -66,6 +61,39 @@ void BasicServiceTest::testReload()
 	QByteArray msg;
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("reloading"));
+
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+}
+
+void BasicServiceTest::testPause()
+{
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+
+	testFeature(ServiceControl::SupportsPause);
+	QVERIFY2(control->pause(), qUtf8Printable(control->error()));
+
+	QByteArray msg;
+	READ_LOOP(msg);
+	QCOMPARE(msg, QByteArray("pausing"));
+
+	testFeature(ServiceControl::SupportsStatus);
+	QCOMPARE(control->status(), ServiceControl::ServicePaused);
+}
+
+void BasicServiceTest::testResume()
+{
+	testFeature(ServiceControl::SupportsStatus);
+	testFeature(ServiceControl::SupportsResume);
+	QCOMPARE(control->status(), ServiceControl::ServicePaused);
+
+	testFeature(ServiceControl::SupportsResume);
+	QVERIFY2(control->resume(), qUtf8Printable(control->error()));
+
+	QByteArray msg;
+	READ_LOOP(msg);
+	QCOMPARE(msg, QByteArray("resuming"));
 
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
@@ -92,11 +120,6 @@ void BasicServiceTest::testStop()
 #endif
 	QVERIFY(socket->waitForDisconnected(5000));
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
-
-	//test "double-stop"
-	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
 	testFeature(ServiceControl::SupportsStatus);
 	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
 }

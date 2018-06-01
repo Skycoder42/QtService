@@ -125,8 +125,13 @@ bool WindowsServiceControl::start()
 	if(StartServiceW(handle, 0, nullptr))
 		return true;
 	else {
-		setWinError(QStringLiteral("Failed to start service with error: %1"));
-		return false;
+		auto code = GetLastError();
+		if(code == ERROR_SERVICE_ALREADY_RUNNING)
+			return true;
+		else {
+			setWinError(QStringLiteral("Failed to start service with error: %1"));
+			return false;
+		}
 	}
 }
 
@@ -139,8 +144,13 @@ bool WindowsServiceControl::stop()
 	if(ControlService(handle, SERVICE_CONTROL_STOP, &status))
 		return true;
 	else {
-		setWinError(QStringLiteral("Failed to stop service with error: %1"));
-		return false;
+		auto code = GetLastError();
+		if(code == ERROR_SERVICE_NOT_ACTIVE)
+			return true;
+		else {
+			setWinError(QStringLiteral("Failed to stop service with error: %1"));
+			return false;
+		}
 	}
 }
 
