@@ -5,6 +5,12 @@
 #include <qt_windows.h>
 using namespace QtService;
 
+#ifdef QT_NO_DEBUG
+#define LIB(x) QStringLiteral(x ".dll")
+#else
+#define LIB(x) QStringLiteral(x "d.dll")
+#endif
+
 class TestWindowsService : public BasicServiceTest
 {
 	Q_OBJECT
@@ -33,11 +39,36 @@ QString TestWindowsService::name()
 void TestWindowsService::init()
 {
 #ifdef QT_NO_DEBUG
-	QString svcPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/release/testservice.exe");
+	QDir svcDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/release")};
 #else
-	QString svcPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/debug/testservice.exe");
+	QDir svcDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/debug")};
 #endif
-	svcPath = QStringLiteral("\"%1\" --backend windows").arg(svcPath);
+	auto svcPath = QDir::toNativeSeparators(QStringLiteral("\"%1/testservice.exe\" --backend windows").arg(svcDir.absolutePath()));
+	QVERIFY(QFile::exists(svcPath));
+
+	// copy Qt libs
+	QDir qtLibDir{QLibraryInfo::location(QLibraryInfo::LibrariesPath)};
+	for(const auto &baseLib : {LIB("Qt5Core"), LIB("Qt5Network")}) {
+		if(!svcDir.exists(baseLib))
+			QVERIFY(QFile::copy(qtLibDir.absoluteFilePath(baseLib), qtLibDir.absoluteFilePath(baseLib)));
+	}
+
+	// copy svc lib
+	auto svcLib = LIB("Qt5Service");
+	QDir bLibDir{QCoreApplication::applicationDirPath() + QStringLiteral("../../../../../lib")};
+	svcDir.remove(svcLib);
+	QVERIFY(QFile::copy(bLibDir.absoluteFilePath(svcLib), svcDir.absoluteFilePath(svcLib)));
+
+	// add plugins to Qt
+	QDir qtPlgDir{QLibraryInfo::location(QLibraryInfo::PluginsPath)};
+	QDir bPlgDir{QCoreApplication::applicationDirPath() + QStringLiteral("../../../../../plugins/servicebackends")};
+	auto plgNew = QStringLiteral("servicebackends");
+	auto plgOld = QStringLiteral("servicebackends.old");
+	auto realPlg = LIB("qwindows");
+	qtPlgDir.rename(plgNew, plgOld);
+	QVERIFY(qtPlgDir.mkdir(plgNew));
+	QVERIFY(qtPlgDir.cd(plgNew));
+	QVERIFY(QFile::copy(bPlgDir.absoluteFilePath(realPlg), qtPlgDir.absoluteFilePath(realPlg)));
 
 	_manager = OpenSCManagerW(nullptr, nullptr,
 							  SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE | STANDARD_RIGHTS_REQUIRED);
@@ -62,18 +93,27 @@ void TestWindowsService::init()
 
 void TestWindowsService::cleanup()
 {
-	if(!_manager)
-		return;
+	if(_manager) {
+		auto handle = OpenServiceW(_manager,
+								   reinterpret_cast<const wchar_t*>(name().utf16()),
+								   DELETE);
+		QVERIFY2(handle, qUtf8Printable(qt_error_string(GetLastError())));
+		QVERIFY2(DeleteService(handle), qUtf8Printable(qt_error_string(GetLastError())));
 
-	auto handle = OpenServiceW(_manager,
-							   reinterpret_cast<const wchar_t*>(name().utf16()),
-							   DELETE);
-	QVERIFY2(handle, qUtf8Printable(qt_error_string(GetLastError())));
-	QVERIFY2(DeleteService(handle), qUtf8Printable(qt_error_string(GetLastError())));
+		CloseServiceHandle(handle);
+		CloseServiceHandle(_manager);
+		_manager = nullptr;
+	}
 
-	CloseServiceHandle(handle);
-	CloseServiceHandle(_manager);
-	_manager = nullptr;
+	QDir qtPlgDir{QLibraryInfo::location(QLibraryInfo::PluginsPath)};
+	auto plgOld = QStringLiteral("servicebackends.old");
+	if(qtPlgDir.exists(plgOld)) {
+		auto plgNew = QStringLiteral("servicebackends");
+		auto svcPlgDir = qtPlgDir;
+		QVERIFY(svcPlgDir.cd(plgNew));
+		QVERIFY(svcPlgDir.removeRecursively());
+		QVERIFY(qtPlgDir.rename(plgOld, plgNew));
+	}
 }
 
 void TestWindowsService::testCustomImpl()
