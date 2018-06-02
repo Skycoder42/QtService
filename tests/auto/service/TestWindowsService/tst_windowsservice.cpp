@@ -50,12 +50,13 @@ void TestWindowsService::init()
 	QDir qtLibDir{QLibraryInfo::location(QLibraryInfo::LibrariesPath)};
 	for(const auto &baseLib : {LIB("Qt5Core"), LIB("Qt5Network")}) {
 		if(!svcDir.exists(baseLib))
-			QVERIFY(QFile::copy(qtLibDir.absoluteFilePath(baseLib), qtLibDir.absoluteFilePath(baseLib)));
+			QVERIFY(QFile::copy(qtLibDir.absoluteFilePath(baseLib), svcDir.absoluteFilePath(baseLib)));
 	}
 
 	// copy svc lib
 	auto svcLib = LIB("Qt5Service");
 	QDir bLibDir{QCoreApplication::applicationDirPath() + QStringLiteral("../../../../../lib")};
+	QVERIFY(bLibDir.exists(svcLib));
 	svcDir.remove(svcLib);
 	QVERIFY(QFile::copy(bLibDir.absoluteFilePath(svcLib), svcDir.absoluteFilePath(svcLib)));
 
@@ -65,6 +66,7 @@ void TestWindowsService::init()
 	auto plgNew = QStringLiteral("servicebackends");
 	auto plgOld = QStringLiteral("servicebackends.old");
 	auto realPlg = LIB("qwindows");
+	QVERIFY(bPlgDir.exists(realPlg));
 	qtPlgDir.rename(plgNew, plgOld);
 	QVERIFY(qtPlgDir.mkdir(plgNew));
 	QVERIFY(qtPlgDir.cd(plgNew));
