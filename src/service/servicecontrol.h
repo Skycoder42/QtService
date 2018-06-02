@@ -90,7 +90,7 @@ public:
 	QDir runtimeDir() const;
 
 public Q_SLOTS:
-	virtual bool start(); //TODO void and no slots, or error message instead of exception
+	virtual bool start();
 	virtual bool stop();
 
 	virtual bool pause();

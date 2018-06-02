@@ -136,7 +136,7 @@ void TerminalClient::socketReady()
 					readData = _inFile->read(num);
 					break;
 				case QtService::TerminalPrivate::LineRequest:
-					readData = _inFile->readLine(); //TODO if really blocking
+					readData = _inFile->readLine();
 					break;
 				default:
 					// hard error!!!

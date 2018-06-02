@@ -9,7 +9,7 @@ SystemdServicePlugin::SystemdServicePlugin(QObject *parent) :
 
 QString SystemdServicePlugin::currentServiceId() const
 {
-	return QCoreApplication::applicationName().toLower() + QStringLiteral(".service");
+	return QCoreApplication::applicationName() + QStringLiteral(".service");
 }
 
 ServiceBackend *SystemdServicePlugin::createServiceBackend(const QString &provider, Service *service)

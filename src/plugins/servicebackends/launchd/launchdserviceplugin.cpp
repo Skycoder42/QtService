@@ -8,8 +8,7 @@ LaunchdServicePlugin::LaunchdServicePlugin(QObject *parent) :
 
 QString LaunchdServicePlugin::currentServiceId() const
 {
-	Q_UNIMPLEMENTED(); //TODO implement everywhere
-	return QCoreApplication::applicationName();
+	return QCoreApplication::organizationDomain() + QLatin1Char('.') + QCoreApplication::applicationName();
 }
 
 QtService::ServiceBackend *LaunchdServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
