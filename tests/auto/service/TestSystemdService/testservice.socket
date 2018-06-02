@@ -6,6 +6,7 @@ PartOf=testservice.service
 
 [Socket]
 ListenStream=15843
+#ListenStream=/run/user/1000/testservice/terminal.socket
 
 [Install]
 WantedBy=sockets.target
