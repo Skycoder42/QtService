@@ -1,6 +1,6 @@
 #include "standardservicebackend.h"
+#include "standardserviceplugin.h"
 #include <QtCore/QLockFile>
-#include <QtService/private/logging_p.h>
 #ifdef Q_OS_WIN
 #include <qt_windows.h>
 #else

@@ -1,6 +1,6 @@
 TARGET  = qandroid
 
-QT += service service-private androidextras
+QT += service androidextras
 QT -= gui
 
 HEADERS += \

@@ -1,4 +1,5 @@
 #include "standardservicecontrol.h"
+#include "standardserviceplugin.h"
 #include <QtCore/QStandardPaths>
 #if QT_CONFIG(process)
 #include <QtCore/QProcess>
@@ -9,7 +10,6 @@
 #else
 #include <csignal>
 #endif
-#include <QtService/private/logging_p.h>
 using namespace QtService;
 
 StandardServiceControl::StandardServiceControl(QString &&serviceId, QObject *parent) :

@@ -1,17 +1,17 @@
 TARGET  = qwindows
 
-QT += service service-private
+QT += service
 QT -= gui
 
 HEADERS += \
 	windowsserviceplugin.h \
 	windowsservicebackend.h \
-    windowsservicecontrol.h
+	windowsservicecontrol.h
 
 SOURCES += \
 	windowsserviceplugin.cpp \
 	windowsservicebackend.cpp \
-    windowsservicecontrol.cpp
+	windowsservicecontrol.cpp
 
 DISTFILES += windows.json
 

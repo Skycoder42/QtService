@@ -1,4 +1,5 @@
 #include "launchdservicecontrol.h"
+#include "launchdserviceplugin.h"
 #include <QtCore/QStandardPaths>
 #include <QtCore/QProcess>
 using namespace QtService;

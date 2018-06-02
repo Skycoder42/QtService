@@ -2,6 +2,7 @@
 #define ANDROIDSERVICEPLUGIN_H
 
 #include <QtService/ServicePlugin>
+#include <QtCore/QLoggingCategory>
 
 class AndroidServicePlugin : public QObject, public QtService::ServicePlugin
 {
@@ -16,5 +17,7 @@ public:
 	QtService::ServiceBackend *createServiceBackend(const QString &provider, QtService::Service *service) override;
 	QtService::ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) override;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logQtService)
 
 #endif // ANDROIDSERVICEPLUGIN_H

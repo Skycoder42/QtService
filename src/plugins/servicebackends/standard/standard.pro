@@ -1,6 +1,6 @@
 TARGET  = qstandard
 
-QT += service service-private
+QT += service
 QT -= gui
 
 HEADERS += \

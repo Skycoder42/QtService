@@ -1,4 +1,5 @@
 #include "androidservicebackend.h"
+#include "androidserviceplugin.h"
 #include <QtCore/QEventLoop>
 #include <QtAndroidExtras/QAndroidService>
 #include <QtAndroidExtras/QtAndroid>

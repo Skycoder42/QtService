@@ -2,6 +2,8 @@
 #include "launchdservicebackend.h"
 #include "launchdservicecontrol.h"
 
+Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.launchd"); //TODO, QtInfoMsg);
+
 LaunchdServicePlugin::LaunchdServicePlugin(QObject *parent) :
 	QObject{parent}
 {}

@@ -1,17 +1,17 @@
 TARGET  = qlaunchd
 
-QT += service service-private
+QT += service
 QT -= gui
 
 HEADERS += \
 		launchdserviceplugin.h \
-    launchdservicebackend.h \
-    launchdservicecontrol.h
+	launchdservicebackend.h \
+	launchdservicecontrol.h
 
 SOURCES += \
 		launchdserviceplugin.cpp \
-    launchdservicebackend.cpp \
-    launchdservicecontrol.cpp
+	launchdservicebackend.cpp \
+	launchdservicecontrol.cpp
 
 DISTFILES += launchd.json
 

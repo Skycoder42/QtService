@@ -1,5 +1,5 @@
 #include "windowsservicecontrol.h"
-#include <QtService/private/logging_p.h>
+#include "windowsserviceplugin.h"
 using namespace QtService;
 
 WindowsServiceControl::WindowsServiceControl(QString &&serviceId, QObject *parent) :

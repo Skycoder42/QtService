@@ -2,6 +2,8 @@
 #include "standardservicebackend.h"
 #include "standardservicecontrol.h"
 
+Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.standard"); //TODO, QtInfoMsg);
+
 StandardServicePlugin::StandardServicePlugin(QObject *parent) :
 	QObject{parent}
 {}

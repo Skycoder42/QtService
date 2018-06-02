@@ -1,4 +1,5 @@
 #include "systemdservicebackend.h"
+#include "systemdserviceplugin.h"
 #include <chrono>
 #include <csignal>
 #include <unistd.h>
@@ -6,8 +7,6 @@
 #define SD_JOURNAL_SUPPRESS_LOCATION
 #include <systemd/sd-journal.h>
 #include <systemd/sd-daemon.h>
-
-#include <QtService/private/logging_p.h>
 
 using namespace QtService;
 

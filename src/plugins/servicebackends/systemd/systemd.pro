@@ -1,6 +1,6 @@
 TARGET  = qsystemd
 
-QT += service service-private
+QT += service
 QT -= gui
 
 CONFIG += link_pkgconfig

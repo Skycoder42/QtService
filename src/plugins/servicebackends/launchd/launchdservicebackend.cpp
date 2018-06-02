@@ -1,5 +1,5 @@
 #include "launchdservicebackend.h"
-#include <QtService/private/logging_p.h>
+#include "launchdserviceplugin.h"
 #include <csignal>
 #include <unistd.h>
 #include <launch.h>

@@ -40,9 +40,9 @@
 **
 ****************************************************************************/
 #include "windowsservicebackend.h"
+#include "windowsserviceplugin.h"
 #include <iostream>
 #include <QtCore/QFileInfo>
-#include <QtService/private/logging_p.h>
 using namespace QtService;
 
 #define SVCNAME const_cast<wchar_t*>(reinterpret_cast<const wchar_t*>(QCoreApplication::applicationName().utf16()))

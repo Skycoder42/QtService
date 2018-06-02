@@ -1,10 +1,10 @@
 #include "systemdservicecontrol.h"
+#include "systemdserviceplugin.h"
 #include <unistd.h>
 #include <QtCore/QBuffer>
 #include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QRegularExpression>
-#include <QtService/private/logging_p.h>
 using namespace QtService;
 
 SystemdServiceControl::SystemdServiceControl(QString &&serviceId, QObject *parent) :

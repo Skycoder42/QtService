@@ -3,6 +3,8 @@
 #include "systemdservicecontrol.h"
 using namespace QtService;
 
+Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.systemd"); //TODO, QtInfoMsg);
+
 SystemdServicePlugin::SystemdServicePlugin(QObject *parent) :
 	QObject(parent)
 {}
