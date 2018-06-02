@@ -50,7 +50,7 @@ int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QString
 {
 	const auto launchctl = QStandardPaths::findExecutable(QStringLiteral("launchctl"));
 	if(launchctl.isEmpty()) {
-		setError(QStringLiteral("Failed to find launchctl executable"));
+		setError(tr("Failed to find launchctl executable"));
 		return -1;
 	}
 
@@ -73,11 +73,11 @@ int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QString
 		if(process.exitStatus() == QProcess::NormalExit)
 			return process.exitCode();
 		else {
-			setError(QStringLiteral("launchctl crashed with error: %1").arg(process.errorString()));
+			setError(tr("launchctl crashed with error: %1").arg(process.errorString()));
 			return 128 + process.error();
 		}
 	} else {
-		setError(QStringLiteral("launchctl did not exit in time"));
+		setError(tr("launchctl did not exit in time"));
 		return -1;
 	}
 }

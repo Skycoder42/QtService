@@ -46,7 +46,7 @@ ServiceControl::ServiceStatus StandardServiceControl::status() const
 	} else if(_statusLock.error() == QLockFile::LockFailedError)
 		return ServiceRunning;
 	else {
-		setError(QStringLiteral("Failed to access lockfile with error: %1").arg(_statusLock.error()));
+		setError(tr("Failed to access lockfile with error: %1").arg(_statusLock.error()));
 		return ServiceStatusUnknown;
 	}
 }
@@ -61,7 +61,7 @@ bool StandardServiceControl::start()
 
 	auto bin = QStandardPaths::findExecutable(serviceId());
 	if(bin.isEmpty()) {
-		setError(QStringLiteral("Unabled to find executable for service with id \"%1\"").arg(serviceId()));
+		setError(tr("Unabled to find executable for service with id \"%1\"").arg(serviceId()));
 		return false;
 	}
 
@@ -77,7 +77,7 @@ bool StandardServiceControl::start()
 	if(ok)
 		qCDebug(logQtService) << "Started service process with PID" << pid;
 	else
-		setError(QStringLiteral("Failed to start service process with error: %1").arg(svcProc.errorString()));
+		setError(tr("Failed to start service process with error: %1").arg(svcProc.errorString()));
 	return ok;
 #else
 	return ServiceControl::start();
@@ -93,7 +93,7 @@ bool StandardServiceControl::stop()
 
 	auto pid = getPid();
 	if(pid == -1) {
-		setError(QStringLiteral("Failed to get pid of running service"));
+		setError(tr("Failed to get pid of running service"));
 		return false;
 	}
 #ifdef Q_OS_WIN
@@ -111,15 +111,15 @@ bool StandardServiceControl::stop()
 					}
 				}
 				if(!ok)
-					setError(QStringLiteral("Service did not stop yet"));
+					setError(tr("Service did not stop yet"));
 			} else
-				setError(QStringLiteral("Failed to send stop signal with error: %1").arg(qt_error_string(GetLastError())));
+				setError(tr("Failed to send stop signal with error: %1").arg(qt_error_string(GetLastError())));
 			SetConsoleCtrlHandler(nullptr, false);
 		} else
-			setError(QStringLiteral("Failed to disable local console handler with error: %1").arg(qt_error_string(GetLastError())));
+			setError(tr("Failed to disable local console handler with error: %1").arg(qt_error_string(GetLastError())));
 		FreeConsole();
 	} else
-		setError(QStringLiteral("Failed to attach to service console with error: %1").arg(qt_error_string(GetLastError())));
+		setError(tr("Failed to attach to service console with error: %1").arg(qt_error_string(GetLastError())));
 	if(hadConsole)
 		AllocConsole();
 	return ok;

@@ -8,7 +8,7 @@ WindowsServiceControl::WindowsServiceControl(QString &&serviceId, QObject *paren
 	//try to open the handle
 	_manager = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_CONNECT);
 	if(!_manager)
-		setWinError(QStringLiteral("Failed to get acces to service manager with error: %1"));
+		setWinError(tr("Failed to get acces to service manager with error: %1"));
 }
 
 QString WindowsServiceControl::backend() const
@@ -40,7 +40,7 @@ ServiceControl::ServiceStatus WindowsServiceControl::status() const
 	SERVICE_STATUS status;
 	ZeroMemory(&status, sizeof(status));
 	if(!QueryServiceStatus(handle, &status)) {
-		setWinError(QStringLiteral("Failed to query service status with error: %1"));
+		setWinError(tr("Failed to query service status with error: %1"));
 		return ServiceStatusUnknown;
 	}
 
@@ -75,7 +75,7 @@ bool WindowsServiceControl::isAutostartEnabled() const
 	QByteArray cData{static_cast<int>(sizeNeeded), '\0'};
 	auto config = reinterpret_cast<LPQUERY_SERVICE_CONFIGW>(cData.data());
 	if(!QueryServiceConfigW(handle, config, cData.size(), &sizeNeeded)) {
-		setWinError(QStringLiteral("Failed to query service status with error: %1"));
+		setWinError(tr("Failed to query service status with error: %1"));
 		return false;
 	}
 
@@ -93,13 +93,13 @@ QVariant WindowsServiceControl::callGenericCommand(const QByteArray &kind, const
 {
 	if(kind == "command") {
 		if(args.size() != 1) {
-			setError(QStringLiteral("The command must be called with a single integer [128,255] as argument"));
+			setError(tr("The command must be called with a single integer [128,255] as argument"));
 			return {};
 		}
 		auto ok = false;
 		DWORD cmd = args.first().toUInt(&ok);
 		if(!ok || cmd < 128 || cmd > 255) {
-			setError(QStringLiteral("The command must be called with a single integer [128,255] as argument"));
+			setError(tr("The command must be called with a single integer [128,255] as argument"));
 			return {};
 		}
 
@@ -110,7 +110,7 @@ QVariant WindowsServiceControl::callGenericCommand(const QByteArray &kind, const
 		if(ControlService(handle, cmd, &status))
 			return true;
 		else {
-			setWinError(QStringLiteral("Failed to send command %1 to service with error: %2").arg(cmd));
+			setWinError(tr("Failed to send command %1 to service with error: %2").arg(cmd));
 			return false;
 		}
 	} else
@@ -129,7 +129,7 @@ bool WindowsServiceControl::start()
 		if(code == ERROR_SERVICE_ALREADY_RUNNING)
 			return true;
 		else {
-			setWinError(QStringLiteral("Failed to start service with error: %1"));
+			setWinError(tr("Failed to start service with error: %1"));
 			return false;
 		}
 	}
@@ -148,7 +148,7 @@ bool WindowsServiceControl::stop()
 		if(code == ERROR_SERVICE_NOT_ACTIVE)
 			return true;
 		else {
-			setWinError(QStringLiteral("Failed to stop service with error: %1"));
+			setWinError(tr("Failed to stop service with error: %1"));
 			return false;
 		}
 	}
@@ -163,7 +163,7 @@ bool WindowsServiceControl::pause()
 	if(ControlService(handle, SERVICE_CONTROL_PAUSE, &status))
 		return true;
 	else {
-		setWinError(QStringLiteral("Failed to pause service with error: %1"));
+		setWinError(tr("Failed to pause service with error: %1"));
 		return false;
 	}
 }
@@ -177,7 +177,7 @@ bool WindowsServiceControl::resume()
 	if(ControlService(handle, SERVICE_CONTROL_CONTINUE, &status))
 		return true;
 	else {
-		setWinError(QStringLiteral("Failed to resume service with error: %1"));
+		setWinError(tr("Failed to resume service with error: %1"));
 		return false;
 	}
 }
@@ -195,7 +195,7 @@ bool WindowsServiceControl::enableAutostart()
 							 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)) {
 		return true;
 	} else {
-		setWinError(QStringLiteral("Failed to enable autostart with error: %1"));
+		setWinError(tr("Failed to enable autostart with error: %1"));
 		return false;
 	}
 }
@@ -213,7 +213,7 @@ bool WindowsServiceControl::disableAutostart()
 							 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)) {
 		return true;
 	} else {
-		setWinError(QStringLiteral("Failed to enable autostart with error: %1"));
+		setWinError(tr("Failed to enable autostart with error: %1"));
 		return false;
 	}
 }
@@ -227,7 +227,7 @@ SC_HANDLE WindowsServiceControl::svcHandle(DWORD permissions) const
 							   reinterpret_cast<const wchar_t*>(serviceId().utf16()),
 							   permissions);
 	if(!handle)
-		setWinError(QStringLiteral("Failed to get access to service with error: %1"));
+		setWinError(tr("Failed to get access to service with error: %1"));
 	return handle;
 }
 
