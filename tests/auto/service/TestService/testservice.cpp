@@ -1,4 +1,5 @@
 #include "testservice.h"
+#include <QtService/Terminal>
 
 #include <QTimer>
 #include <QTcpSocket>
@@ -6,7 +7,10 @@ using namespace QtService;
 
 TestService::TestService(int &argc, char **argv) :
 	Service{argc, argv}
-{}
+{
+	setTerminalActive(true);
+	setStartWithTerminal(true);
+}
 
 bool TestService::preStart()
 {
@@ -59,11 +63,13 @@ Service::CommandMode TestService::onStart()
 
 Service::CommandMode TestService::onStop(int &exitCode)
 {
+	Q_UNUSED(exitCode);
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("stopping");
-	_socket->flush();
-	if(_socket)
-		exitCode = _socket->waitForBytesWritten(2500) ? EXIT_SUCCESS : EXIT_FAILURE;
+	if(_socket) {
+		_socket->flush();
+		_socket->waitForBytesWritten(2500);
+	}
 	return Synchronous;
 }
 
@@ -94,8 +100,41 @@ Service::CommandMode TestService::onResume()
 
 QVariant TestService::onCallback(const QByteArray &kind, const QVariantList &args)
 {
-	qDebug() << Q_FUNC_INFO;
+	qDebug() << Q_FUNC_INFO << kind << args;
 	_stream << kind << args;
 	_socket->flush();
 	return true;
+}
+
+bool TestService::verifyCommand(const QStringList &arguments)
+{
+	qDebug() << Q_FUNC_INFO << arguments;
+	if(arguments.contains(QStringLiteral("--passive")))
+		setTerminalMode(Service::ReadWritePassive);
+	else
+		setTerminalMode(Service::ReadWriteActive);
+	return true;
+}
+
+void TestService::terminalConnected(Terminal *terminal)
+{
+	qDebug() << Q_FUNC_INFO << terminal->command();
+	if(terminal->command().startsWith(QStringLiteral("stop")))
+		quit();
+	else if(terminal->terminalMode() == Service::ReadWriteActive) {
+		connect(terminal, &Terminal::readyRead,
+				terminal, [terminal](){
+			qDebug() << Q_FUNC_INFO << terminal->readAll();
+			terminal->disconnectTerminal();
+		});
+		terminal->write("name: ");
+		terminal->requestLine();
+	} else {
+		connect(terminal, &Terminal::readyRead,
+				terminal, [terminal](){
+			auto data = terminal->readAll();
+			qDebug() << Q_FUNC_INFO << data;
+			terminal->write(data);
+		});
+	}
 }

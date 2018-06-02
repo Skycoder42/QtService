@@ -89,6 +89,9 @@ void TerminalClient::connected()
 	_stream << static_cast<int>(_mode) << _cmdArgs;
 	_socket->flush();
 	qCDebug(logQtService) << "Connected to service!";
+	// write initial data for console
+	if(_inConsole)
+		consoleReady();
 }
 
 void TerminalClient::disconnected()
@@ -154,6 +157,7 @@ void TerminalClient::socketReady()
 				if(!_stream.commitTransaction())
 					break;
 				_outFile->write(data);
+				_outFile->flush();
 			}
 
 			if(_stream.status() == QDataStream::ReadCorruptData) {
@@ -162,13 +166,19 @@ void TerminalClient::socketReady()
 				_socket->disconnectFromServer();
 			}
 		}
-	} else
+	} else {
 		_outFile->write(_socket->readAll());
+		_outFile->flush();
+	}
 }
 
 void TerminalClient::consoleReady()
 {
-	_socket->write(_inConsole->read(_inConsole->bytesAvailable()));
+	auto mBytes = _inConsole->bytesAvailable();
+	if(mBytes > 0) {
+		_socket->write(_inConsole->read(mBytes));
+		_socket->flush();
+	}
 }
 
 bool TerminalClient::verifyArgs()

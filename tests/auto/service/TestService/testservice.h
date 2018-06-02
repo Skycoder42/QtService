@@ -24,6 +24,11 @@ protected:
 
 	QVariant onCallback(const QByteArray &kind, const QVariantList &args) override;
 
+	bool verifyCommand(const QStringList &arguments) override;
+
+protected Q_SLOTS:
+	void terminalConnected(QtService::Terminal *terminal) override;
+
 private:
 	QLocalServer *_server = nullptr;
 	QLocalSocket *_socket = nullptr;

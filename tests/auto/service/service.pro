@@ -3,7 +3,8 @@ TEMPLATE = subdirs
 SUBDIRS += \
 	TestBaseLib \
 	TestService \
-	TestStandardService
+	TestStandardService \
+    TestTerminalService
 
 unix:!android:!ios:system(pkg-config --exists libsystemd && systemctl --version): SUBDIRS += TestSystemdService
 win32: SUBDIRS += TestWindowsService
