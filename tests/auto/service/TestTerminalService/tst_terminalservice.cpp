@@ -96,7 +96,7 @@ QProcess *TestTerminalService::createProc(QStringList args)
 	proc->setProgram(svcPath);
 	proc->setArguments(args);
 	proc->setProcessChannelMode(QProcess::ForwardedErrorChannel);
-	proc->start();
+	proc->start(QIODevice::ReadWrite | QIODevice::Text);
 
 	return proc;
 }
