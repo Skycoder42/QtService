@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>de.skycoder42.qtservice.tests.testservice</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>%{TESTSERVICE_PATH}</string>
+		<string>--backend</string>
+		<string>launchd</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>DYLD_LIBRARY_PATH</key>
+		<string>%{DYLD_LIBRARY_PATH}</string>
+		<key>DYLD_FRAMEWORK_PATH</key>
+		<string>%{DYLD_FRAMEWORK_PATH}</string>
+		<key>QT_PLUGIN_PATH</key>
+		<string>%{QT_PLUGIN_PATH}</string>
+	</dict>
+	<key>Sockets</key>
+	<dict>
+		<key>Listeners</key>
+		<dict>
+			<key>SockServiceName</key>
+			<string>15843</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
