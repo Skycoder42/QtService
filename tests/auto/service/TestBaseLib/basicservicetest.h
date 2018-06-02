@@ -47,4 +47,8 @@ protected:
 	stream >> __VA_ARGS__; \
 } while(!stream.commitTransaction())
 
+#define TEST_STATUS(state) \
+	if(control->supportFlags().testFlag(ServiceControl::SupportsStatus)) \
+		QCOMPARE(control->status(), state)
+
 #endif // BASICSERVICETEST_H

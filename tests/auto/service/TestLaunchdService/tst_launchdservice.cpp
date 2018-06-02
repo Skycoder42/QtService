@@ -31,7 +31,7 @@ QString TestLaunchdService::backend()
 
 QString TestLaunchdService::name()
 {
-	return testservice;
+	return QStringLiteral("de.skycoder42.qtservice.tests.testservice");
 }
 
 void TestLaunchdService::init()
@@ -56,7 +56,7 @@ void TestLaunchdService::init()
 				  .replace("%{TESTSERVICE_PATH}", QString(QCoreApplication::applicationDirPath() + QStringLiteral("/../TestService/testservice")).toUtf8()));
 	}
 
-	launchdLoad(launchdHome.absoluteFilePath(testservice), true);
+	QVERIFY(launchdLoad(launchdHome.absoluteFilePath(testservice), true));
 }
 
 void TestLaunchdService::cleanup()

@@ -23,6 +23,8 @@
 	<dict>
 		<key>Listeners</key>
 		<dict>
+			<key>SockFamily</key>
+			<string>IPv4</string>
 			<key>SockServiceName</key>
 			<string>15843</string>
 		</dict>

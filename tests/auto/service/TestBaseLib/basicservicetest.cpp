@@ -28,8 +28,7 @@ void BasicServiceTest::cleanupTestCase()
 
 void BasicServiceTest::testStart()
 {
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
+	TEST_STATUS(ServiceControl::ServiceStopped);
 
 	testFeature(ServiceControl::SupportsStart);
 	QVERIFY2(control->start(), qUtf8Printable(control->error()));
@@ -46,14 +45,12 @@ void BasicServiceTest::testStart()
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("started"));
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	TEST_STATUS(ServiceControl::ServiceRunning);
 }
 
 void BasicServiceTest::testReload()
 {
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	TEST_STATUS(ServiceControl::ServiceRunning);
 
 	testFeature(ServiceControl::SupportsReload);
 	QVERIFY2(control->reload(), qUtf8Printable(control->error()));
@@ -62,14 +59,12 @@ void BasicServiceTest::testReload()
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("reloading"));
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	TEST_STATUS(ServiceControl::ServiceRunning);
 }
 
 void BasicServiceTest::testPause()
 {
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	TEST_STATUS(ServiceControl::ServiceRunning);
 
 	testFeature(ServiceControl::SupportsPause);
 	QVERIFY2(control->pause(), qUtf8Printable(control->error()));
@@ -78,25 +73,21 @@ void BasicServiceTest::testPause()
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("pausing"));
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServicePaused);
+	TEST_STATUS(ServiceControl::ServicePaused);
 }
 
 void BasicServiceTest::testResume()
 {
-	testFeature(ServiceControl::SupportsStatus);
 	testFeature(ServiceControl::SupportsResume);
-	QCOMPARE(control->status(), ServiceControl::ServicePaused);
+	TEST_STATUS(ServiceControl::ServicePaused);
 
-	testFeature(ServiceControl::SupportsResume);
 	QVERIFY2(control->resume(), qUtf8Printable(control->error()));
 
 	QByteArray msg;
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("resuming"));
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	TEST_STATUS(ServiceControl::ServiceRunning);
 }
 
 void BasicServiceTest::testCustom()
@@ -107,8 +98,7 @@ void BasicServiceTest::testCustom()
 
 void BasicServiceTest::testStop()
 {
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	TEST_STATUS(ServiceControl::ServiceRunning);
 
 	testFeature(ServiceControl::SupportsStop);
 	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
@@ -120,8 +110,7 @@ void BasicServiceTest::testStop()
 #endif
 	QVERIFY(socket->waitForDisconnected(5000));
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
+	TEST_STATUS(ServiceControl::ServiceStopped);
 }
 
 void BasicServiceTest::testAutostart()
@@ -151,16 +140,17 @@ void BasicServiceTest::testCustomImpl()
 
 void BasicServiceTest::performSocketTest()
 {
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
+	TEST_STATUS(ServiceControl::ServiceStopped);
+	else
+		QThread::sleep(3); //leave some time for the svc to actually stop
 
 	auto tcpSocket = new QTcpSocket(this);
 	tcpSocket->connectToHost(QStringLiteral("127.0.0.1"), 15843);
-	QVERIFY(tcpSocket->waitForConnected(5000));
 	while(control->status() == ServiceControl::ServiceStarting)
 		QThread::msleep(500);
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	QVERIFY(tcpSocket->waitForConnected(5000));
+
+	TEST_STATUS(ServiceControl::ServiceRunning);
 
 	QByteArray msg = "hello world";
 	tcpSocket->write(msg);
@@ -174,8 +164,8 @@ void BasicServiceTest::performSocketTest()
 
 	testFeature(ServiceControl::SupportsStop);
 	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceStopped);
+
+	TEST_STATUS(ServiceControl::ServiceStopped);
 }
 
 void BasicServiceTest::testFeature(ServiceControl::SupportFlag flag)
