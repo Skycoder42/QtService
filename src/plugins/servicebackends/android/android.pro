@@ -5,11 +5,13 @@ QT -= gui
 
 HEADERS += \
 	androidserviceplugin.h \
-	androidservicebackend.h
+	androidservicebackend.h \
+    androidservicecontrol.h
 
 SOURCES += \
 	androidserviceplugin.cpp \
-	androidservicebackend.cpp
+	androidservicebackend.cpp \
+    androidservicecontrol.cpp
 
 DISTFILES += android.json
 

@@ -4,6 +4,11 @@
 #include <QtService/ServicePlugin>
 #include <QtCore/QLoggingCategory>
 
+#include <QtAndroidExtras/QAndroidIntent>
+#include <QtAndroidExtras/QAndroidBinder>
+#include <QtAndroidExtras/QAndroidServiceConnection>
+#include <QtAndroidExtras/QtAndroid>
+
 class AndroidServicePlugin : public QObject, public QtService::ServicePlugin
 {
 	Q_OBJECT
@@ -19,5 +24,10 @@ public:
 };
 
 Q_DECLARE_LOGGING_CATEGORY(logQtService)
+
+Q_DECLARE_METATYPE(QAndroidBinder*)
+Q_DECLARE_METATYPE(QAndroidIntent)
+Q_DECLARE_METATYPE(QAndroidServiceConnection*)
+Q_DECLARE_METATYPE(QtAndroid::BindFlags)
 
 #endif // ANDROIDSERVICEPLUGIN_H
