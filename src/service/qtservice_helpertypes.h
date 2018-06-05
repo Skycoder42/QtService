@@ -24,7 +24,7 @@ struct fn_info<TRet(TClass::*)(TArgs...) const>
 	static inline std::function<QVariant(QVariantList)> pack(const std::index_sequence<Is...> &, const TFunctor &fn) {
 		return [fn](const QVariantList &args) {
 			Q_UNUSED(args)
-			return QVariant::fromValue<TRet>(fn(args[Is].template value<TArgs>()...));
+			return QVariant::fromValue<TRet>(fn(args[Is].template value<std::decay_t<TArgs>>()...));
 		};
 	}
 };
@@ -41,7 +41,7 @@ struct fn_info<void(TClass::*)(TArgs...) const>
 	static inline std::function<QVariant(QVariantList)> pack(const std::index_sequence<Is...> &, const TFunctor &fn) {
 		return [fn](const QVariantList &args) {
 			Q_UNUSED(args)
-			fn(args[Is].template value<TArgs>()...);
+			fn(args[Is].template value<std::decay_t<TArgs>>()...);
 			return QVariant{};
 		};
 	}

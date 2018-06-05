@@ -75,7 +75,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void started();
-	void stopped(int exitCode);
+	void stopped(int exitCode = EXIT_SUCCESS);
 	void reloaded();
 	void paused();
 	void resumed();
@@ -104,6 +104,8 @@ protected:
 	void addCallback(const QByteArray &kind, const std::function<QVariant(QVariantList)> &fn);
 	template <typename TFunction>
 	void addCallback(const QByteArray &kind, const TFunction &fn);
+	template <typename TClass, typename TReturn, typename... TArgs>
+	void addCallback(const QByteArray &kind, TReturn(TClass::*fn)(TArgs...), std::enable_if_t<std::is_base_of<QtService::Service, TClass>::value, void*> = nullptr);
 
 private:
 	friend class QtService::ServiceBackend;
@@ -117,6 +119,15 @@ template<typename TFunction>
 void Service::addCallback(const QByteArray &kind, const TFunction &fn)
 {
 	addCallback(kind, __helpertypes::pack_function(fn));
+}
+
+template<typename TClass, typename TReturn, typename... TArgs>
+void Service::addCallback(const QByteArray &kind, TReturn (TClass::*fn)(TArgs...), std::enable_if_t<std::is_base_of<QtService::Service, TClass>::value, void*>)
+{
+	auto self = static_cast<TClass*>(this);
+	addCallback(kind, [self, fn](TArgs... args) -> TReturn {
+		return (self->*fn)(args...);
+	});
 }
 
 }

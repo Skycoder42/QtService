@@ -17,13 +17,6 @@ public class AndroidService extends QtService {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		// explicitly exit to prevent the process from beeing cached
-		System.exit(_exitCode);
-	}
-
-	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		int res = super.onStartCommand(intent, flags, startId);
 		try {
@@ -35,9 +28,5 @@ public class AndroidService extends QtService {
 		res = callStartCommand(intent, flags, startId, res);
 		_sem.release();
 		return res;
-	}
-
-	public void stopSelfSecure() {
-		stopService(new Intent(this, this.getClass()));//Stop myself
 	}
 }

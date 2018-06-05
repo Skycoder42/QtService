@@ -45,7 +45,7 @@ int AndroidServiceBackend::runService(int &argc, char **argv, int flags)
 void AndroidServiceBackend::quitService()
 {
 	QAndroidJniExceptionCleaner cleaner {QAndroidJniExceptionCleaner::OutputMode::Verbose};
-	_javaService.callMethod<void>("stopSelfSecure");
+	_javaService.callMethod<void>("stopSelf");
 }
 
 void AndroidServiceBackend::reloadService()
