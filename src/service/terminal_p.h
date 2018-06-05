@@ -46,6 +46,17 @@ private:
 	QDataStream commandStream;
 };
 
+class TerminalAwaitablePrivate
+{
+public:
+	TerminalAwaitablePrivate(Terminal *terminal, qint64 readCnt);
+
+	Terminal * const terminal;
+	const qint64 readCnt;
+	QMetaObject::Connection connection;
+	QByteArray result;
+};
+
 }
 
 #endif // QTSERVICE_TERMINAL_P_H

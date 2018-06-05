@@ -99,6 +99,21 @@ bool Terminal::isAutoDelete() const
 	return d->autoDelete;
 }
 
+Terminal::Awaitable Terminal::awaitChar()
+{
+	return Awaitable{this, Awaitable::ReadSingle};
+}
+
+Terminal::Awaitable Terminal::awaitChars(qint64 num)
+{
+	return Awaitable{this, num};
+}
+
+Terminal::Awaitable Terminal::awaitLine()
+{
+	return Awaitable{this, Awaitable::ReadLine};
+}
+
 void Terminal::disconnectTerminal()
 {
 	d->socket->disconnectFromServer();
@@ -194,6 +209,63 @@ bool Terminal::open(QIODevice::OpenMode mode)
 	return false;
 }
 
+// ------------- Awaitable implementation -------------
+
+Terminal::Awaitable::Awaitable(Terminal *terminal, qint64 readCnt) :
+	d{new TerminalAwaitablePrivate{terminal, readCnt}}
+{}
+
+Terminal::Awaitable::Awaitable(Terminal::Awaitable &&other)
+{
+	d.swap(other.d);
+}
+
+Terminal::Awaitable &Terminal::Awaitable::operator=(Terminal::Awaitable &&other)
+{
+	d.swap(other.d);
+	return *this;
+}
+
+Terminal::Awaitable::~Awaitable() = default;
+
+void Terminal::Awaitable::prepare(std::function<void()> resume)
+{
+	d->connection = QObject::connect(d->terminal, &QIODevice::readyRead,
+									 [this, resume{std::move(resume)}]() {
+		switch(d->readCnt) {
+		case ReadLine:
+			if(!d->terminal->canReadLine())
+				return;
+			d->result = d->terminal->readLine();
+			break;
+		default:
+			if(d->terminal->bytesAvailable() < d->readCnt)
+				return;
+			d->result = d->terminal->read(d->readCnt);
+			break;
+		}
+		QObject::disconnect(d->connection);
+		resume();
+	});
+
+	switch(d->readCnt) {
+	case ReadLine:
+		d->terminal->requestLine();
+		break;
+	case ReadSingle:
+		d->terminal->requestChar();
+		break;
+	default:
+		d->terminal->requestChars(d->readCnt);
+		break;
+	}
+}
+
+Terminal::Awaitable::type &&Terminal::Awaitable::result()
+{
+	return std::move(d->result);
+}
+
 // ------------- Private Implementation -------------
 
 TerminalPrivate::TerminalPrivate(QLocalSocket *socket, QObject *parent) :
@@ -254,3 +326,10 @@ void TerminalPrivate::readyRead()
 		}
 	}
 }
+
+
+
+TerminalAwaitablePrivate::TerminalAwaitablePrivate(Terminal *terminal, qint64 readCnt) :
+	terminal{terminal},
+	readCnt{readCnt}
+{}

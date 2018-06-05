@@ -2,6 +2,7 @@
 #define QTSERVICE_TERMINAL_H
 
 #include <QtCore/qiodevice.h>
+#include <QtCore/qscopedpointer.h>
 
 #include "QtService/qtservice_global.h"
 #include "QtService/service.h"
@@ -9,6 +10,7 @@
 namespace QtService {
 
 class TerminalPrivate;
+class TerminalAwaitablePrivate;
 class Q_SERVICE_EXPORT Terminal : public QIODevice //TODO copy doc from backproc
 {
 	Q_OBJECT
@@ -18,6 +20,27 @@ class Q_SERVICE_EXPORT Terminal : public QIODevice //TODO copy doc from backproc
 	Q_PROPERTY(bool autoDelete READ isAutoDelete WRITE setAutoDelete NOTIFY autoDeleteChanged)
 
 public:
+	class Q_SERVICE_EXPORT Awaitable
+	{
+	public:
+		enum SpecialReads : qint64 {
+			ReadLine = 0,
+			ReadSingle = 1
+		};
+
+		Awaitable(Terminal *terminal, qint64 readCnt = ReadSingle);
+		Awaitable(Awaitable &&other);
+		Awaitable &operator=(Awaitable &&other);
+		~Awaitable();
+
+		using type = QByteArray;
+		void prepare(std::function<void()> resume);
+		type &&result();
+
+	private:
+		QScopedPointer<TerminalAwaitablePrivate> d;
+	};
+
 	explicit Terminal(TerminalPrivate *d_ptr, QObject *parent = nullptr);
 	~Terminal() override;
 
@@ -33,6 +56,11 @@ public:
 	Service::TerminalMode terminalMode() const;
 	QStringList command() const;
 	bool isAutoDelete() const;
+
+	//awaitables
+	Awaitable awaitChar();
+	Awaitable awaitChars(qint64 num);
+	Awaitable awaitLine();
 
 public Q_SLOTS:
 	void disconnectTerminal();
