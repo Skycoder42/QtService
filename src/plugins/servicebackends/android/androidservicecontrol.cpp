@@ -22,7 +22,7 @@ bool AndroidServiceControl::serviceExists() const
 {
 	QAndroidJniExceptionCleaner cleaner;
 	QAndroidJniEnvironment env;
-	return QAndroidJniObject{static_cast<jobject>(env->FindClass(qUtf8Printable(serviceId())))}.isValid();
+	return QAndroidJniObject{static_cast<jobject>(env->FindClass(jniServiceId().constData()))}.isValid();
 }
 
 QVariant AndroidServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
@@ -103,6 +103,11 @@ QString AndroidServiceControl::serviceName() const
 	return serviceId().split(QLatin1Char('/')).last();
 }
 
+QByteArray AndroidServiceControl::jniServiceId() const
+{
+	return serviceId().replace(QLatin1Char('.'), QLatin1Char('/')).toUtf8();
+}
+
 bool AndroidServiceControl::bind(QAndroidServiceConnection *serviceConnection, QtAndroid::BindFlags flags)
 {
 	if(!serviceExists())
@@ -129,7 +134,7 @@ void AndroidServiceControl::startWithIntent(const QAndroidIntent &intent)
 	auto context = QtAndroid::androidContext();
 	intent.handle().callObjectMethod("setClass", "(Landroid/content/Context;Ljava/lang/Class;)Landroid/content/Intent;",
 									 context.object(),
-									 env->FindClass(qUtf8Printable(serviceId())));
+									 env->FindClass(jniServiceId().constData()));
 	context.callObjectMethod("startService", "(Landroid/content/Intent;)Landroid/content/ComponentName;",
 							 intent.handle().object());
 }

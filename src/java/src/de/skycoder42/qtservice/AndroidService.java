@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import org.qtproject.qt5.android.bindings.QtService;
 
-class AndroidService extends QtService {
+public class AndroidService extends QtService {
 	private int _exitCode = 0;
 	private final Semaphore _sem = new Semaphore(0);
 
@@ -23,17 +23,21 @@ class AndroidService extends QtService {
 		System.exit(_exitCode);
 	}
 
-	@override
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		int res = super.onStartCommand(intent, flags, startId);
-		_sem.acquire();
+		try {
+			_sem.acquire();
+		} catch(InterruptedException e) {
+			e.printStackTrace();
+			return res;
+		}
 		res = callStartCommand(intent, flags, startId, res);
 		_sem.release();
 		return res;
 	}
 
-	@Override
-	public void stopSelf() {
+	public void stopSelfSecure() {
 		stopService(new Intent(this, this.getClass()));//Stop myself
 	}
 }

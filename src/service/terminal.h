@@ -35,7 +35,7 @@ public:
 
 		using type = QByteArray;
 		void prepare(std::function<void()> resume);
-		type &&result();
+		type result();
 
 	private:
 		QScopedPointer<TerminalAwaitablePrivate> d;

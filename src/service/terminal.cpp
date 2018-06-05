@@ -231,7 +231,7 @@ Terminal::Awaitable::~Awaitable() = default;
 void Terminal::Awaitable::prepare(std::function<void()> resume)
 {
 	d->connection = QObject::connect(d->terminal, &QIODevice::readyRead,
-									 [this, resume{std::move(resume)}]() {
+									 [this, resume]() {
 		switch(d->readCnt) {
 		case ReadLine:
 			if(!d->terminal->canReadLine())
@@ -261,7 +261,7 @@ void Terminal::Awaitable::prepare(std::function<void()> resume)
 	}
 }
 
-Terminal::Awaitable::type &&Terminal::Awaitable::result()
+Terminal::Awaitable::type Terminal::Awaitable::result()
 {
 	return std::move(d->result);
 }

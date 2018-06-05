@@ -81,13 +81,13 @@ public:
 	virtual bool isAutostartEnabled() const;
 	QString error() const;
 
-	virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args);
+	Q_INVOKABLE virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args);
 	template <typename TRet, typename... TArgs>
 	TRet callCommand(const QByteArray &kind, TArgs... args);
 	template <typename... TArgs>
 	void callCommand(const QByteArray &kind, TArgs... args);
 
-	QDir runtimeDir() const;
+	Q_INVOKABLE QDir runtimeDir() const;
 
 public Q_SLOTS:
 	virtual bool start();

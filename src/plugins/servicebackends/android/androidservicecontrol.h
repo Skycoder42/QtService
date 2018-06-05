@@ -28,6 +28,8 @@ protected:
 	QString serviceName() const override;
 
 private:
+	QByteArray jniServiceId() const;
+
 	bool bind(QAndroidServiceConnection *serviceConnection, QtAndroid::BindFlags flags);
 	void unbind(QAndroidServiceConnection *serviceConnection);
 	void startWithIntent(const QAndroidIntent &intent);

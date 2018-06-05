@@ -10,8 +10,12 @@ AndroidServicePlugin::AndroidServicePlugin(QObject *parent) :
 
 QString AndroidServicePlugin::currentServiceId() const
 {
-	Q_UNIMPLEMENTED();
-	return QCoreApplication::applicationName();
+	auto service = QtAndroid::androidService();
+	if(service.isValid()) {
+		auto clazz = service.callObjectMethod("getClass", "()Ljava/lang/Class;");
+		return clazz.callObjectMethod("getName", "()Ljava/lang/String;").toString();
+	} else
+		return {};
 }
 
 QtService::ServiceBackend *AndroidServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
