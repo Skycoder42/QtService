@@ -2,9 +2,6 @@
 #include <QDebug>
 #include <QTcpSocket>
 #include <QTimer>
-#ifdef Q_OS_ANDROID
-#include <QtAndroidExtras>
-#endif
 
 EchoService::EchoService(int &argc, char **argv) :
 	Service(argc, argv)
@@ -22,11 +19,6 @@ bool EchoService::preStart()
 		qDebug() << "SIGUSR2";
 		return 42;
 	});
-#ifdef Q_OS_ANDROID
-	addCallback("onBind", [](const QAndroidIntent &intent) -> QAndroidBinder* {
-		return nullptr;
-	});
-#endif
 
 	return true;
 }

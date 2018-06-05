@@ -3,5 +3,7 @@ QT_FOR_CONFIG += core
 
 SUBDIRS += \
 	EchoService \
-    EchoControl \
-    TerminalService
+	EchoControl \
+	TerminalService
+
+android: SUBDIRS += AndroidServiceTest
