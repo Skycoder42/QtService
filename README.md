@@ -83,7 +83,7 @@ protected:
 		qDebug() << "Service was started";
 		return Synchronous; //service is now assumed started
 	}
-	
+
 	CommandMode onStop(int &exitCode) override {
 		qDebug() << "Stop received";
 		// do some complicated stopping stuff asynchronously that takes some time...
@@ -117,8 +117,10 @@ To start a terminal client, simply prepend `--terminal` as well as the backend t
 ```.sh
 #!/bin/sh
 # use as "service-cli <arguments>" (assuming this script is named service-cli)
-exec /path/to/service --backend systemd --terminal "$@"
+exec /path/to/service -platform minimal --backend systemd --terminal "$@"
 ```
+
+(The platform argument is recommended to not depend on any windowing system)
 
 ### Service Control
 The `QtService::ServiceControl` allows you to control services by sending commands to them and retrieving the status. However, what exactly is possible greatly varies for each platform. Always use `QtService::ServiceControl::supportFlags` to figure out what you can actually do on the current platform. You can also check the doxygen documentation to get an overview over all the backends and their features.

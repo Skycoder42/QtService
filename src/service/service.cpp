@@ -136,7 +136,7 @@ Service::TerminalMode Service::terminalMode() const
 	return d->terminalMode;
 }
 
-bool Service::globalTerminal() const
+bool Service::isGlobalTerminal() const
 {
 	return d->terminalGlobal;
 }

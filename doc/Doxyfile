@@ -927,7 +927,9 @@ EXCLUDE_PATTERNS       = moc_* \
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = QAbstractAspect \
+EXCLUDE_SYMBOLS        = QtService::__helpertypes
+						 \
+						 QAbstractAspect \
 						 QBasicAtomicInteger \
 						 QBasicAtomicPointer \
 						 QBasicMutex \
@@ -1414,7 +1416,7 @@ QCH_FILE               = ../qtservice.qch
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_QHP is set to YES.
 
-QHP_NAMESPACE          = com.skycoder42.qtservice.100
+QHP_NAMESPACE          = de.skycoder42.qtservice.100
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating Qt
 # Help Project output. For more information please see Qt Help Project / Virtual

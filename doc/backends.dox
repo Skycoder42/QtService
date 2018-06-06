@@ -1,0 +1,169 @@
+/*!
+@page qtservice_backends Supported Service Backends
+@brief An overview for the features each backend supports
+
+@tableofcontents
+
+@section qtservice_backends_standard Standard Backend
+@subsection qtservice_backends_standard_backend Service Backend
+- Is a dummy that simply runs as a normal console process
+- Uses QCoreApplication as application
+- Logging is done formatted to stderr
+- Ensures only 1 instance is running by using a lockfile
+- Maps common unix signals to commands:
+	- `SIGINT`, `SIGTERM`, `SIGQUIT`: stop
+	- `SIGHUB`: reload
+	- `SIGTSTP`: pause
+	- `SIGCONT`: resume
+	- `SIGUSR1`: callback "SIGUSR1"
+	- `SIGUSR2`: callback "SIGUSR2"
+- Can handle windows signals to stop the service: CTRL_C_EVENT, CTRL_BREAK_EVENT
+- Stopping is only possible via those signals or from within the service itself
+- Callbacks signatures:
+	- `void SIGUSR1()`: Invoked by handling the unix signal `SIGUSR1`
+	- `void SIGUSR2()`: Invoked by handling the unix signal `SIGUSR2`
+@subsection qtservice_backends_standard_control Service Control
+- Support Flags:
+	- QtService::ServiceControl::SupportsStart (only on platforms that provice QProcess)
+	- QtService::ServiceControl::SupportsStop
+	- QtService::ServiceControl::SupportsStatus
+- Custom commands: none
+- Starting is done by simply running the service executable as detached process
+- The lockfile is used to determine the service state - which means only services that use the
+backend can be controlled properly
+- Stopping is done by sending a signal to the service
+
+@section qtservice_backends_systemd Systemd Backend
+@subsection qtservice_backends_systemd_backend Service Backend
+- All QDebug is logged into journald
+- Uses QCoreApplication as application
+- Can be used for user and system services
+- should be used with `-platform minimal` to avoid any dependencies to the windowing system
+- supported systemd commands:
+	- start
+	- stop
+	- reload
+- Implemented as notify-daemon - automatically reports the status to systemd
+- Supports the systemd watchdog (optionally)
+- Supports named and default socket activation (via a .socket file)
+- Maps common unix signals to commands:
+	- `SIGINT`, `SIGTERM`, `SIGQUIT`: stop
+	- `SIGHUB`: reload
+	- `SIGTSTP`: pause
+	- `SIGCONT`: resume
+	- `SIGUSR1`: callback "SIGUSR1"
+	- `SIGUSR2`: callback "SIGUSR2"
+- Callbacks signatures:
+	- `void SIGUSR1()`: Invoked by handling the unix signal `SIGUSR1`
+	- `void SIGUSR2()`: Invoked by handling the unix signal `SIGUSR2`
+
+@subsection qtservice_backends_systemd_control Service Control
+- Support Flags:
+	- QtService::ServiceControl::SupportsStart
+	- QtService::ServiceControl::SupportsStop
+	- QtService::ServiceControl::SupportsGetAutostart
+	- QtService::ServiceControl::SupportsSetAutostart
+	- QtService::ServiceControl::SupportsStatus
+	- QtService::ServiceControl::SupportsCustomCommands
+	- QtService::ServiceControl::SupportsBlocking
+	- QtService::ServiceControl::SupportsNonBlocking
+- Custom commands:
+	- Any command that is a valid systemctl command. The general signature is:
+`int command(parameters...)` and will invoke systemctl as
+`systemctl [--user|--system] [--no-block] <command> <service-name> <arguments>` and return the result
+of that command. The first two parameters as well as the service name are automatically determined
+by the backend, depending on the control configuration. For example, to send the `SIGUSR1` signal to
+a running service, you would call `callCommand<int>("kill", QStringLiteral("--signal=SIGUSR1"));`
+
+@section qtservice_backends_windows Windows Backend
+@subsection qtservice_backends_windows_backend Service Backend
+- Logging: The service registers as eventsource and reports event to the windows event log
+- Uses QCoreApplication as application
+- supported windows commands:
+	- start
+	- stop
+	- pause
+	- resume
+	- custom commands (callback "command")
+- Windows service type: `SERVICE_WIN32_OWN_PROCESS`
+- Windows service flags: `SERVICE_ACCEPT_PAUSE_CONTINUE | SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN`
+- Periodically reports startup state
+- Callbacks signatures:
+	- `void command(DWORD)`: Invoke by handling custom service commands (code range is `[128;255]`)
+
+@subsection qtservice_backends_windows_control Service Control
+- Support Flags:
+	- QtService::ServiceControl::SupportsStart
+	- QtService::ServiceControl::SupportsStop
+	- QtService::ServiceControl::SupportsPause
+	- QtService::ServiceControl::SupportsResume
+	- QtService::ServiceControl::SupportsGetAutostart
+	- QtService::ServiceControl::SupportsSetAutostart
+	- QtService::ServiceControl::SupportsStatus
+	- QtService::ServiceControl::SupportsCustomCommands
+	- QtService::ServiceControl::SupportsNonBlocking
+- Custom commands:
+	- `bool command(DWORD cmd)`: Accepts commands in the range of `[128;255]`. The command is sent
+to the service as custom command
+
+@section qtservice_backends_launchd Launchd Backend
+@subsection qtservice_backends_launchd_backend Service Backend
+- All QDebug is logged with syslog
+- Uses QCoreApplication as application
+- Supports named socket activation (via the plist files `Sockets` category)
+- Maps common unix signals to commands:
+	- `SIGINT`, `SIGTERM`, `SIGQUIT`: stop
+	- `SIGHUB`: reload
+	- `SIGTSTP`: pause
+	- `SIGCONT`: resume
+	- `SIGUSR1`: callback "SIGUSR1"
+	- `SIGUSR2`: callback "SIGUSR2"
+- Callbacks signatures:
+	- `void SIGUSR1()`: Invoked by handling the unix signal `SIGUSR1`
+	- `void SIGUSR2()`: Invoked by handling the unix signal `SIGUSR2`
+
+@subsection qtservice_backends_launchd_control Service Control
+- Support Flags:
+	- QtService::ServiceControl::SupportsStart
+	- QtService::ServiceControl::SupportsStop
+	- QtService::ServiceControl::SupportsCustomCommands
+	- QtService::ServiceControl::SupportsNonBlocking
+- Custom commands:
+	- Any command that is a valid launchctl command. The general signature is:
+`int command(parameters...)` and will invoke launchctl as
+`launchctl <command> <arguments> <service-name>` and return the result
+of that command. The service name is automatically determined by the backend, depending on the
+control configuration.
+
+@section qtservice_backends_android Android Backend
+@subsection qtservice_backends_android_backend Service Backend
+- Logging is done to logcat, as usual for Qt for android
+- Uses QAndroidService as application
+- Handles Android service commands:
+	- "service is started" (either via binding or explicit start): start
+	- stopService (or stopSelf): stop
+	- onStartCommand: callback "onStartCommand"
+	- onBind: callback "onBind"
+- Callbacks signatures:
+	- `int onStartCommand(QAndroidIntent, int, int)`: Run in the *android thread* (!) to react to
+the corresponding command
+	- `QAndroidBinder *onBind(QAndroidIntent)`: Run in the *android thread* (!) to react to the
+corresponding command
+
+@subsection qtservice_backends_android_control Service Control
+- Support Flags:
+	- QtService::ServiceControl::SupportsStart
+	- QtService::ServiceControl::SupportsStop
+	- QtService::ServiceControl::SupportsCustomCommands
+	- QtService::ServiceControl::SupportsNonBlocking
+- Custom commands:
+	- `void startWithIntent(QAndroidIntent)`: Starts the service with a custom intent. If the
+service is already running it is delivered to the running service. The target class is set
+automatically, so you don't have to set it on your intent.
+	- `bool bind(QAndroidServiceConnection*, QtAndroid::BindFlags)`: Binds to the given service. If
+it is not already running that will also start the service. The bind status is reported to the
+QAndroidServiceConnection.
+	- `void unbind(QAndroidServiceConnection*)`: Unbinds the service connected by the given
+connection. If no other binders are connected and the service was not started explicitly, this will
+stop the service.
+*/
