@@ -79,7 +79,6 @@ void AndroidServiceBackend::onExit()
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));
 	auto subRes = exitLoop.exec();
-	_javaService.setField<jint>("_exitCode", subRes);
 }
 
 QAndroidBinder *AndroidServiceBackend::onBind(const QAndroidIntent &intent)

@@ -7,7 +7,6 @@ import android.content.Intent;
 import org.qtproject.qt5.android.bindings.QtService;
 
 public class AndroidService extends QtService {
-	private int _exitCode = 0;
 	private final Semaphore _sem = new Semaphore(0);
 
 	private static native int callStartCommand(Intent intent, int flags, int startId, int oldCode);
