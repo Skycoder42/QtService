@@ -23,8 +23,6 @@ int activityMain(int argc, char *argv[])
 											  "registerChannel", "(Landroid/content/Context;)V",
 											  QtAndroid::androidContext().object());
 
-	qmlRegisterUncreatableType<QtService::ServiceControl>("de.skycoder42.QtService", 1, 0, "ServiceControl", QStringLiteral("baum"));
-
 	QQmlApplicationEngine engine;
 	auto control = QtService::ServiceControl::create(QStringLiteral("android"), QStringLiteral("de.skycoder42.qtservice.AndroidService"), &engine);
 	auto helper = new ControlHelper{control};

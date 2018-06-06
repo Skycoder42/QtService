@@ -1,6 +1,5 @@
 package de.skycoder42.qtservice.test;
 
-import android.content.Intent;
 import android.content.Context;
 import android.app.Service;
 import android.app.Notification;
@@ -12,7 +11,7 @@ class TestServiceHelper
 	private static final int NotId = 42;
 	private static final String ChannelId = "42";
 
-	static void registerChannel(Context context)
+	public static void registerChannel(Context context)
 	{
 		NotificationChannel foreground = new NotificationChannel(ChannelId,
 				"Test Service",
@@ -26,7 +25,7 @@ class TestServiceHelper
 		manager.createNotificationChannel(foreground);
 	}
 
-	static void notifyRunning(Service context, String message)
+	public static void notifyRunning(Service context, String message)
 	{
 		Notification.Builder builder = new Notification.Builder(context, ChannelId)
 			.setContentTitle("Test Service")
@@ -37,7 +36,7 @@ class TestServiceHelper
 		context.startForeground(NotId, builder.build());
 	}
 
-	static void updateNotifyRunning(Service context, String message)
+	public static void updateNotifyRunning(Service context, String message)
 	{
 		Notification.Builder builder = new Notification.Builder(context, ChannelId)
 			.setContentTitle("Test Service")
@@ -49,7 +48,7 @@ class TestServiceHelper
 		manager.notify(NotId, builder.build());
 	}
 
-	static void stopNotifyRunning(Service context)
+	public static void stopNotifyRunning(Service context)
 	{
 		context.stopForeground(true);
 	}

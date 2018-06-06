@@ -54,8 +54,8 @@ public:
 
 	static Service *instance();
 
-	QList<int> getSockets(const QByteArray &socketName);
-	int getSocket();
+	Q_INVOKABLE QList<int> getSockets(const QByteArray &socketName);
+	Q_INVOKABLE int getSocket();
 
 	QString backend() const;
 	QDir runtimeDir() const;
@@ -131,5 +131,7 @@ void Service::addCallback(const QByteArray &kind, TReturn (TClass::*fn)(TArgs...
 }
 
 }
+
+#define qService QtService::Service::instance()
 
 #endif // QTSERVICE_SERVICE_H
