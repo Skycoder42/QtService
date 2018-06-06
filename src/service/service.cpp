@@ -78,9 +78,14 @@ int Service::exec()
 			asTerminal = true;
 	}
 
-	if(asTerminal && d->terminalActive) {
-		TerminalClient client{this};
-		return client.exec(d->argc, d->argv, d->flags);
+	if(asTerminal) {
+		if(d->terminalActive) {
+			TerminalClient client{this};
+			return client.exec(d->argc, d->argv, d->flags);
+		} else {
+			qCCritical(logQtService) << "Terminal mode has not been enabled! See QtService::Service::terminalActive";
+			return EXIT_FAILURE;
+		}
 	} else {
 		try {
 			d->backend = factory->createServiceBackend(d->backendProvider, this);

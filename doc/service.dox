@@ -1,0 +1,223 @@
+/*!
+@class QtService::Service
+
+This class is the primary interface for a service. In your own service, you will implement this class
+and use it as replacement for QCoreApplication:
+
+@code{.cpp}
+int main(int argc, char *argv[])
+{
+	MyService service{argc, argv}; // extends QtService::Service
+	return service.exec();
+}
+@endcode
+
+@attention When using the service, do not create a QCoreApplication (or any other) yourself! This is
+done internally by each backend at the appropriate point. Also, when implementing the interface, make
+shure to pass the argc argument to the constructer as a reference! Passing by value will crash your
+application. Furthermore, do nothing else in the main besides setting the serices properties!
+Any setup etc. must all be done in the Service::onStart method!!! (The properties that need to be
+set early all have a hint in their documentation)
+*/
+
+/*!
+@property QtService::Service::backend
+
+@default{`standard`}
+
+This is set by the backend which is internally used to run the service. The backend can be selected
+by the `--backend <backend>` command.
+
+@accessors{
+	@readAc{backend()}
+	@constantAc
+}
+*/
+
+/*!
+@property QtService::Service::runtimeDir
+
+@default{<i>Platform dependend</i>}
+
+The runtime directory to be used to place sockets, lockfiles and other temporary stuff. This directoy
+may be managed by the underlying service framework and is the same as reported by the service control
+
+@accessors{
+	@readAc{runtimeDir()}
+	@constantAc
+}
+
+@sa ServiceControl::runtimeDir
+*/
+
+/*!
+@property QtService::Service::terminalActive
+
+@default{`false`}
+
+Set this property to true to enable the internal terminal server. When activated, terminals that are
+created via `--terminal` can connect to the service. Otherwise they won't be able to.
+
+@note Terminals won't even try to connect if this property is not set. Thus you should always set
+this property before calling Service::exec. If you want to device whether you want terminals
+dynamically, simply set this property to false again in the Service::preStart or Service::onStart
+methods.
+
+@accessors{
+	@readAc{isTerminalActive()}
+	@writeAc{setTerminalActive()}
+	@notifyAc{terminalActiveChanged()}
+}
+
+@sa Terminal, Service::terminalConnected, Service::terminalMode, Service::globalTerminal,
+Service::startWithTerminal
+*/
+
+/*!
+@property QtService::Service::terminalMode
+
+@default{`Service::ReadWriteActive`}
+
+The terminal mode that terminal clients should use to connect to the service with. The mode
+determines how I/O is managed between the service and the terminal. The general recommendation is
+to design a terminal for Service::ReadWriteActive when it is intended to be used by a human, and use
+one of the other 3 for machine to machine communication, choosing whichever directions of
+communication are needed.
+
+Please note that this property is evaluated from the terminals themselves, which means you should
+set it before calling Service::exec. Changing it on the service instance will have no effect.
+
+@note For the active mode, the user won't be able to input anything unless the Terminal::request*
+(or Terminal::await*) methods are called.
+
+@accessors{
+	@readAc{terminalMode()}
+	@writeAc{setTerminalMode()}
+	@notifyAc{terminalModeChanged()}
+}
+
+@sa Terminal, Service::terminalActive, Terminal::terminalMode, Terminal::requestChar,
+Terminal::requestChars, Terminal::requestLine, Terminal::awaitChar, Terminal::awaitChars,
+Terminal::awaitLine
+*/
+
+/*!
+@property QtService::Service::globalTerminal
+
+@default{`false`}
+
+In local mode (the default) only terminals started from the same user account as the one the service
+is running as can access the service. This is fine for user-mode services, but system services
+typically run as system user.
+
+When in global mode, **anyone** can connect to the service, effectively bridging that barrier.
+
+@note Changing this property after activating terminals (setting Service::terminalActive to true)
+has no effect. Either set this property beforehand or disable and reenable the former after changing
+this one.
+
+@warning In global mode, **ANY** user has access to the service, and can send commands to it. You
+should be very careful when exposing a service to the whole system, as it can lead to potential
+security risks, especially when the service is running as system service.
+
+@accessors{
+	@readAc{globalTerminal()}
+	@writeAc{setGlobalTerminal()}
+	@notifyAc{globalTerminalChanged()}
+}
+
+@sa Terminal, Service::terminalActive
+*/
+
+/*!
+@property QtService::Service::startWithTerminal
+
+@default{`false`}
+
+If enabled, the terminal client will use the ServiceControl of the corresponding service backend
+to determine whether the service is already running, and if not start it.
+
+This of course will only work if the service supports starting. If status information is supported,
+the terminals will use that to check the state. Otherwise the simply to start in a fire and forget
+manner and then try to connect.
+
+@note This property is evaluated from the terminals themselves, which means you should set it before
+calling Service::exec. Changing it on the service instance will have no effect.
+
+@accessors{
+	@readAc{startWithTerminal()}
+	@writeAc{setStartWithTerminal()}
+	@notifyAc{startWithTerminalChanged()}
+}
+
+@sa Terminal, Service::terminalActive, ServiceControl, ServiceControl::SupportsStart,
+ServiceControl::SupportsStatus
+*/
+
+/*!
+@fn QtService::Service::Service
+
+@param argc The `argc` argument of the main
+@param argv The `argv` argument of the main
+
+Create a service from the arguments passed to the application
+
+@attention It is *very important* that the first parameter is a reference! When implementing this
+interface, make shure your constructor has the the two arg parameters and the the argc argument is
+a reference as well! Passing by value will crash your application!
+*/
+
+/*!
+@fn QtService::Service::exec
+
+@returns The exit code of the application that should be returned from the main.
+
+This method is blocking and will internally call `QCoreApplication::exec` at some point. In other
+words this method starts the service as well as the main event loop.
+*/
+
+/*!
+@fn QtService::Service::instance
+
+@returns The current service instance
+
+This is only set when actually running as service and the service has been created. Otherwise,
+nullptr is returned
+
+@sa qService
+*/
+
+/*!
+@fn QtService::Service::getSockets
+
+@param socketName The name of the socket to be retrieved
+@returns The socket descriptors associated with that name
+
+On services that supports socket activation, you can retrieve the activated sockets with this method.
+Typically, only one socket is found per name, but sometimes you may want to listen on different
+interfaces for the same service, thus it is possible multiple sockets share an identity. In case you
+only have a single unnamed socket, use Service::getSocket instead
+
+The returned sockets can be used with classes like QTcpServer, QLocalServer or QWebSocketServer. All
+of these classes have a method to set an already activated socket descriptor they can work with.
+
+@sa Service::getSocket, QTcpServer::setSocketDescriptor, QLocalServer::listen,
+QWebSocketServer::setSocketDescriptor, http://0pointer.de/blog/projects/socket-activation.html
+*/
+
+/*!
+@fn QtService::Service::getSocket
+
+@returns The default socket descriptor, if one exists, otherwise -1
+
+On services that supports socket activation, you can retrieve an activated sockets with this method.
+If the backend supports getting the default, unnamed socket, then this method is an easy way to get
+it. If you want multiple sockets or can access them by name only, use Service::getSockets instead.
+
+The returned socket can be used with classes like QTcpServer, QLocalServer or QWebSocketServer. All
+of these classes have a method to set an already activated socket descriptor they can work with.
+
+@sa Service::getSockets, QTcpServer::setSocketDescriptor, QLocalServer::listen(qintptr),
+QWebSocketServer::setSocketDescriptor, http://0pointer.de/blog/projects/socket-activation.html
+*/
+

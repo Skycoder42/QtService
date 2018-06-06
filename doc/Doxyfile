@@ -927,23 +927,15 @@ EXCLUDE_PATTERNS       = moc_* \
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = QtService::__helpertypes
+EXCLUDE_SYMBOLS        = QtService::__helpertypes \
+						 de::skycoder42::qtservice::AndroidService \
 						 \
-						 QAbstractAspect \
+						 QAbstractXmlReceiver \
 						 QBasicAtomicInteger \
 						 QBasicAtomicPointer \
 						 QBasicMutex \
-						 QComponent \
-						 QEntity \
 						 QFutureWatcherBase \
-						 QGeometry \
-						 QGeometryRenderer \
-						 QMaterial \
-						 QNode \
-						 QNodeCreatedChangeBase \
-						 QPaintEngineEx \
-						 QQmlExtensionInterface \
-						 QTechniqueFilter
+						 QPaintEngineEx
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include

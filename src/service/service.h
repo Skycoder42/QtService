@@ -35,7 +35,7 @@ class Q_SERVICE_EXPORT Service : public QObject
 	//! Specifies the mode new terminals are started as
 	Q_PROPERTY(TerminalMode terminalMode READ terminalMode WRITE setTerminalMode NOTIFY terminalModeChanged)
 	//! Specifies whether terminals from all users can connect, or only of the same user as the service
-	Q_PROPERTY(boolglobalTerminal READ isGlobalTerminal WRITE setGlobalTerminal NOTIFY globalTerminalChanged)
+	Q_PROPERTY(bool globalTerminal READ isGlobalTerminal WRITE setGlobalTerminal NOTIFY globalTerminalChanged)
 	//! Specifies whether terminals should try to start the service if it is not running
 	Q_PROPERTY(bool startWithTerminal READ startWithTerminal WRITE setStartWithTerminal NOTIFY startWithTerminalChanged)
 

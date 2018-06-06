@@ -95,7 +95,9 @@ protected:
 };
 
 int main(int argc, char *argv[]) {
-	//IMPORTANT: do NOT create a QCoreApplication here - this is done internally by the backends!
+	// IMPORTANT: do NOT create a QCoreApplication here - this is done internally by the backends!
+	// also, do nothing else in the main besides setting the serices properties! Any setup etc. must all be
+	// done in the onStart method!!!
 	TestService service{argc, argv};
 	return service.exec();
 }
