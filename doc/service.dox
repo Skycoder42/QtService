@@ -471,4 +471,52 @@ of command line arguments which leads to a better experience when using terminal
 @sa Terminal, Service::terminalConnected, Terminal::command
 */
 
+/*!
+@fn QtService::Service::addCallback(const QByteArray &, const std::function<QVariant(QVariantList)> &)
+
+@param kind The kind of command the callback should be registered for
+@param fn The function to be called on such a command
+
+By using this method you can register a function as callback. When a comand of the given kind is send
+to the service the default implementation of the Service::onCallback method will call this callback
+with the arguments it received and return the value returned by it.
+*/
+
+/*!
+@fn QtService::Service::addCallback(const QByteArray &, const TFunction &)
+
+@tparam TFunction The type of the functor to be called
+@copydetails Service::addCallback(const QByteArray &, const std::function<QVariant(QVariantList)> &)
+
+This version will automatically convert the QVariantList arguments to the types that are required by
+the given method and convert the returned value back to QVariant. Please make shure the arguments
+types match the ones declared by the service backend, as different number or types can crash your
+application. Also, make shure all used types are registered to the metatype system via
+`#Q_DECLARE_METATYPE` - otherwise the conversions will fail to compile.
+
+@sa @ref qtservice_backends, Service::onCallback, ServiceControl::callCommand
+*/
+
+/*!
+@fn QtService::Service::addCallback(const QByteArray &, TReturn (TClass::*)(TArgs...), std::enable_if_t<std::is_base_of<QtService::Service, TClass>::value, void*>)
+
+@tparam TClass The type of your service subclass. Must extend QtService::Service
+@tparam TReturn The return-type of the class member
+@tparam TArgs The arguments of the class member
+@copydetails Service::addCallback(const QByteArray &, const std::function<QVariant(QVariantList)> &)
+
+With this overload you can pass a member function as callback to the service. The service will
+automatically bind it to the calling instance and then pass the method on to the generic function
+overload to perform the parameter conversions. (The 3rd parameter is only used as a compiler trick,
+it is never used and you should never pass anything as the 3rd argument)
+
+This version will automatically convert the QVariantList arguments to the types that are required by
+the given method and convert the returned value back to QVariant. Please make shure the arguments
+types match the ones declared by the service backend, as different number or types can crash your
+application. Also, make shure all used types are registered to the metatype system via
+`#Q_DECLARE_METATYPE` - otherwise the conversions will fail to compile.
+
+@sa @ref qtservice_backends, Service::onCallback, ServiceControl::callCommand
+*/
+
 
