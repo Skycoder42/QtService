@@ -103,6 +103,8 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+A list of things you need to be aware of when using the service can be found in the QtService::Service documentation. Make shure you always follow those rules, as they are essential to get a working service.
+
 Actually running the service depends on your choosen backend. When testing with the standard backend, you can simply run the service without any parameters, or the backend explicitly specified:
 
 ```

@@ -125,7 +125,7 @@ protected Q_SLOTS:
 	virtual void terminalConnected(Terminal *terminal);
 
 protected:
-	//! Is called right after creation of the QCoreApplication
+	//! Fallback method for otherwise impossible early setup (try to not use it)
 	virtual bool preStart();
 
 	//! Is called by the backend to start the service

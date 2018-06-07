@@ -76,7 +76,7 @@ void TerminalServer::newConnection()
 void TerminalServer::terminalReady(TerminalPrivate *terminal, bool success)
 {
 	if(success)
-		emit terminalConnected(new Terminal{terminal, this});
+		emit terminalConnected(new Terminal{terminal, _service});
 	else
 		terminal->deleteLater();
 }
