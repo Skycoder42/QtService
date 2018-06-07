@@ -1,0 +1,22 @@
+[Unit]
+Description=%{ProjectName} Service
+Documentation=https://github.com/Skycoder42/QtService
+@if '%{SocketPort}'
+After=network-online.target %{SvcSystemdSocketName}
+@endif
+
+[Service]
+Type=notify
+NotifyAccess=exec
+ExecStart=/path/to/%{TargetName} -platform minimal --backend systemd
+ExecReload=/path/to/%{TargetName} -platform minimal --backend systemd reload $MAINPID
+ExecStop=/path/to/%{TargetName} -platform minimal --backend systemd stop $MAINPID
+#WatchdogSec=10
+Restart=on-abnormal
+RuntimeDirectory=%{TargetName}
+
+[Install]
+# Use the following for a system service
+#WantedBy=multi-user.target
+# Use the following for a user service
+WantedBy=default.target

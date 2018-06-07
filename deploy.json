@@ -1,0 +1,14 @@
+{
+	"title": "QtService",
+	"description": "A platform independent library to easily create system services and use some of their features.",
+	"modules": [ "QtService" ],
+	"dependencies": [],
+	"excludes": [ "mingw" ],
+	"license": {
+		"name": "BSD-3-Clause",
+		"path": "LICENSE"
+	},
+	"installs": {
+		"ProjectTemplate": "Tools/QtCreator/share/qtcreator/templates/wizards/projects/qtservice"
+	}
+}

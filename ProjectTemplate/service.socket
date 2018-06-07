@@ -1,0 +1,11 @@
+[Unit]
+Description=%{ProjectName} Service Socket
+Documentation=https://github.com/Skycoder42/QtService
+After=network.target
+PartOf=%{SvcSystemdName}
+
+[Socket]
+ListenStream=%{SocketPort}
+
+[Install]
+WantedBy=sockets.target
