@@ -103,8 +103,20 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-A list of things you need to be aware of when using the service can be found in the QtService::Service documentation. Make shure you always follow those rules, as they are essential to get a working service.
+**Rules of usage:**<br/>
+You should always follow the following rules when using/creating a service. You can also find this
+list in the QtService::Service class documentation:
 
+- Do not create a QCoreApplication yourself - this is done internally
+- Use the same constructor signature to pass the main arguments. It is very important that the argc
+argument is passed as reference! Passing as value will crash your application
+- Do nothing else in the main besides setting the serices properties that need to be set early! Any
+setup etc. must all be done in the Service::onStart method!!! (The properties that need to be set
+early all have a hint in their documentation)
+- Never call QCoreApplication::quit (or QCoreApplication::exit)! Use Service::quit instead
+- Do not rely on QCoreApplication::aboutToQuit, as this may not be emitted at all, or on some
+arbitrary point. Put all cleanup code in the Service::onStop method
+- Be careful with Service::preStart - only use it when you have no other choice
 Actually running the service depends on your choosen backend. When testing with the standard backend, you can simply run the service without any parameters, or the backend explicitly specified:
 
 ```

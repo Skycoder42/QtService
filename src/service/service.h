@@ -14,6 +14,7 @@
 #include "QtService/qtservice_global.h"
 #include "QtService/qtservice_helpertypes.h"
 
+//! The primary namespace of the QtService library
 namespace QtService {
 
 class Terminal;
@@ -139,6 +140,7 @@ protected:
 	//! Is called by the backend to resume the service
 	virtual CommandMode onResume();
 
+	//TODO make async as well?
 	//! Is called by the backend if a platform specific callback was triggered
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
 

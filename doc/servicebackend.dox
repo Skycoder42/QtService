@@ -1,0 +1,161 @@
+/*!
+@class QtService::ServiceBackend
+
+This class is only needed when implementing your own service backend. It's what the Service uses
+internally to properly run and interact with the service systems
+
+@sa Service, ServicePlugin
+*/
+
+/*!
+@fn QtService::ServiceBackend::runService
+
+@param argc The argc from Service, i.e. from the main
+@param argv The argv from Service, i.e. from the main
+@param flags The flags from Service, i.e. from the main
+@returns The return value from QCoreApplication::exec
+
+This method should perform all the required startup stuff for the service, prepare logging etc. What
+must do is to create a QCoreApplication (or another application) and eventually run
+QCoreApplication::exec - as this method should also block until execution finished. You should return
+the exit code form the main if possible.
+
+Returning from this method early should typically be done only in case of an error and an error exit
+code returned.
+
+Internally, you must use ServiceBackend::processServiceCommand (and
+ServiceBackend::processServiceCallback) at the appropriate points in your implementation to call the
+corresponding service methods.
+
+@sa Service::exec, Service::Service
+*/
+
+/*!
+@fn QtService::ServiceBackend::quitService
+
+Your implementation should perform a graceful service exit. This means a call to this method should
+behave the same as stopping the service from the service manager.
+
+@sa Service::quit, Service::onStop
+*/
+
+/*!
+@fn QtService::ServiceBackend::reloadService
+
+Your implementation should perform a service reload. This means a call to this method should behave
+the same as reloading the service from the service manager. If reloading is not supported by your
+backend, simply call `processServiceCommand(ReloadCommand);` to properly handle the reload with
+doing anything service-manager related.
+
+@sa Service::reload, Service::onReload
+*/
+
+/*!
+@fn QtService::ServiceBackend::getActivatedSockets
+
+@param name The name of the socket(s) to be retrieved, or a null name for the default socket.
+@returns A list with all sockets found for that name, or an empty list if non were found
+
+If your service backends supports socket activation, implement this method to make the available.
+It is either called with a name passed to Service::getSockets, or with a null bytearray if the
+default socket (Service::getSocket) was requested. Sockets returned from this method should be ready
+to use, aka in the listening state (this is typically the case for bound sockets)
+
+@sa Service::getSockets, Service::getSocket, QByteArray::isNull
+*/
+
+/*!
+@fn QtService::ServiceBackend::signalTriggered
+
+@param signal The signal that was triggered
+
+If you need to handle signals, this is the easiest way. Please note that this method is called
+asynchronously. So if you need signal handlers that are synchronous, you must implement them
+yourself. The signal values are the standard defined values of signals for all platforms, i.e. the
+SIGINT signal on unix is the same as that define from the signal.h header.
+
+In order to be able to catch signals with this method they must be registered first. Use
+ServiceBackend::registerForSignal to do so.
+
+@sa ServiceBackend::registerForSignal, ServiceBackend::unregisterFromSignal
+*/
+
+/*!
+@fn QtService::ServiceBackend::processServiceCommand
+
+@param code The command code to be executed
+
+This method calls the correspondig onCommand method of the Service instance. This method takes care
+of both sync and async calls. For usage, you should always assume asynchronous runs. In other words,
+do not complete the operation after this method returns. Instead connect to the coresponding done
+signal and continue from there.
+
+@note Connections to those signals should be done before calling this method, as they might be
+emitted before the method returns! Use queued connections if that would conflict with your
+implementation
+
+The methods called and signals to connect to for each command are:
+ Command						| Method			| Signal
+--------------------------------|-------------------|--------
+ ServiceBackend::StartCommand	| Service::onStart	| Service::started
+ ServiceBackend::StopCommand	| Service::onStop	| Service::stopped
+ ServiceBackend::ReloadCommand	| Service::onReload	| Service::reloaded
+ ServiceBackend::PauseCommand	| Service::onPause	| Service::paused
+ ServiceBackend::ResumeCommand	| Service::onResume	| Service::resumed
+
+@sa ServiceBackend::ServiceCommand, ServiceBackend::service
+*/
+
+/*!
+@fn QtService::ServiceBackend::processServiceCallbackImpl
+
+@param kind The kind of callback to be called
+@param args The arguments of the callback
+@returns The return of the callback
+
+Wrapper that calls Service::onCallback and returns it's value. This method call is, unlike other
+commands, synchronous.
+
+@sa ServiceBackend::processServiceCallback, Service::onCallback
+*/
+
+/*!
+@fn QtService::ServiceBackend::registerForSignal
+
+@param signal The signal to register for
+@returns true if the signal was (or already has been) registered
+
+You need to call this method to register a signal you want to handle. After registering it, it will
+be delivered via ServiceBackend::signalTriggered as soon as it is triggered.
+
+@sa ServiceBackend::signalTriggered, ServiceBackend::unregisterFromSignal
+*/
+
+/*!
+@fn QtService::ServiceBackend::unregisterFromSignal
+
+@param signal The signal to unregister from
+@returns true if the signal was (or already has been) unregistered
+
+After unregistering, the "default signal handler" will be used again to handle such a signal. In
+other words the state before the registration is recovered.
+
+@sa ServiceBackend::signalTriggered, ServiceBackend::registerForSignal
+*/
+
+/*!
+@fn QtService::ServiceBackend::preStartService
+
+@returns true if startup can be continued, false to cancle early
+
+You should call this method right after creating the QCoreApplication object and after setting up
+logging. It's a wrapper that calls Service::preStart and returns it's value. If false is returned
+the service cannot start properly and you should exit as soon as possible.
+
+@note If you need to complete the startup and enter the running state, do so. But if false was
+returned instead of calling the start command simply quit the service without ever starting. If you
+implement it that way, make shure neither the start nor the stop command are ever triggered
+
+@sa Service::preStart
+*/
+
