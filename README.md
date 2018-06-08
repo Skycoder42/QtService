@@ -117,6 +117,7 @@ early all have a hint in their documentation)
 - Do not rely on QCoreApplication::aboutToQuit, as this may not be emitted at all, or on some
 arbitrary point. Put all cleanup code in the Service::onStop method
 - Be careful with Service::preStart - only use it when you have no other choice
+
 Actually running the service depends on your choosen backend. When testing with the standard backend, you can simply run the service without any parameters, or the backend explicitly specified:
 
 ```

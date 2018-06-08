@@ -120,3 +120,247 @@ Use setError() to set an error from the implementation
 
 @sa ServiceControl::setError
 */
+
+/*!
+@fn QtService::ServiceControl::likelyBackend
+
+@returns The most likely backend for the current platform
+
+ Platform	| Backend
+------------|---------
+ Android	| android
+ Linux		| systemd
+ Windows	| windows
+ MacOs		| launchd
+ Others		| standard
+
+@sa ServiceControl::listBackends, ServiceControl::create
+*/
+
+/*!
+@fn QtService::ServiceControl::create
+
+@param backend The backend to create a control from
+@param serviceId The id of the service to control
+@param parent The parent object of the new control
+@returns The newly created backend, or nullptr
+@throws QException In case loading fails
+
+Uses the plugin defined by backend to create a service control for the given service. If no
+plugin can be found that provides this backend, nullptr is returned. If a plugin was found,
+but actually loading it and creating the control failed, an exception is thrown.
+
+The returned instance is owned by the caller. To check if the control operates on a valid
+service, use ServiceControl::serviceExists
+
+@sa ServiceControl::serviceExists, ServiceControl::supportFlags, ServiceControl::likelyBackend
+*/
+
+/*!
+@fn QtService::ServiceControl::callGenericCommand
+
+@param kind The kind of command to be called
+@param args The arguments of the command
+@returns The return of the command
+
+Custom commands can only be used if the control supports the
+ServiceControl::SupportsCustomCommands flag is set. If the operation is not supported,
+an invalid variant will be returned and ServiceControl::error is set.
+
+This method can be used to execute a custom command, i.e. one that is not a standard command.
+Each backend can define it's own custom commands. The kind is what should be done and the
+arguments are parameters for the execution of that command. The command will follow the
+standard blocking rules and return a value of whatever kind.
+
+The commands that are possible are defined by each backend. For the standard backends you can
+find the commans on the @ref qtservice_backends Page.
+*/
+
+/*!
+@fn QtService::ServiceControl::serviceExists
+
+@returns true if the service exists, false if not
+
+This method uses the service backend to perform a check whether the service defined by
+ServiceControl::serviceId actually exists. On errors, ServiceControl::error will be set.
+
+For backends that cannot determine this they should simply always return true. If the backend
+fails to find out, ServiceControl::setError can be used to set an error string.
+
+@sa ServiceControl::serviceId, ServiceControl::error
+*/
+
+/*!
+@fn QtService::ServiceControl::status
+
+@returns The current status of the service
+
+The status can only be returned if the control supports the ServiceControl::SupportsStatus
+flag is set. The kinds of status returned differ on the capabilities of each service manager.
+If the operation is not supported, ServiceControl::ServiceStatusUnknown will be returned and
+ServiceControl::error is set.
+
+A backend should query the manager from this method in a synchronous manner to get and return
+the service status. If the backend fails to find out, ServiceControl::setError can be used to
+set an error string and ServiceControl::ServiceStatusUnknown should be returned to indicate
+the error.
+
+@sa ServiceControl::SupportsStatus, ServiceControl::supportFlags, ServiceControl::error
+*/
+
+/*!
+@fn QtService::ServiceControl::isAutostartEnabled
+
+@returns true if the service will start automatically with the system, false if not
+
+The status can only be returned if the control supports the
+ServiceControl::SupportsGetAutostart flag is set.
+
+@note When using socket activation, the autostart is reported as false, as the service itself
+will not start until someone tries to connect to the socket. So activated services should not
+be autostart enabled. Instead try to connect to them, and if it fails start them explicitly.
+
+A backend should query the manager from this method in a synchronous manner to get and return
+the autostart status. If the backend fails to find out, ServiceControl::setError can be used
+to set an error string and false should be returned.
+
+@sa ServiceControl::SupportsGetAutostart, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::enableAutostart, ServiceControl::disableAutostart
+*/
+
+/*!
+@fn QtService::ServiceControl::runtimeDir
+
+@returns The runtime directory to be used to place sockets, lockfiles and other temporary
+stuff
+
+This directoy is determined by the service engine to find the runtime directory of a service
+on each platform. This should always be the same value as the Service::runtimeDir for the
+service controlled by this instance.
+
+@sa Service::runtimeDir
+*/
+
+/*!
+@fn QtService::ServiceControl::start
+
+@returns true if successfully started, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportsStart flag
+is set. If the operation is not supported, false will be returned and ServiceControl::error
+is set.
+
+The command will follow the standard blocking rules and return true either after successfully
+starting or dispatching the start command.
+
+@sa ServiceControl::SupportsStart, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::blocking, ServiceControl::stop
+*/
+
+/*!
+@fn QtService::ServiceControl::stop
+
+@returns true if successfully stopped, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportsStop flag
+is set. If the operation is not supported, false will be returned and ServiceControl::error
+is set.
+
+The command will follow the standard blocking rules and return true either after successfully
+stopping or dispatching the stop command.
+
+@sa ServiceControl::SupportsStop, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::blocking, ServiceControl::start
+*/
+
+/*!
+@fn QtService::ServiceControl::pause
+
+@returns true if successfully paused, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportsPause flag
+is set. If the operation is not supported, false will be returned and ServiceControl::error
+is set.
+
+The command will follow the standard blocking rules and return true either after successfully
+pausing or dispatching the pause command.
+
+@sa ServiceControl::SupportsPause, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::blocking, ServiceControl::resume
+*/
+
+/*!
+@fn QtService::ServiceControl::resume
+
+@returns true if successfully resumed, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportsResume flag
+is set. If the operation is not supported, false will be returned and ServiceControl::error
+is set.
+
+The command will follow the standard blocking rules and return true either after successfully
+resuming or dispatching the resume command.
+
+@sa ServiceControl::SupportsResume, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::blocking, ServiceControl::pause
+*/
+
+/*!
+@fn QtService::ServiceControl::reload
+
+@returns true if successfully reloaded, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportsReload flag
+is set. If the operation is not supported, false will be returned and ServiceControl::error
+is set.
+
+The command will follow the standard blocking rules and return true either after successfully
+reloading or dispatching the reload command.
+
+@sa ServiceControl::SupportsReload, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::blocking
+*/
+
+/*!
+@fn QtService::ServiceControl::enableAutostart
+
+@returns true if autostart was enabled, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportsSetAutostart
+flag is set. If the operation is not supported, false will be returned and
+ServiceControl::error is set.
+
+The method will only set the autostart state. This will not start a service that is currently
+not running.
+
+@sa ServiceControl::SupportsSetAutostart, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::disableAutostart, ServiceControl::isAutostartEnabled
+*/
+
+/*!
+@fn QtService::ServiceControl::disableAutostart
+
+@returns true if autostart was disabled, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportsSetAutostart
+flag is set. If the operation is not supported, false will be returned and
+ServiceControl::error is set.
+
+The method will only set the autostart state. This will not stop a service that is currently
+running.
+
+@sa ServiceControl::SupportsSetAutostart, ServiceControl::supportFlags, ServiceControl::error,
+ServiceControl::enableAutostart, ServiceControl::isAutostartEnabled
+*/
+
+
+/*!
+@fn QtService::ServiceControl::serviceName
+
+@returns The services common name
+
+This should be the QCoreApplication::name of the target service. This however is only a
+guessed value and is only valid if the service follows the standard naming rules.
+
+@sa ServiceControl::serviceId
+*/

@@ -1,0 +1,54 @@
+/*!
+@class QtService::ServicePlugin
+
+The plugin that must be implemented to create a Service plugin. The plugins IID is
+#QtService_ServicePlugin_Iid. The plugin most have a json file with the following layout:
+
+@code{.json}
+{
+	"Keys" : [ "backend1", "backend2", ... ]
+}
+@endcode
+
+Each string in the `Keys` array is the name of a kind of backend that is provided from that
+plugin. Most plugins provide only one type of backend, so for most cases you have only 1
+element in the list. Please note that the plugin must be able to handle all these providers
+when passed to it's methods.
+
+For more details on how to implement such a plugin, have a look at:
+[The High-Level API: Writing Qt Extensions](https://doc.qt.io/qt-5/plugins-howto.html#the-high-level-api-writing-qt-extensions)
+
+@sa ServiceBackend, ServiceControl, #QtService_ServicePlugin_Iid
+*/
+
+/*!
+@fn QtService::ServicePlugin::createServiceBackend
+
+@param backend The service manager backend to create a service for
+@param service The service instance that will use the backend to run as a service
+@returns A newly created backend instance for the given backend.
+
+This method is only called from the service instance to create the backend used to run the
+service. This method is called before any Qt-related stuff has been done - so there is not
+QCoreApplication yet.
+
+@sa Service::exec, ServiceBackend
+*/
+
+/*!
+@fn QtService::ServicePlugin::createServiceControl
+
+@param backend The service manager backend to create a control for
+@param serviceId The identifier of the service to create the control for
+@param parent The parent for the control. Should be set as the QObject::parent of the newly
+created control
+@returns A newly created control instance for the given backend.
+
+<b>This method must be threadsafe</b>
+
+You should always return a valid backend for all valid providers and don't need to perform
+additional validity checks. It is save to return `nullptr` in case the store cannot be created.
+The backends passed to this method are the ones defined in the json file.
+
+@sa ServiceControl::create, ServiceControl
+*/

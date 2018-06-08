@@ -132,6 +132,7 @@ void Terminal::requestChar()
 
 void Terminal::requestChars(qint64 num)
 {
+	Q_ASSERT_X(num > 0, Q_FUNC_INFO, "Cannot read negative amounts of data");
 	if(d->terminalMode != Service::ReadWriteActive) {
 		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
 		return;
@@ -213,7 +214,9 @@ bool Terminal::open(QIODevice::OpenMode mode)
 
 Terminal::Awaitable::Awaitable(Terminal *terminal, qint64 readCnt) :
 	d{new TerminalAwaitablePrivate{terminal, readCnt}}
-{}
+{
+	Q_ASSERT_X(readCnt >= 0, Q_FUNC_INFO, "Cannot read negative amounts of data");
+}
 
 Terminal::Awaitable::Awaitable(Terminal::Awaitable &&other)
 {

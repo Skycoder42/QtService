@@ -94,10 +94,28 @@ public:
 
 	//! Calls the command of kind with the given arguments and returns it's result
 	Q_INVOKABLE virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args);
-	//! @copybrief ServiceControl::callGenericCommand
+
+	/*! @copybrief ServiceControl::callGenericCommand
+	 * @tparam TRet The return value of the command
+	 * @tparam TArgs The arguments passed to the command
+	 * @copydetails ServiceControl::callGenericCommand
+	 *
+	 * This generic variant will automatically convert the arguments to variant types and
+	 * pass the to the callGenericCommand() method.
+	 *
+	 * @sa @ref qtservice_backends, ServiceControl::callGenericCommand, ServiceControl::blocking, Service::onCallback, Service::addCallback
+	 */
 	template <typename TRet, typename... TArgs>
 	TRet callCommand(const QByteArray &kind, TArgs... args);
-	//! @copybrief ServiceControl::callGenericCommand
+	/*! @copybrief ServiceControl::callGenericCommand
+	 * @tparam TArgs The arguments passed to the command
+	 * @copydetails ServiceControl::callGenericCommand
+	 *
+	 * This generic variant will automatically convert the arguments to variant types and
+	 * pass the to the callGenericCommand() method.
+	 *
+	 * @sa @ref qtservice_backends, ServiceControl::callGenericCommand, ServiceControl::blocking, Service::onCallback, Service::addCallback
+	 */
 	template <typename... TArgs>
 	void callCommand(const QByteArray &kind, TArgs... args);
 

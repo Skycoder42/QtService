@@ -1,0 +1,184 @@
+/*!
+@class QtService::Terminal
+
+For every connected terminal, one instance of the Terminal class is created, and provided by
+the service. The terminal allows interaction with each connected terminal, by receiving it's
+stdin and sending data to it's stdout.
+
+The Terminal implements the QIODevice interface. This allows easy integration into the
+application. The terminal is a sequential device.
+
+@note The Terminal::terminalMode determines how the device can be used to interact with the
+remote terminal. Read that documentation to make shure you use this class correctly
+
+@sa Service, Service::terminalConnected, Terminal::terminalMode
+*/
+
+/*!
+@property QtService::Terminal::terminalMode
+
+@default{`Service::ReadWriteActive`}
+
+The terminal mode that this terminal used to connect to the service with. The mode determines
+how I/O is managed between the service and the terminal. This cannot be changed after
+connecting, which means you should simply discard terminals with unallowed modes.
+
+The modes are define in Service::TerminalMode - from the clients perspective. However here is
+a table to explain what they are
+
+ Terminal mode				| Open mode				| Explanation
+----------------------------|-----------------------|-------------
+ Service::ReadOnly			| QIODevice::WriteOnly	| @copybrief Service::ReadOnly
+ Service::WriteOnly			| QIODevice::ReadOnly	| @copybrief Service::WriteOnly
+ Service::ReadWritePassive	| QIODevice::ReadWrite	| @copybrief Service::ReadWritePassive
+ Service::ReadWriteActive	| QIODevice::ReadWrite	| @copybrief Service::ReadWriteActive
+
+@note For the active mode, the user won't be able to input anything unless the
+Terminal::request* (or Terminal::await*) methods are called. This means whenever your service
+wants to read data from an active terminal, you must call such a method and then wait for
+the data to arrive. For all other write modes, the user can simply send data whenever he
+wants to
+
+@accessors{
+	@readAc{terminalMode()}
+	@constantAc
+}
+
+@sa Service::terminalMode, Terminal::requestChar, Terminal::requestChars,
+Terminal::requestLine, Terminal::awaitChar, Terminal::awaitChars, Terminal::awaitLine
+*/
+
+/*!
+@property QtService::Terminal::command
+
+@default{<i>Arguments passed to the terminal</i>}
+
+When someone creates a terminal he does so by invoking the application with some arguments.
+These arguments are what can be retrieved via this property. The arguments are pre-filtered,
+which means the application name as well as QtService-specific arguments do not appear here.
+So for example, the command `service.exe --terminal --backend windows hello world` can be
+retrieved from this property as `["hello", "world"]`
+
+Validation of the arguments must be done by the service. However, you should use
+Service::verifyCommand to verify the passed arguments on the clients side before connection to
+the service. After receiving, verify them again and then use them.
+
+@accessors{
+	@readAc{command()}
+	@constantAc
+}
+
+@sa Service::verifyCommand
+*/
+
+/*!
+@property QtService::Terminal::autoDelete
+
+@default{`true`}
+
+If set to `true` the terminal will be automatically deleted, as soon as the terminal was
+disconnected. If you need to access the terminal even after closing, you can disable it.
+
+@accessors{
+	@readAc{isAutoDelete()}
+	@writeAc{setAutoDelete()}
+	@notifyAc{autoDeleteChanged()}
+}
+
+@sa Terminal::disconnectTerminal, Terminal::terminalDisconnected
+*/
+
+/*!
+@fn QtService::Terminal::awaitChar
+
+@returns an awaitable to await the character
+
+This method can only be used from within a coroutine (See
+[QtCoroutines](https://github.com/Skycoder42/QtCoroutines)). It basically calls requestChar()
+and then awaits the character on the device and returns the read data
+
+@sa Terminal::requestChar, Terminal::awaitChars, Terminal::awaitLine, Terminal::Awaitable
+*/
+
+/*!
+@fn QtService::Terminal::awaitChars
+
+@param num The amount of characters to be read
+@returns an awaitable to await the characters
+
+This method can only be used from within a coroutine (See
+[QtCoroutines](https://github.com/Skycoder42/QtCoroutines)). It basically calls requestChars()
+and then awaits the characters on the device and returns the read data
+
+@sa Terminal::requestChars, Terminal::awaitChar, Terminal::awaitLine, Terminal::Awaitable
+*/
+
+/*!
+@fn QtService::Terminal::awaitLine
+
+@returns an awaitable to await the line
+
+This method can only be used from within a coroutine (See
+[QtCoroutines](https://github.com/Skycoder42/QtCoroutines)). It basically calls requestLine()
+and then awaits the line on the device and returns the read data
+
+@sa Terminal::requestLine, Terminal::awaitChar, Terminal::awaitChars, Terminal::Awaitable
+*/
+
+/*!
+@fn QtService::Terminal::disconnectTerminal
+
+This closes the network connection after flushing the remaining data.
+
+@note Disconnecting the terminal will **not** close it! You can still read remaining data
+from the terminal after disconnecting. For a full close, use the close() method.
+
+@sa Terminal::close
+*/
+
+/*!
+@fn QtService::Terminal::requestChar
+
+@returns an awaitable to await the character
+
+This method can only be used when the terminal is in the Service::ReadWriteActive mode. In that
+case you need to request input from the client - and this method is one way to do so.
+
+It will send a request to the client telling it to read 1 byte of data. The request is done
+asynchronously, which means you have to connect to QIODevice::readyRead to be notified as
+soon as the data has been sent back.
+
+@sa Terminal::awaitChar, Terminal::requestChars, Terminal::requestLine, Terminal::terminalMode,
+Service::ReadWriteActive
+*/
+
+/*!
+@fn QtService::Terminal::requestChars
+
+@param num The amount of characters to be requested
+
+This method can only be used when the terminal is in the Service::ReadWriteActive mode. In that
+case you need to request input from the client - and this method is one way to do so.
+
+It will send a request to the client telling it to read `num` bytes of data. The request is done
+asynchronously, which means you have to connect to QIODevice::readyRead to be notified as
+soon as the data has been sent back.
+
+@sa Terminal::awaitChars, Terminal::requestChar, Terminal::requestLine, Terminal::terminalMode,
+Service::ReadWriteActive
+*/
+
+/*!
+@fn QtService::Terminal::requestLine
+
+This method can only be used when the terminal is in the Service::ReadWriteActive mode. In that
+case you need to request input from the client - and this method is one way to do so.
+
+It will send a request to the client telling it to read bytes of data until a newline character
+is found. That data, including the newline character is then sent back. The request is done
+asynchronously, which means you have to connect to QIODevice::readyRead to be notified as
+soon as the data has been sent back.
+
+@sa Terminal::awaitLine, Terminal::requestChar, Terminal::requestChars, Terminal::terminalMode,
+Service::ReadWriteActive
+*/

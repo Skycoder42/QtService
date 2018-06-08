@@ -95,7 +95,7 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	app.installNativeEventFilter(new SvcEventFilter{});
 	setStatus(SERVICE_START_PENDING);
 	if(!preStartService())
-		return EXIT_FAILURE; //TODO implement correctly
+		exit(EXIT_FAILURE); //hard exit to kill all threads without fail
 	setStatus(SERVICE_START_PENDING);
 	connect(service(), &Service::started,
 			this, &WindowsServiceBackend::onRunning);

@@ -140,7 +140,6 @@ protected:
 	//! Is called by the backend to resume the service
 	virtual CommandMode onResume();
 
-	//TODO make async as well?
 	//! Is called by the backend if a platform specific callback was triggered
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
 
@@ -181,6 +180,8 @@ void Service::addCallback(const QByteArray &kind, TReturn (TClass::*fn)(TArgs...
 
 }
 
+//! A define for the service instance for easy use, see QtService::Service::instance
 #define qService QtService::Service::instance()
 
+//! @file service.h The Service header
 #endif // QTSERVICE_SERVICE_H

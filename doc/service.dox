@@ -191,7 +191,7 @@ words this method starts the service as well as the main event loop.
 This is only set when actually running as service and the service has been created. Otherwise,
 nullptr is returned
 
-@sa qService
+@sa #qService
 */
 
 /*!
@@ -467,6 +467,11 @@ int MyService::doStuff(int p1, double p2) {
 This method is called on a Terminal client (i.e. *not* the service process, but the terminal client
 process) before it tries to connect to the service. You can implement to provide an early validation
 of command line arguments which leads to a better experience when using terminals.
+
+The arguments are pre-filtered, which means the application name as well as QtService-specific
+arguments do not appear here. So for example, the command
+`service.exe --terminal --backend windows hello world` can be retrieved from this property as
+`["hello", "world"]`
 
 @sa Terminal, Service::terminalConnected, Terminal::command
 */
