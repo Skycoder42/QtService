@@ -133,7 +133,10 @@ void ControlWidget::on_enabledCheckBox_clicked(bool checked)
 {
 	if(!_control)
 		return;
-	_control->setAutostartEnabled(checked);
+	if(checked)
+		_control->enableAutostart();
+	else
+		_control->disableAutostart();
 }
 
 void ControlWidget::on_startButton_clicked()

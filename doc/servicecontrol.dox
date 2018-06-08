@@ -1,0 +1,122 @@
+/*!
+@class QtService::ServiceControl
+
+This class can be used to get information about a specific service and control it by sending
+service commands to it through the service manager. This can be used for all services of the
+corresponding manager, not only services created by this library.
+
+The concrete instances are implemented by each service backend plugin, thus the creation via
+a helper method.
+
+@attention Not all service backends support all kinds of service operations. This class is a
+common interface, but to find out which methods actually work, you need to query the
+ServiceControl::supportFlags property for a concrete backend. Those flags however are
+typically (but not neccessarily) static per plugin. You can check the what each backends
+implementation supports on the @ref qtservice_backends page.
+
+@sa @ref qtservice_backends, ServiceControl::supportFlags
+*/
+
+/*!
+@property QtService::ServiceControl::backend
+
+@default{<i>Set on creation</i>}
+
+This is simply the backend this control was created by. Typically this is exactly the same
+as what was passed to the ServiceControl::create function - allthough for backends that have
+multiple names this may not be the case.
+
+@accessors{
+	@readAc{backend()}
+	@constantAc
+}
+
+@sa ServiceControl::create, ServiceControl::serviceId
+*/
+
+/*!
+@property QtService::ServiceControl::serviceId
+
+@default{<i>Set on creation</i>}
+
+This is simply the service id this control was created by. Typically this is exactly the same
+as what was passed to the ServiceControl::create function, but backends may normalize the name
+if applicable.
+
+@accessors{
+	@readAc{serviceId()}
+	@constantAc
+}
+
+@sa ServiceControl::create, ServiceControl::backend
+*/
+
+/*!
+@property QtService::ServiceControl::supportFlags
+
+@default{<i>Depends on backend</i>}
+
+The support flags indicate what this concrete implementation is capable of doing. The flags
+returned depend on the backend and should be checked before performing an operation, as
+performing an unsupported operation will cause an error.
+
+@accessors{
+	@readAc{supportFlags()}
+	@constantAc
+}
+
+@sa ServiceControl::backend, ServiceControl::SupportFlag, ServiceControl::create
+*/
+
+/*!
+@property QtService::ServiceControl::blocking
+
+@default{`supportFlags().testFlag(SupportsBlocking)`}
+
+Whether a backend supports either of those modes depends on the support flags. The following
+combinations are possible:
+
+ SupportsBlocking	| SupportsNonBlocking	| Behaviour
+--------------------|-----------------------|-----------
+ yes				| yes					| The behaviour of all commands is determined by this property
+ yes				| no					| This property is ignored - services will always behave blocking
+ no					| yes					| This property is ignored - services will always behave non blocking
+ no					| no					| This property is ignored - the services behaviour is undefined - some methods may be blocking, other unblocking
+
+If commands are blocking, it means that the control won't return from a command until it's
+execution has been completed. So if you for example start a service in blocking mode, the
+method will return only after the service reached the running state or error. In this case
+the method will return the actual result of the operation.
+
+In nonblocking mode the command is only dispatched to the service manager and true is returned
+if the manager accepted the command. You will have to use ServiceControl::status to check the
+services state, if available.
+
+@accessors{
+	@readAc{isBlocking()}
+	@writeAc{setBlocking()}
+	@notifyAc{blockingChanged()}
+}
+
+@sa ServiceControl::SupportsBlocking, ServiceControl::SupportsNonBlocking
+*/
+
+/*!
+@property QtService::ServiceControl::error
+
+@default{<i>null string</i>}
+
+This error can be set form the implementations in case an operation or query failed. It is
+a localized string describing what went wrong. The error message is not cleared automatically.
+Use clearError() to clear it.
+
+Use setError() to set an error from the implementation
+
+@accessors{
+	@readAc{error()}
+	@resetAc{clearError()}
+	@notifyAc{errorChanged()}
+}
+
+@sa ServiceControl::setError
+*/

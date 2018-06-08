@@ -171,11 +171,12 @@ Module {
         }
         Property { name: "backend"; type: "string"; isReadonly: true }
         Property { name: "serviceId"; type: "string"; isReadonly: true }
-        Property { name: "supportFlags"; type: "SupportFlags"; isReadonly: true }
+        Property {
+            name: "supportFlags"
+            type: "QtService::ServiceControl::SupportFlags"
+            isReadonly: true
+        }
         Property { name: "blocking"; type: "bool" }
-        Property { name: "serviceExists"; type: "bool"; isReadonly: true }
-        Property { name: "status"; type: "ServiceStatus"; isReadonly: true }
-        Property { name: "autostartEnabled"; type: "bool" }
         Property { name: "error"; type: "string"; isReadonly: true }
         Signal {
             name: "blockingChanged"
@@ -196,17 +197,16 @@ Module {
             name: "setBlocking"
             Parameter { name: "blocking"; type: "bool" }
         }
-        Method {
-            name: "setAutostartEnabled"
-            type: "bool"
-            Parameter { name: "enabled"; type: "bool" }
-        }
+        Method { name: "clearError" }
         Method {
             name: "callGenericCommand"
             type: "QVariant"
             Parameter { name: "kind"; type: "QByteArray" }
             Parameter { name: "args"; type: "QVariantList" }
         }
+        Method { name: "serviceExists"; type: "bool" }
+        Method { name: "status"; type: "QtService::ServiceControl::ServiceStatus" }
+        Method { name: "isAutostartEnabled"; type: "bool" }
         Method { name: "runtimeDir"; type: "QDir" }
     }
     Component {

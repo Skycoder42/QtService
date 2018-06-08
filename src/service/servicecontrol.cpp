@@ -9,9 +9,31 @@ QStringList ServiceControl::listBackends()
 	return ServicePrivate::listBackends();
 }
 
+QString ServiceControl::likelyBackend()
+{
+#if defined(Q_OS_ANDROID)
+	auto backend = QStringLiteral("android");
+#elif defined(Q_OS_LINUX)
+	auto backend = QStringLiteral("systemd");
+#elif defined(Q_OS_MACOS)
+	auto backend = QStringLiteral("launchd");
+#elif defined(Q_OS_WIN32)
+	auto backend = QStringLiteral("windows");
+#else
+	QString backend;
+#endif
+	if(ServicePrivate::listBackends().contains(backend))
+		return backend;
+	else
+		return QStringLiteral("standard");
+}
+
 ServiceControl *ServiceControl::create(const QString &backend, QString serviceId, QObject *parent)
 {
-	return ServicePrivate::createControl(backend, std::move(serviceId), parent);
+	auto control = ServicePrivate::createControl(backend, std::move(serviceId), parent);
+	// set the correct default value
+	control->d->blocking = control->supportFlags().testFlag(SupportsBlocking);
+	return control;
 }
 
 ServiceControl::ServiceControl(QString &&serviceId, QObject *parent) :
@@ -31,16 +53,6 @@ bool ServiceControl::isBlocking() const
 	return d->blocking;
 }
 
-ServiceControl::ServiceStatus ServiceControl::status() const
-{
-	return ServiceStatusUnknown;
-}
-
-bool ServiceControl::isAutostartEnabled() const
-{
-	return false;
-}
-
 QString ServiceControl::error() const
 {
 	return d->error;
@@ -48,10 +60,24 @@ QString ServiceControl::error() const
 
 QVariant ServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
 {
-	Q_UNUSED(kind)
 	Q_UNUSED(args)
-	qCWarning(logQtService) << "Operation custom command is not implemented with backend" << backend();
+	setError(tr("Operation custom command for kind %1 is not implemented for backend %2")
+			 .arg(QString::fromUtf8(kind), backend()));
 	return {};
+}
+
+ServiceControl::ServiceStatus ServiceControl::status() const
+{
+	setError(tr("Reading the service status is not implemented for backend %1")
+			 .arg(backend()));
+	return ServiceStatusUnknown;
+}
+
+bool ServiceControl::isAutostartEnabled() const
+{
+	setError(tr("Reading the autostart state is not implemented for backend %1")
+			 .arg(backend()));
+	return false;
 }
 
 QDir ServiceControl::runtimeDir() const
@@ -61,43 +87,50 @@ QDir ServiceControl::runtimeDir() const
 
 bool ServiceControl::start()
 {
-	qCWarning(logQtService) << "Operation start is not implemented with backend" << backend();
+	setError(tr("Operation start is not implemented for backend %1")
+			 .arg(backend()));
 	return false;
 }
 
 bool ServiceControl::stop()
 {
-	qCWarning(logQtService) << "Operation stop is not implemented with backend" << backend();
+	setError(tr("Operation stop is not implemented for backend %1")
+			 .arg(backend()));
 	return false;
 }
 
 bool ServiceControl::pause()
 {
-	qCWarning(logQtService) << "Operation pause is not implemented with backend" << backend();
+	setError(tr("Operation pause is not implemented for backend %1")
+			 .arg(backend()));
 	return false;
 }
 
 bool ServiceControl::resume()
 {
-	qCWarning(logQtService) << "Operation resume is not implemented with backend" << backend();
+	setError(tr("Operation resume is not implemented for backend %1")
+			 .arg(backend()));
 	return false;
 }
 
 bool ServiceControl::reload()
 {
-	qCWarning(logQtService) << "Operation reload is not implemented with backend" << backend();
+	setError(tr("Operation reload is not implemented for backend %1")
+			 .arg(backend()));
 	return false;
 }
 
 bool ServiceControl::enableAutostart()
 {
-	qCWarning(logQtService) << "Operation enable is not implemented with backend" << backend();
+	setError(tr("Operation enable autostart is not implemented for backend %1")
+			 .arg(backend()));
 	return false;
 }
 
 bool ServiceControl::disableAutostart()
 {
-	qCWarning(logQtService) << "Operation disable is not implemented with backend" << backend();
+	setError(tr("Operation disable autostart is not implemented for backend %1")
+			 .arg(backend()));
 	return false;
 }
 
@@ -106,16 +139,18 @@ void ServiceControl::setBlocking(bool blocking)
 	if (d->blocking == blocking)
 		return;
 
+	if(blocking && !supportFlags().testFlag(SupportsBlocking))
+		return;
+	if(!blocking && !supportFlags().testFlag(SupportsNonBlocking))
+		return;
+
 	d->blocking = blocking;
 	emit blockingChanged(d->blocking, {});
 }
 
-bool ServiceControl::setAutostartEnabled(bool enabled)
+void ServiceControl::clearError()
 {
-	if(enabled)
-		return enableAutostart();
-	else
-		return disableAutostart();
+	setError(QString{});
 }
 
 QString ServiceControl::serviceName() const
