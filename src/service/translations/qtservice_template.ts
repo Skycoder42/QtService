@@ -2,9 +2,30 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>AndroidServiceControl</name>
+    <message>
+        <location filename="../../plugins/servicebackends/android/androidservicecontrol.cpp" line="+32"/>
+        <location line="+6"/>
+        <source>The bind command must be called with a QAndroidServiceConnection* as first parameter and QtAndroid::BindFlags as optional second parameter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+6"/>
+        <source>The unbind command must be called with a QAndroidServiceConnection* as only parameter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+6"/>
+        <source>The startWithIntent command must be called with a QAndroidIntent as only parameter</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LaunchdServiceControl</name>
     <message>
-        <location filename="../../plugins/servicebackends/launchd/launchdservicecontrol.cpp" line="+53"/>
+        <location filename="../../plugins/servicebackends/launchd/launchdservicecontrol.cpp" line="+54"/>
         <source>Failed to find launchctl executable</source>
         <translation type="unfinished"></translation>
     </message>
@@ -16,6 +37,59 @@
     <message>
         <location line="+4"/>
         <source>launchctl did not exit in time</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QtService::ServiceControl</name>
+    <message>
+        <location filename="../servicecontrol.cpp" line="+64"/>
+        <source>Operation custom command for kind %1 is not implemented for backend %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Reading the service status is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Reading the autostart state is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Operation start is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Operation stop is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Operation pause is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Operation resume is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Operation reload is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Operation enable autostart is not implemented for backend %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Operation disable autostart is not implemented for backend %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
