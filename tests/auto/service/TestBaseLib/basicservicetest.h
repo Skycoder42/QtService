@@ -39,7 +39,6 @@ protected:
 
 	void performSocketTest();
 	void testFeature(QtService::ServiceControl::SupportFlag flag);
-	bool waitAsLongAs(QtService::ServiceControl::ServiceStatus status);
 };
 
 #define READ_LOOP(...) do { \
