@@ -33,8 +33,7 @@ void BasicServiceTest::testStart()
 	testFeature(ServiceControl::SupportsStart);
 	QVERIFY2(control->start(), qUtf8Printable(control->error()));
 	// blocking should only return after the server started, but for non blocking this may not be the case...
-	if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
-		QThread::sleep(3);
+	QVERIFY(waitAsLongAs(ServiceControl::ServiceStarting));
 
 	socket = new QLocalSocket(this);
 	socket->connectToServer(QStringLiteral("__qtservice_testservice"));
@@ -54,6 +53,7 @@ void BasicServiceTest::testReload()
 
 	testFeature(ServiceControl::SupportsReload);
 	QVERIFY2(control->reload(), qUtf8Printable(control->error()));
+	QVERIFY(waitAsLongAs(ServiceControl::ServiceReloading));
 
 	QByteArray msg;
 	READ_LOOP(msg);
@@ -68,6 +68,7 @@ void BasicServiceTest::testPause()
 
 	testFeature(ServiceControl::SupportsPause);
 	QVERIFY2(control->pause(), qUtf8Printable(control->error()));
+	QVERIFY(waitAsLongAs(ServiceControl::ServicePausing));
 
 	QByteArray msg;
 	READ_LOOP(msg);
@@ -82,6 +83,7 @@ void BasicServiceTest::testResume()
 	TEST_STATUS(ServiceControl::ServicePaused);
 
 	QVERIFY2(control->resume(), qUtf8Printable(control->error()));
+	QVERIFY(waitAsLongAs(ServiceControl::ServiceResuming));
 
 	QByteArray msg;
 	READ_LOOP(msg);
@@ -102,6 +104,7 @@ void BasicServiceTest::testStop()
 
 	testFeature(ServiceControl::SupportsStop);
 	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
+	QVERIFY(waitAsLongAs(ServiceControl::ServiceStopping));
 
 #ifndef Q_OS_WIN
 	QByteArray msg;
@@ -150,6 +153,7 @@ void BasicServiceTest::performSocketTest()
 		QThread::msleep(500);
 	QVERIFY(tcpSocket->waitForConnected(5000));
 
+	QVERIFY(waitAsLongAs(ServiceControl::ServiceStarting));
 	TEST_STATUS(ServiceControl::ServiceRunning);
 
 	QByteArray msg = "hello world";
@@ -164,6 +168,7 @@ void BasicServiceTest::performSocketTest()
 
 	testFeature(ServiceControl::SupportsStop);
 	QVERIFY2(control->stop(), qUtf8Printable(control->error()));
+	QVERIFY(waitAsLongAs(ServiceControl::ServiceStopping));
 
 	TEST_STATUS(ServiceControl::ServiceStopped);
 }
@@ -181,5 +186,17 @@ void BasicServiceTest::testFeature(ServiceControl::SupportFlag flag)
 						 QByteArray(QByteArrayLiteral("feature ") + meta.valueToKey(flag) + QByteArrayLiteral(" not supported by backend")).constData(),
 						 Abort);
 		}
+	}
+}
+
+bool BasicServiceTest::waitAsLongAs(ServiceControl::ServiceStatus status)
+{
+	if(control->supportFlags().testFlag(ServiceControl::SupportsStatus)) {
+		for(auto i = 0; i < 20 && control->status() == status; i++)
+			QThread::msleep(500);
+		return control->status() != status;
+	} else {
+		QThread::sleep(5);
+		return true;
 	}
 }
