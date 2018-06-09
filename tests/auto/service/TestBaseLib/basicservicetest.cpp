@@ -141,7 +141,7 @@ void BasicServiceTest::testCustomImpl()
 void BasicServiceTest::performSocketTest()
 {
 	TEST_STATUS(ServiceControl::ServiceStopped);
-	else
+	if(control->status() != ServiceControl::ServiceStopped)
 		QThread::sleep(3); //leave some time for the svc to actually stop
 
 	auto tcpSocket = new QTcpSocket(this);
@@ -182,4 +182,15 @@ void BasicServiceTest::testFeature(ServiceControl::SupportFlag flag)
 						 Abort);
 		}
 	}
+}
+
+void BasicServiceTest::waitAsLongAs(ServiceControl::ServiceStatus status)
+{
+	static const QHash<ServiceControl::ServiceStatus, QList<ServiceControl::ServiceStatus>> statusMap {
+		{ServiceControl::ServiceStopped, {ServiceControl::ServiceStopping}},
+		{ServiceControl::ServiceRunning, {ServiceControl::ServiceStarting, ServiceControl::ServiceResuming, ServiceControl::ServiceReloading}},
+		{ServiceControl::ServicePaused, {ServiceControl::ServicePausing}}
+	};
+	for(auto i = 0; i < 20 && statusMap[status].contains(control->status()); i++)
+		QThread::msleep(500);
 }

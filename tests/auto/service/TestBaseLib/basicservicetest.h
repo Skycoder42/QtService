@@ -39,6 +39,7 @@ protected:
 
 	void performSocketTest();
 	void testFeature(QtService::ServiceControl::SupportFlag flag);
+	void waitAsLongAs(QtService::ServiceControl::ServiceStatus status);
 };
 
 #define READ_LOOP(...) do { \
@@ -47,8 +48,11 @@ protected:
 	stream >> __VA_ARGS__; \
 } while(!stream.commitTransaction())
 
-#define TEST_STATUS(state) \
-	if(control->supportFlags().testFlag(ServiceControl::SupportsStatus)) \
-		QCOMPARE(control->status(), state)
+#define TEST_STATUS(state) do {\
+	if(control->supportFlags().testFlag(ServiceControl::SupportsStatus)) { \
+		waitAsLongAs(state); \
+		QCOMPARE(control->status(), state); \
+	} \
+} while(false)
 
 #endif // BASICSERVICETEST_H
