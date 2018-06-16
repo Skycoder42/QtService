@@ -1,0 +1,1488 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<tagfile>
+  <compound kind="file">
+    <name>service.h</name>
+    <path>/home/sky/Programming/QtLibraries/QtService/src/service/</path>
+    <filename>service_8h</filename>
+    <class kind="class">QtService::Service</class>
+    <namespace>QtService</namespace>
+    <member kind="define">
+      <type>#define</type>
+      <name>qService</name>
+      <anchorfile>service_8h.html</anchorfile>
+      <anchor>aea6ad960ca40d641a84a4e652be17a7f</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>serviceplugin.h</name>
+    <path>/home/sky/Programming/QtLibraries/QtService/src/service/</path>
+    <filename>serviceplugin_8h</filename>
+    <class kind="class">QtService::ServicePlugin</class>
+    <namespace>QtService</namespace>
+    <member kind="define">
+      <type>#define</type>
+      <name>QtService_ServicePlugin_Iid</name>
+      <anchorfile>serviceplugin_8h.html</anchorfile>
+      <anchor>ad32c2e8308084fd8c410e7f86fe61538</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtService::Terminal::Awaitable</name>
+    <filename>class_qt_service_1_1_terminal_1_1_awaitable.html</filename>
+    <member kind="enumeration">
+      <type></type>
+      <name>SpecialReads</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>a36d246fb9fa15583e6726cac5e7cd28d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadLine</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>a36d246fb9fa15583e6726cac5e7cd28dacdcc158609ffc881d236c6a3cbc8de90</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadSingle</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>a36d246fb9fa15583e6726cac5e7cd28dabcd50df970a5d8ad962d99d19bfc2631</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadLine</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>a36d246fb9fa15583e6726cac5e7cd28dacdcc158609ffc881d236c6a3cbc8de90</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadSingle</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>a36d246fb9fa15583e6726cac5e7cd28dabcd50df970a5d8ad962d99d19bfc2631</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Awaitable</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>af044c4be992987a4d455954fe8bc21ee</anchor>
+      <arglist>(Terminal *terminal, qint64 readCnt=ReadSingle)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Awaitable</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>a47aae1b6a8dd7241198e9b7d57ae5d34</anchor>
+      <arglist>(Awaitable &amp;&amp;other)</arglist>
+    </member>
+    <member kind="function">
+      <type>Awaitable &amp;</type>
+      <name>operator=</name>
+      <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
+      <anchor>a1fd42cc70e7676e5d0c36309c1f2a7b4</anchor>
+      <arglist>(Awaitable &amp;&amp;other)</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtService::Service</name>
+    <filename>class_qt_service_1_1_service.html</filename>
+    <base>QObject</base>
+    <member kind="enumeration">
+      <type></type>
+      <name>CommandMode</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ac80c603a10d06224f3e75604920642d9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Synchronous</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ac80c603a10d06224f3e75604920642d9ae7cafd37ee8ca6ab14d8482d2be8a64d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Asynchronous</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ac80c603a10d06224f3e75604920642d9a5bc5c42d7802d95725ea38eb5a294079</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>TerminalMode</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadOnly</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2a9b40c2e9bfa0044d5248f133fe74240f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>WriteOnly</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2a7958a709864139c47529227383af8363</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadWritePassive</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2ac17e78711daad85a853fc51f6759464c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadWriteActive</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2a28228d78e2298fb40e6638104cc94384</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Synchronous</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ac80c603a10d06224f3e75604920642d9ae7cafd37ee8ca6ab14d8482d2be8a64d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>Asynchronous</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ac80c603a10d06224f3e75604920642d9a5bc5c42d7802d95725ea38eb5a294079</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadOnly</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2a9b40c2e9bfa0044d5248f133fe74240f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>WriteOnly</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2a7958a709864139c47529227383af8363</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadWritePassive</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2ac17e78711daad85a853fc51f6759464c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReadWriteActive</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4d4e2022cf06e670e6ae4159809c5df2a28228d78e2298fb40e6638104cc94384</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>quit</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a660c2d3cc0e6d6bc4b5550efac74b0ea</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>reload</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a2eaf96952546bbebdf246a766e871eb7</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setTerminalActive</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a4cc1e1ab4c9efa9c1c91e1b04ea982db</anchor>
+      <arglist>(bool terminalActive)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setTerminalMode</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a327ee7a22b7daf148d712b4e9274833a</anchor>
+      <arglist>(TerminalMode terminalMode)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setGlobalTerminal</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ab11738e5476eeaa3d7bc8b079962440d</anchor>
+      <arglist>(bool globalTerminal)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setStartWithTerminal</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a6d38becd2d3dd627da1dd961bcd85df0</anchor>
+      <arglist>(bool startWithTerminal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>started</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a893971790ec721395c029bbd2d69d20e</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>stopped</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a1d967420b3b868cce39f814c22f275e5</anchor>
+      <arglist>(int exitCode=EXIT_SUCCESS)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>reloaded</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a3edf18c53e1c34ab56dba01750b54b96</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>paused</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>af88b03394beb885950942fafc6470080</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>resumed</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a60b05e10d8ceca239d74cb337e684aaa</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>terminalActiveChanged</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a03391ded8622fdcb5d9ae6d1c735da34</anchor>
+      <arglist>(bool terminalActive, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>terminalModeChanged</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a73d0690ec9f8b56222378f75c62493c4</anchor>
+      <arglist>(TerminalMode terminalMode, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>globalTerminalChanged</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a447c4fa0f7d996778cf46f36b2c87ed7</anchor>
+      <arglist>(bool globalTerminal, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>startWithTerminalChanged</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a58c7c85f5159c273598bc00bdc37f8ea</anchor>
+      <arglist>(bool startWithTerminal, QPrivateSignal)</arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>Service</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a72b8326683a385700d089878fd1088d7</anchor>
+      <arglist>(int &amp;argc, char **argv, int=QCoreApplication::ApplicationFlags)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>exec</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a6d4be608f35ff5aee19d0b901a247dab</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>Q_INVOKABLE QList&lt; int &gt;</type>
+      <name>getSockets</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a37dcd115761d201e938c64997ba093ac</anchor>
+      <arglist>(const QByteArray &amp;socketName)</arglist>
+    </member>
+    <member kind="function">
+      <type>Q_INVOKABLE int</type>
+      <name>getSocket</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a37247843879c4194311fdc7303f1d8a8</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>QString</type>
+      <name>backend</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ae2250c03317e9f45ea4ca5d97c66accd</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>QDir</type>
+      <name>runtimeDir</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a1e01cebc3ecc5a4cb80e7fd2598e1874</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isTerminalActive</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a061479c66ae964cc1d36e89ba4b5a915</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>TerminalMode</type>
+      <name>terminalMode</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>add89b1eee445511287ab9e944c5aca1f</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isGlobalTerminal</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>af7d5efdd45272424994fc1fed797dc38</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>startWithTerminal</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>acc553aea91b84b62a20e1a41b94e92a7</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static Service *</type>
+      <name>instance</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a48260a6748d58d1d8bdf89a892806dd2</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot" protection="protected" virtualness="virtual">
+      <type>virtual void</type>
+      <name>terminalConnected</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a3a55dd15310403b3351e9f6b737326d4</anchor>
+      <arglist>(Terminal *terminal)</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>preStart</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>aabfeb679b453be1c812bf9bf23e8a70f</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="pure">
+      <type>virtual CommandMode</type>
+      <name>onStart</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a511ad3160fbdf5791db906072ffc091a</anchor>
+      <arglist>()=0</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual CommandMode</type>
+      <name>onStop</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a144aa7e5018a37d30f86be9757663fa7</anchor>
+      <arglist>(int &amp;exitCode)</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual CommandMode</type>
+      <name>onReload</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a92c7d2aefe700433cd3f40b366f866b7</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual CommandMode</type>
+      <name>onPause</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>acfd382ae657c6e93a3817ec4668c81a2</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual CommandMode</type>
+      <name>onResume</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a5b2015da891eb4f31ffef0ca113a4cee</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QVariant</type>
+      <name>onCallback</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ace46cbd30a085a8eb77dc6ba7c25fa75</anchor>
+      <arglist>(const QByteArray &amp;kind, const QVariantList &amp;args)</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>verifyCommand</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a6d0e43426aa84216e085615dd3d1767e</anchor>
+      <arglist>(const QStringList &amp;arguments)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>void</type>
+      <name>addCallback</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>af8e8a4c99acf9dd2501b702412a2f7e7</anchor>
+      <arglist>(const QByteArray &amp;kind, const std::function&lt; QVariant(QVariantList)&gt; &amp;fn)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>void</type>
+      <name>addCallback</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>ab27e1ee21992a6ec3acacf586c1c2417</anchor>
+      <arglist>(const QByteArray &amp;kind, const TFunction &amp;fn)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>void</type>
+      <name>addCallback</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>aadc004adf77ab5d0528fc1c5c5b0620a</anchor>
+      <arglist>(const QByteArray &amp;kind, TReturn(TClass::*fn)(TArgs...), std::enable_if_t&lt; std::is_base_of&lt; QtService::Service, TClass &gt;::value, void *&gt;=nullptr)</arglist>
+    </member>
+    <member kind="property">
+      <type>QString</type>
+      <name>backend</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a41dd108dbbb7e378b66b4025b805698c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>QDir</type>
+      <name>runtimeDir</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a6da452f1935a735b590d3d5c7ce04e11</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>terminalActive</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a57801cc8e80075002fc7eb4ab12f2ecb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>TerminalMode</type>
+      <name>terminalMode</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>aa3054ed0679a460359bccfbb3771d44f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>globalTerminal</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>aa111dc994bcef733db1edaa143bf439c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>startWithTerminal</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a0684f20530470043570891b371977c98</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtService::ServiceBackend</name>
+    <filename>class_qt_service_1_1_service_backend.html</filename>
+    <base>QObject</base>
+    <member kind="enumeration">
+      <type></type>
+      <name>ServiceCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>StartCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0a54e5b82d4e1c8a5ebd417da4a343d749</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>StopCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0ad74ea47a119ccb0a10f26476356e1072</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReloadCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0a9caa4f7fd036a2c7f010df0dd0d2cb97</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PauseCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0abd600bd0d5b101d0a4ac1eaf5a376ec4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ResumeCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0a127c3d2193321616eb58a703b379187f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>StartCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0a54e5b82d4e1c8a5ebd417da4a343d749</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>StopCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0ad74ea47a119ccb0a10f26476356e1072</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ReloadCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0a9caa4f7fd036a2c7f010df0dd0d2cb97</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PauseCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0abd600bd0d5b101d0a4ac1eaf5a376ec4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ResumeCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afba7eab575d025c158d714ab31be5ea0a127c3d2193321616eb58a703b379187f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type></type>
+      <name>ServiceBackend</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a9c592f5c8cb75b7660689a8446fa2b5e</anchor>
+      <arglist>(Service *service)</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual int</type>
+      <name>runService</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a33d2467d834f279a2e80056adc491207</anchor>
+      <arglist>(int &amp;argc, char **argv, int flags)=0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual void</type>
+      <name>quitService</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a42e8ec18c4c8568222b334ed732ce6ea</anchor>
+      <arglist>()=0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual void</type>
+      <name>reloadService</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>adb7daf143f9fb8a36cc6d39156645aa7</anchor>
+      <arglist>()=0</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual QList&lt; int &gt;</type>
+      <name>getActivatedSockets</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a69dc25fcab0da698d745ed7d26341280</anchor>
+      <arglist>(const QByteArray &amp;name)</arglist>
+    </member>
+    <member kind="slot" protection="protected" virtualness="virtual">
+      <type>virtual void</type>
+      <name>signalTriggered</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a0f0f4413de9425a9a4559e7b43759be8</anchor>
+      <arglist>(int signal)</arglist>
+    </member>
+    <member kind="slot" protection="protected">
+      <type>void</type>
+      <name>processServiceCommand</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>ad7c6457145226bd2ce6cb4285a55ba89</anchor>
+      <arglist>(QtService::ServiceBackend::ServiceCommand code)</arglist>
+    </member>
+    <member kind="slot" protection="protected">
+      <type>QVariant</type>
+      <name>processServiceCallbackImpl</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a10aa9efba55332a020c0959686d650f5</anchor>
+      <arglist>(const QByteArray &amp;kind, const QVariantList &amp;args={})</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QtService::Service *</type>
+      <name>service</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a27bb1e7cb3c3c8eb0f69073793bf0c3b</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>TRet</type>
+      <name>processServiceCallback</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a0b261e3f70cfd2e8630b5dbe63a14b29</anchor>
+      <arglist>(const QByteArray &amp;kind, TArgs... args)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>void</type>
+      <name>processServiceCallback</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>afde51e56dd6cf0d2ef640e03ebf40dbf</anchor>
+      <arglist>(const QByteArray &amp;kind, TArgs... args)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>bool</type>
+      <name>registerForSignal</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>a6ce2271d82cfc5374debbeadb55d90a3</anchor>
+      <arglist>(int signal)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>bool</type>
+      <name>unregisterFromSignal</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>aad35a7e2f98aa53b1a9bdf1e27e4e09f</anchor>
+      <arglist>(int signal)</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>bool</type>
+      <name>preStartService</name>
+      <anchorfile>class_qt_service_1_1_service_backend.html</anchorfile>
+      <anchor>ac23fded59033b71d1a53b4282ac157e2</anchor>
+      <arglist>()</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtService::ServiceControl</name>
+    <filename>class_qt_service_1_1_service_control.html</filename>
+    <base>QObject</base>
+    <member kind="enumeration">
+      <type></type>
+      <name>SupportFlag</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182fa</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa01e6e415ac751b351281b9b2d6927f64</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStop</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa66de204706111b2111c52f64af7cd382</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsPause</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa0e05d55ff21f7af167ebeb79843ecb13</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsResume</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa56307d8c9dddaa2e2bb016fb5e393ed6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsReload</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa62b24026d517f0f7f394631ea4bb55fc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsGetAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa2e22c0eeceb35c06d9567723aa0294df</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsSetAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa90e093034063a83ac7e814a94c6ade38</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa1d8aecbfecfbb559154e576580b86f44</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsNonBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa098b3055daa3ec9e4998ee765232da52</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStatus</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faac8b064ab419e077165dfa89ce745a442</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsCustomCommands</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa3b5c5749d73045c3fec50edd8005ac12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStartStop</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faaa6a2dd94de1097939f3bc46d5b45104b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsPauseResume</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faafe0edfb76d0bfc13d8180a0cc5d1869d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa315194bb9cce14e57f71fbacc404a38f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsBlockingNonBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faabb01a4bc42ef1743020444a0a84c217e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>ServiceStatus</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStatusUnknown</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a31b1193121678540378a4255fdd93ab5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStopped</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a301f32ed446d079b8c7e0e519b9fe10a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStarting</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a333b90b6f0445811d89292b768c48ce0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceRunning</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a7ffa69569b27ba9115745638a5c33208</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServicePausing</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8ac69ec92231c786a6065591981da87505</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServicePaused</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a2f7af385fccc8dcd67e194b509a5432f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceResuming</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8ad0aca85aea44f2f3070fd1c8d2f0ce88</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceReloading</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a31abd399a88f2c972277db4e4e2dfaa2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStopping</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a58ba960dc57f5ac215bdca849f795522</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceErrored</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a6e4d008512702232be703c556ff0d761</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa01e6e415ac751b351281b9b2d6927f64</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStop</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa66de204706111b2111c52f64af7cd382</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsPause</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa0e05d55ff21f7af167ebeb79843ecb13</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsResume</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa56307d8c9dddaa2e2bb016fb5e393ed6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsReload</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa62b24026d517f0f7f394631ea4bb55fc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsGetAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa2e22c0eeceb35c06d9567723aa0294df</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsSetAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa90e093034063a83ac7e814a94c6ade38</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa1d8aecbfecfbb559154e576580b86f44</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsNonBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa098b3055daa3ec9e4998ee765232da52</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStatus</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faac8b064ab419e077165dfa89ce745a442</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsCustomCommands</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa3b5c5749d73045c3fec50edd8005ac12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsStartStop</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faaa6a2dd94de1097939f3bc46d5b45104b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsPauseResume</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faafe0edfb76d0bfc13d8180a0cc5d1869d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faa315194bb9cce14e57f71fbacc404a38f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SupportsBlockingNonBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0d8ff1b5bd65cd9edeac8c9256f182faabb01a4bc42ef1743020444a0a84c217e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStatusUnknown</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a31b1193121678540378a4255fdd93ab5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStopped</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a301f32ed446d079b8c7e0e519b9fe10a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStarting</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a333b90b6f0445811d89292b768c48ce0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceRunning</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a7ffa69569b27ba9115745638a5c33208</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServicePausing</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8ac69ec92231c786a6065591981da87505</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServicePaused</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a2f7af385fccc8dcd67e194b509a5432f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceResuming</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8ad0aca85aea44f2f3070fd1c8d2f0ce88</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceReloading</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a31abd399a88f2c972277db4e4e2dfaa2</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceStopping</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a58ba960dc57f5ac215bdca849f795522</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ServiceErrored</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3880184b2f3afbc2caed5fa01986d3e8a6e4d008512702232be703c556ff0d761</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="slot" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>start</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a6c9c2ae5c8e1d8d75485855261ecd8f6</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>stop</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a15038964dd1e670eaa8bf225565aef46</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>pause</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>aefc11759715b45c9598a4c7367ec4965</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>resume</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0bca786b13f064815fecf518e7d48d17</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>reload</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a641c29f61aa506827c03e863439b1f2e</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>enableAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>ad6520a76027acf05eb5673221036a211</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot" virtualness="virtual">
+      <type>virtual bool</type>
+      <name>disableAutostart</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>aac8c5a0018da8813c37660fc302031f2</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a3777faea77ac312d8a7c3c0554f54f4e</anchor>
+      <arglist>(bool blocking)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>clearError</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a50f456aad44c58f2a603864e5eab834c</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>blockingChanged</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>aaf1a9d6b4f6df95ac91d6cee82917ba7</anchor>
+      <arglist>(bool blocking, QPrivateSignal)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>errorChanged</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a5f789a279de76d39d191251cf13b129f</anchor>
+      <arglist>(QString error, QPrivateSignal)</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual QString</type>
+      <name>backend</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>ac3db4178100843e756c5a350c3681a80</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function">
+      <type>QString</type>
+      <name>serviceId</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a5670684359fb3550ca58f7099d242b0a</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual SupportFlags</type>
+      <name>supportFlags</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a87fc80aed0b93e60f3f5aa6da9810aa3</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isBlocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a78fdf8973da3ad204ad89230ff07b871</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>QString</type>
+      <name>error</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>ada052f024ce59ef05cb5e01f23576fc7</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual Q_INVOKABLE QVariant</type>
+      <name>callGenericCommand</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a4c03422db2fcf3ef1ed785685c81746a</anchor>
+      <arglist>(const QByteArray &amp;kind, const QVariantList &amp;args)</arglist>
+    </member>
+    <member kind="function">
+      <type>TRet</type>
+      <name>callCommand</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>add2e8f49e22f8deed45a11651f125b5f</anchor>
+      <arglist>(const QByteArray &amp;kind, TArgs... args)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>callCommand</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a45e2327c6f7c9dae06ece21706d7faa3</anchor>
+      <arglist>(const QByteArray &amp;kind, TArgs... args)</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual Q_INVOKABLE bool</type>
+      <name>serviceExists</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>aac67a458d0cabd9d8487710b0bdb8c7a</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual Q_INVOKABLE QtService::ServiceControl::ServiceStatus</type>
+      <name>status</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a5fdf4354b36803479946a77f63d07de3</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" virtualness="virtual">
+      <type>virtual Q_INVOKABLE bool</type>
+      <name>isAutostartEnabled</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>aa1291dba150c1c50c7567ac04a8ca4cc</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Q_INVOKABLE QDir</type>
+      <name>runtimeDir</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>ab9f189f18035a008fe8508f4a1d750cc</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static QStringList</type>
+      <name>listBackends</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a8edd714388baf4a3e8e8a555c9a70b62</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static QString</type>
+      <name>likelyBackend</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0f5711052c8bf5def154d58c48a31d28</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static ServiceControl *</type>
+      <name>create</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a87bea6e486b1f665d28ea3e664631fd6</anchor>
+      <arglist>(const QString &amp;backend, QString serviceId, QObject *parent=nullptr)</arglist>
+    </member>
+    <member kind="function" protection="protected" virtualness="virtual">
+      <type>virtual QString</type>
+      <name>serviceName</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>ad17c6e402613b34b6aaea853008c569d</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>void</type>
+      <name>setError</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a50b96bc655300afda94983ef0704e2e7</anchor>
+      <arglist>(QString error) const</arglist>
+    </member>
+    <member kind="property">
+      <type>QString</type>
+      <name>backend</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>aa28c184afd600cbee21d381a2957f781</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>QString</type>
+      <name>serviceId</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a97e8dc62467f1059e7876cbcf70ddb2b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>QtService::ServiceControl::SupportFlags</type>
+      <name>supportFlags</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a58837e8f71b8cf90fd6d1d335f326326</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>blocking</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a5d113dbe282d8bb1cb938df7bd47e5f4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>QString</type>
+      <name>error</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>ac462cbf6eecf3a5cc2b80651bbfd9a06</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtService::ServicePlugin</name>
+    <filename>class_qt_service_1_1_service_plugin.html</filename>
+    <member kind="function" virtualness="pure">
+      <type>virtual QString</type>
+      <name>currentServiceId</name>
+      <anchorfile>class_qt_service_1_1_service_plugin.html</anchorfile>
+      <anchor>ae60b3d7149283547c36706b47e60e56b</anchor>
+      <arglist>() const =0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual ServiceBackend *</type>
+      <name>createServiceBackend</name>
+      <anchorfile>class_qt_service_1_1_service_plugin.html</anchorfile>
+      <anchor>a3b5cb74675570be53bd7117d62af5340</anchor>
+      <arglist>(const QString &amp;backend, Service *service)=0</arglist>
+    </member>
+    <member kind="function" virtualness="pure">
+      <type>virtual ServiceControl *</type>
+      <name>createServiceControl</name>
+      <anchorfile>class_qt_service_1_1_service_plugin.html</anchorfile>
+      <anchor>ab73bee105e15e90eb869a66c97d1ad14</anchor>
+      <arglist>(const QString &amp;backend, QString &amp;&amp;serviceId, QObject *parent)=0</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>QtService::Terminal</name>
+    <filename>class_qt_service_1_1_terminal.html</filename>
+    <base>QIODevice</base>
+    <class kind="class">QtService::Terminal::Awaitable</class>
+    <member kind="slot">
+      <type>void</type>
+      <name>disconnectTerminal</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ad7d3cbca2bd084be4ad5500747c01e43</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>requestChar</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ad2e467d396edc0b85ea5119334f74e2a</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>requestChars</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>aa8df9bc4dc8bac79a4dc39ea3f573010</anchor>
+      <arglist>(qint64 num)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>requestLine</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a2ccbb58dc3bf8dcce9508b8656f90344</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>writeLine</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ab677a46eb29bf8736d2650bd644d0739</anchor>
+      <arglist>(const QByteArray &amp;line, bool flush=true)</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>flush</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>abc339baa524e24e852d302428f113bba</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="slot">
+      <type>void</type>
+      <name>setAutoDelete</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a67f86a579bdf656d8ea75778c26a0b9f</anchor>
+      <arglist>(bool autoDelete)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>terminalDisconnected</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a0c33efed0fa92e7567613037f01bd314</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>terminalError</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a075f8e6d4a723f9ec8d4ff02b17f3803</anchor>
+      <arglist>(int errorCode)</arglist>
+    </member>
+    <member kind="signal">
+      <type>void</type>
+      <name>autoDeleteChanged</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ab8f1f1b3ad2aba07c211fd3b7704a770</anchor>
+      <arglist>(bool autoDelete)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isSequential</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ab9f847dff5092246de87a3b0474672d0</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>close</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a11688ad983168176751b5959c917bc33</anchor>
+      <arglist>() override</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>atEnd</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ae953ec583b7519e6b14ce20cea540f26</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>qint64</type>
+      <name>bytesAvailable</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a7603295acf4cb8fe6504625ff173c0e5</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>qint64</type>
+      <name>bytesToWrite</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>afdba97e0539d130a55a89ba8a453e9e9</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>canReadLine</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a040197e7956fc42f1d6e7be8060ff805</anchor>
+      <arglist>() const override</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>waitForReadyRead</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a7088a149c013e69ccab9c45c25662a23</anchor>
+      <arglist>(int msecs) override</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>waitForBytesWritten</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a005984158077f769a40e83dd58bb94d2</anchor>
+      <arglist>(int msecs) override</arglist>
+    </member>
+    <member kind="function">
+      <type>Service::TerminalMode</type>
+      <name>terminalMode</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a1782e4cc3dc88cf678585a89f06441ba</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>QStringList</type>
+      <name>command</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>aeac0d1742a39a321cec5afdcd428ea21</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>isAutoDelete</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ae498b11702878c0d538b52124b79505d</anchor>
+      <arglist>() const</arglist>
+    </member>
+    <member kind="function">
+      <type>Awaitable</type>
+      <name>awaitChar</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a384b1713a6aabe922c1f64531392c2f8</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>Awaitable</type>
+      <name>awaitChars</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a73363abf4fe7dfa6693f743ad7918ead</anchor>
+      <arglist>(qint64 num)</arglist>
+    </member>
+    <member kind="function">
+      <type>Awaitable</type>
+      <name>awaitLine</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>af04609d5f84e591e6043c3d87b9ca2ae</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>qint64</type>
+      <name>readData</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ae9f6d212acef9dc44c2da9e013076b67</anchor>
+      <arglist>(char *data, qint64 maxlen) override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>qint64</type>
+      <name>readLineData</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a525a2e38c8162f30b2e526dee6f966c9</anchor>
+      <arglist>(char *data, qint64 maxlen) override</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>qint64</type>
+      <name>writeData</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ac27e793b9bfd3d7059aa9eaf162dfcc3</anchor>
+      <arglist>(const char *data, qint64 len) override</arglist>
+    </member>
+    <member kind="property">
+      <type>QtService::Service::TerminalMode</type>
+      <name>terminalMode</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>a6aa705226346d8e33854be4472663fcd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>QStringList</type>
+      <name>command</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>ae9a3b97f9ba78a30f68cf82348f86cbc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="property">
+      <type>bool</type>
+      <name>autoDelete</name>
+      <anchorfile>class_qt_service_1_1_terminal.html</anchorfile>
+      <anchor>af1e55e05a350d438c5ac5d96768a1c92</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="namespace">
+    <name>QtService</name>
+    <filename>namespace_qt_service.html</filename>
+    <class kind="class">QtService::Service</class>
+    <class kind="class">QtService::ServiceBackend</class>
+    <class kind="class">QtService::ServiceControl</class>
+    <class kind="class">QtService::ServicePlugin</class>
+    <class kind="class">QtService::Terminal</class>
+  </compound>
+  <compound kind="page">
+    <name>qtservice_backends</name>
+    <title>Supported Service Backends</title>
+    <filename>qtservice_backends</filename>
+    <docanchor file="qtservice_backends" title="Standard Backend">qtservice_backends_standard</docanchor>
+    <docanchor file="qtservice_backends" title="Service Backend">qtservice_backends_standard_backend</docanchor>
+    <docanchor file="qtservice_backends" title="Service Control">qtservice_backends_standard_control</docanchor>
+    <docanchor file="qtservice_backends" title="Systemd Backend">qtservice_backends_systemd</docanchor>
+    <docanchor file="qtservice_backends" title="Service Backend">qtservice_backends_systemd_backend</docanchor>
+    <docanchor file="qtservice_backends" title="Service Control">qtservice_backends_systemd_control</docanchor>
+    <docanchor file="qtservice_backends" title="Windows Backend">qtservice_backends_windows</docanchor>
+    <docanchor file="qtservice_backends" title="Service Backend">qtservice_backends_windows_backend</docanchor>
+    <docanchor file="qtservice_backends" title="Service Control">qtservice_backends_windows_control</docanchor>
+    <docanchor file="qtservice_backends" title="Launchd Backend">qtservice_backends_launchd</docanchor>
+    <docanchor file="qtservice_backends" title="Service Backend">qtservice_backends_launchd_backend</docanchor>
+    <docanchor file="qtservice_backends" title="Service Control">qtservice_backends_launchd_control</docanchor>
+    <docanchor file="qtservice_backends" title="Android Backend">qtservice_backends_android</docanchor>
+    <docanchor file="qtservice_backends" title="Service Backend">qtservice_backends_android_backend</docanchor>
+    <docanchor file="qtservice_backends" title="Service Control">qtservice_backends_android_control</docanchor>
+  </compound>
+  <compound kind="page">
+    <name>index</name>
+    <title></title>
+    <filename>index</filename>
+    <docanchor file="index" title="Features">qtservice_readme_label_0</docanchor>
+    <docanchor file="index" title="Download/Installation">qtservice_readme_label_1</docanchor>
+    <docanchor file="index" title="Usage">qtservice_readme_label_2</docanchor>
+    <docanchor file="index" title="Terminals">qtservice_readme_label_3</docanchor>
+    <docanchor file="index" title="Service Control">qtservice_readme_label_4</docanchor>
+    <docanchor file="index" title="Documentation">qtservice_readme_label_5</docanchor>
+    <docanchor file="index" title="References">qtservice_readme_label_6</docanchor>
+  </compound>
+</tagfile>
