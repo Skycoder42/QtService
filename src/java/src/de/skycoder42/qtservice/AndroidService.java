@@ -11,7 +11,7 @@ public class AndroidService extends QtService {
 
 	private static native int callStartCommand(Intent intent, int flags, int startId, int oldCode);
 
-	private void nativeReady() {
+	public void nativeReady() {
 		_sem.release();
 	}
 
