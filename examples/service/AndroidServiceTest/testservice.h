@@ -13,8 +13,8 @@ public:
 	explicit TestService(int &argc, char **argv);
 
 protected:
-	CommandMode onStart() override;
-	CommandMode onStop(int &exitCode) override;
+	CommandResult onStart() override;
+	CommandResult onStop(int &exitCode) override;
 
 	int onStartCommand(const QAndroidIntent &intent, int flags, int startId);
 	QAndroidBinder *onBind(const QAndroidIntent &intent);

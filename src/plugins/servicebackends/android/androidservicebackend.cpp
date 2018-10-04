@@ -82,11 +82,12 @@ void AndroidServiceBackend::onStarted(bool success)
 void AndroidServiceBackend::onExit()
 {
 	QEventLoop exitLoop;
-	connect(service(), QOverload<bool>::of(&Service::stopped),
+	connect(service(), &Service::stopped,
 			&exitLoop, &QEventLoop::exit);
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));
 	auto subRes = exitLoop.exec();
+	Q_UNUSED(subRes);
 }
 
 QAndroidBinder *AndroidServiceBackend::onBind(const QAndroidIntent &intent)

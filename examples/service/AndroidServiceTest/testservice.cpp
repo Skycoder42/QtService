@@ -18,15 +18,15 @@ TestService::TestService(int &argc, char **argv) :
 	addCallback("onBind", &TestService::onBind);
 }
 
-QtService::Service::CommandMode TestService::onStart()
+QtService::Service::CommandResult TestService::onStart()
 {
 	qDebug() << "onStart";
 	doStartNotify();
 	//QTimer::singleShot(5000, this, &TestService::quit);
-	return Synchronous;
+	return OperationCompleted;
 }
 
-QtService::Service::CommandMode TestService::onStop(int &)
+QtService::Service::CommandResult TestService::onStop(int &)
 {
 	qDebug() << "onStop";
 	QAndroidJniObject::callStaticMethod<void>("de/skycoder42/qtservice/test/TestServiceHelper",
@@ -35,8 +35,8 @@ QtService::Service::CommandMode TestService::onStop(int &)
 //	QTimer::singleShot(3000, this, [this](){
 //		emit stopped();
 //	});
-//	return Asynchronous;
-	return Synchronous;
+//	return OperationPending;
+	return OperationCompleted;
 }
 
 int TestService::onStartCommand(const QAndroidIntent &intent, int flags, int startId)
