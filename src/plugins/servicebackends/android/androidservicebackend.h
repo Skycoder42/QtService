@@ -21,6 +21,7 @@ public:
 	static jint onStartCommand(jobject intent, jint flags, jint startId, jint oldId);
 
 private Q_SLOTS:
+	void onStarted(bool success);
 	void onExit();
 
 private:

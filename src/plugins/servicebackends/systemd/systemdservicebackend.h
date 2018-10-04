@@ -22,9 +22,10 @@ protected Q_SLOTS:
 private Q_SLOTS:
 	void sendWatchdog();
 
-	void onReady();
+	void onStarted(bool success);
+	void onReloaded(bool success);
 	void onStopped(int exitCode);
-	void onPaused();
+	void onPaused(bool success);
 
 private:
 	QTimer *_watchdogTimer = nullptr;

@@ -32,6 +32,9 @@ void QtServiceDeclarativeModule::registerTypes(const char *uri)
 
 	qmlRegisterSingletonType<QtService::QmlServiceSingleton>(uri, 1, 0, "QtService", createSingleton);
 
+	//Version 1.1
+	qmlRegisterModule(uri, 1, 1);
+
 	// Check to make shure no module update is forgotten
-	static_assert(VERSION_MAJOR == 1 && VERSION_MINOR == 0, "QML module version needs to be updated");
+	static_assert(VERSION_MAJOR == 1 && VERSION_MINOR == 1, "QML module version needs to be updated");
 }

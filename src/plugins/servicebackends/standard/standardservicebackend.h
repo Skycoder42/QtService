@@ -19,7 +19,8 @@ protected Q_SLOTS:
 	void signalTriggered(int signal) override;
 
 private Q_SLOTS:
-	void onPaused();
+	void onStarted(bool success);
+	void onPaused(bool success);
 };
 
 #endif // STANDARDSERVICEBACKEND_H

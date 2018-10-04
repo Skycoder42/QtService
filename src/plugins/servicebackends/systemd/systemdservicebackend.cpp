@@ -104,8 +104,18 @@ void SystemdServiceBackend::sendWatchdog()
 	sd_notify(false, "WATCHDOG=1");
 }
 
-void SystemdServiceBackend::onReady()
+void SystemdServiceBackend::onStarted(bool success)
 {
+	if(success)
+		sd_notify(false, "READY=1");
+	else
+		onStopped(EXIT_FAILURE);
+}
+
+void SystemdServiceBackend::onReloaded(bool success)
+{
+	if(!success) //TODO test
+		sd_notify(false, "ERRNO=1");
 	sd_notify(false, "READY=1");
 }
 
@@ -116,9 +126,10 @@ void SystemdServiceBackend::onStopped(int exitCode)
 	qApp->exit(exitCode);
 }
 
-void SystemdServiceBackend::onPaused()
+void SystemdServiceBackend::onPaused(bool success)
 {
-	kill(getpid(), SIGSTOP); //now actually stop
+	if(success)
+		kill(getpid(), SIGSTOP); //now actually stop
 }
 
 int SystemdServiceBackend::run(int &argc, char **argv, int flags)
@@ -129,11 +140,11 @@ int SystemdServiceBackend::run(int &argc, char **argv, int flags)
 	if(!preStartService())
 		return EXIT_FAILURE;
 
-	connect(service(), &Service::started,
-			this, &SystemdServiceBackend::onReady);
-	connect(service(), &Service::reloaded,
-			this, &SystemdServiceBackend::onReady);
-	connect(service(), &Service::paused,
+	connect(service(), QOverload<bool>::of(&Service::started),
+			this, &SystemdServiceBackend::onStarted);
+	connect(service(), QOverload<bool>::of(&Service::reloaded),
+			this, &SystemdServiceBackend::onReloaded);
+	connect(service(), QOverload<bool>::of(&Service::paused),
 			this, &SystemdServiceBackend::onPaused,
 			Qt::QueuedConnection);
 

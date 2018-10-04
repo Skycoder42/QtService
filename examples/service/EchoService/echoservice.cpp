@@ -23,7 +23,7 @@ bool EchoService::preStart()
 	return true;
 }
 
-QtService::Service::CommandMode EchoService::onStart()
+QtService::Service::CommandResult EchoService::onStart()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server = new QTcpServer(this);
@@ -46,18 +46,18 @@ QtService::Service::CommandMode EchoService::onStart()
 		qApp->exit(EXIT_FAILURE);
 	}
 
-	return Synchronous;
+	return OperationCompleted;
 }
 
-QtService::Service::CommandMode EchoService::onStop(int &exitCode)
+QtService::Service::CommandResult EchoService::onStop(int &exitCode)
 {
 	Q_UNUSED(exitCode)
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
-	return Synchronous;
+	return OperationCompleted;
 }
 
-QtService::Service::CommandMode EchoService::onReload()
+QtService::Service::CommandResult EchoService::onReload()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
@@ -68,21 +68,21 @@ QtService::Service::CommandMode EchoService::onReload()
 		qApp->exit(EXIT_FAILURE);
 	}
 
-	return Synchronous;
+	return OperationCompleted;
 }
 
-QtService::Service::CommandMode EchoService::onPause()
+QtService::Service::CommandResult EchoService::onPause()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->pauseAccepting();
-	return Synchronous;
+	return OperationCompleted;
 }
 
-QtService::Service::CommandMode EchoService::onResume()
+QtService::Service::CommandResult EchoService::onResume()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->resumeAccepting();
-	return Synchronous;
+	return OperationCompleted;
 }
 
 void EchoService::newConnection()

@@ -11,17 +11,17 @@ TerminalService::TerminalService(int &argc, char **argv) :
 	//setTerminalMode(Service::ReadWritePassive);
 }
 
-Service::CommandMode TerminalService::onStart()
+Service::CommandResult TerminalService::onStart()
 {
 	qDebug() << "Service started with terminal mode:" << terminalMode();
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode TerminalService::onStop(int &exitCode)
+Service::CommandResult TerminalService::onStop(int &exitCode)
 {
 	qDebug() << "Closing down service...";
 	Q_UNUSED(exitCode)
-	return Synchronous;
+	return OperationCompleted;
 }
 
 bool TerminalService::verifyCommand(const QStringList &arguments)

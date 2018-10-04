@@ -17,7 +17,10 @@ int LaunchdServiceBackend::runService(int &argc, char **argv, int flags)
 	if(!preStartService())
 		return EXIT_FAILURE;
 
-	connect(service(), &Service::paused,
+	connect(service(), QOverload<bool>::of(&Service::started),
+			this, &LaunchdServiceBackend::onStarted,
+			Qt::QueuedConnection);
+	connect(service(), QOverload<bool>::of(&Service::paused),
 			this, &LaunchdServiceBackend::onPaused,
 			Qt::QueuedConnection);
 
@@ -93,9 +96,16 @@ void LaunchdServiceBackend::signalTriggered(int signal)
 	}
 }
 
-void LaunchdServiceBackend::onPaused()
+void LaunchdServiceBackend::onStarted(bool success)
 {
-	kill(getpid(), SIGSTOP); //now actually stop
+	if(!success)
+		qApp->exit(EXIT_FAILURE);
+}
+
+void LaunchdServiceBackend::onPaused(bool success)
+{
+	if(success)
+		kill(getpid(), SIGSTOP); //now actually stop
 }
 
 void LaunchdServiceBackend::syslogMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)

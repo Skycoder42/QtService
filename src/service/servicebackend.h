@@ -77,10 +77,10 @@ protected:
 	bool preStartService();
 
 private Q_SLOTS:
-	void onSvcStarted();
+	void onSvcStarted(bool success);
 	void onSvcStopped();
-	void onSvcResumed();
-	void onSvcPaused();
+	void onSvcResumed(bool success);
+	void onSvcPaused(bool success);
 
 private:
 	QScopedPointer<ServiceBackendPrivate> d;

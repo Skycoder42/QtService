@@ -18,7 +18,7 @@ bool TestService::preStart()
 	return true;
 }
 
-Service::CommandMode TestService::onStart()
+Service::CommandResult TestService::onStart()
 {
 	qDebug() << Q_FUNC_INFO;
 
@@ -32,7 +32,6 @@ Service::CommandMode TestService::onStart()
 		_stream.setDevice(_socket);
 		_server->close();
 
-		emit started();
 		_stream << QByteArray("started");
 		_socket->flush();
 	});
@@ -58,10 +57,10 @@ Service::CommandMode TestService::onStart()
 	}
 
 	qDebug() << "start ready";
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode TestService::onStop(int &exitCode)
+Service::CommandResult TestService::onStop(int &exitCode)
 {
 	Q_UNUSED(exitCode);
 	qDebug() << Q_FUNC_INFO;
@@ -70,32 +69,32 @@ Service::CommandMode TestService::onStop(int &exitCode)
 		_socket->flush();
 		_socket->waitForBytesWritten(2500);
 	}
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode TestService::onReload()
+Service::CommandResult TestService::onReload()
 {
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("reloading");
 	_socket->flush();
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode TestService::onPause()
+Service::CommandResult TestService::onPause()
 {
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("pausing");
 	_socket->flush();
 	_socket->waitForBytesWritten(2500);
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode TestService::onResume()
+Service::CommandResult TestService::onResume()
 {
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("resuming");
 	_socket->flush();
-	return Synchronous;
+	return OperationCompleted;
 }
 
 QVariant TestService::onCallback(const QByteArray &kind, const QVariantList &args)

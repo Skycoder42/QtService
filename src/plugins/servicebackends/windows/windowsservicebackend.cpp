@@ -97,12 +97,12 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	if(!preStartService())
 		exit(EXIT_FAILURE); //hard exit to kill all threads without fail
 	setStatus(SERVICE_START_PENDING);
-	connect(service(), &Service::started,
-			this, &WindowsServiceBackend::onRunning);
-	connect(service(), &Service::paused,
+	connect(service(), QOverload<bool>::of(&Service::started),
+			this, &WindowsServiceBackend::onStarted);
+	connect(service(), QOverload<bool>::of(&Service::paused),
 			this, &WindowsServiceBackend::onPaused);
-	connect(service(), &Service::resumed,
-			this, &WindowsServiceBackend::onRunning);
+	connect(service(), QOverload<bool>::of(&Service::resumed),
+			this, &WindowsServiceBackend::onResumed);
 	connect(service(), &Service::stopped,
 			qApp, &QCoreApplication::exit);
 
@@ -150,14 +150,30 @@ void WindowsServiceBackend::reloadService()
 	processServiceCommand(ReloadCommand);
 }
 
-void WindowsServiceBackend::onRunning()
+void WindowsServiceBackend::onStarted(bool success)
 {
-	setStatus(SERVICE_RUNNING);
+	if(success)
+		setStatus(SERVICE_RUNNING);
+	else {
+		setStatus(SERVICE_STOP_PENDING); //TODO followup with the actual stopping
+		qApp->exit(EXIT_FAILURE);
+	}
 }
 
-void WindowsServiceBackend::onPaused()
+void WindowsServiceBackend::onPaused(bool success)
 {
-	setStatus(SERVICE_PAUSED);
+	if(success)
+		setStatus(SERVICE_PAUSED);
+	else
+		setStatus(SERVICE_RUNNING);
+}
+
+void WindowsServiceBackend::onResumed(bool success)
+{
+	if(success)
+		setStatus(SERVICE_RUNNING);
+	else
+		setStatus(SERVICE_PAUSED);
 }
 
 void WindowsServiceBackend::setStatus(DWORD status)

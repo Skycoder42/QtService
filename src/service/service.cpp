@@ -213,25 +213,25 @@ bool Service::preStart()
 	return true;
 }
 
-Service::CommandMode Service::onStop(int &exitCode)
+Service::CommandResult Service::onStop(int &exitCode)
 {
 	Q_UNUSED(exitCode);
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode Service::onReload()
+Service::CommandResult Service::onReload()
 {
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode Service::onPause()
+Service::CommandResult Service::onPause()
 {
-	return Synchronous;
+	return OperationCompleted;
 }
 
-Service::CommandMode Service::onResume()
+Service::CommandResult Service::onResume()
 {
-	return Synchronous;
+	return OperationCompleted;
 }
 
 QVariant Service::onCallback(const QByteArray &kind, const QVariantList &args)
@@ -329,4 +329,6 @@ void ServicePrivate::stopTerminals()
 {
 	if(!isRunning)
 		return;
+
+	//TODO implement
 }

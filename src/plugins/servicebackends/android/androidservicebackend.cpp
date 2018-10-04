@@ -70,11 +70,19 @@ jint AndroidServiceBackend::onStartCommand(jobject intent, jint flags, jint star
 	return oldId;
 }
 
+void AndroidServiceBackend::onStarted(bool success)
+{
+	if(!success) {
+		disconnect(qApp, &QCoreApplication::aboutToQuit,
+				   this, &AndroidServiceBackend::onExit);
+		quitService();
+	}
+}
+
 void AndroidServiceBackend::onExit()
 {
-	QAndroidJniExceptionCleaner cleaner {QAndroidJniExceptionCleaner::OutputMode::Verbose};
 	QEventLoop exitLoop;
-	connect(service(), &Service::stopped,
+	connect(service(), QOverload<bool>::of(&Service::stopped),
 			&exitLoop, &QEventLoop::exit);
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));

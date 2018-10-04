@@ -12,8 +12,8 @@ public:
 
 	// Service interface
 protected:
-	CommandMode onStart() override;
-	CommandMode onStop(int &exitCode) override;
+	CommandResult onStart() override;
+	CommandResult onStop(int &exitCode) override;
 	bool verifyCommand(const QStringList &arguments) override;
 
 	// Service interface

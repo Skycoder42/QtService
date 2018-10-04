@@ -63,7 +63,10 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 			this, [&]() {
 		lock.unlock();
 	});
-	connect(service(), &Service::paused,
+	connect(service(), QOverload<bool>::of(&Service::started),
+			this, &StandardServiceBackend::onStarted,
+			Qt::QueuedConnection);
+	connect(service(), QOverload<bool>::of(&Service::paused),
 			this, &StandardServiceBackend::onPaused,
 			Qt::QueuedConnection);
 
@@ -130,10 +133,17 @@ void StandardServiceBackend::signalTriggered(int signal)
 	}
 }
 
-void StandardServiceBackend::onPaused()
+void StandardServiceBackend::onStarted(bool success)
+{
+	if(!success)
+		qApp->exit(EXIT_FAILURE);
+}
+
+void StandardServiceBackend::onPaused(bool success)
 {
 #ifdef Q_OS_UNIX
-	kill(getpid(), SIGSTOP); //now actually stop
+	if(success)
+		kill(getpid(), SIGSTOP); //now actually stop
 #endif
 }
 

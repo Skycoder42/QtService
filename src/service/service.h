@@ -42,11 +42,19 @@ class Q_SERVICE_EXPORT Service : public QObject
 
 public:
 	//! Indicates whether a service command has finished or needs to run asynchronously
-	enum CommandMode {
-		Synchronous, //!< The command was completed synchronously
-		Asynchronous //!< The command is beeing proccessed asynchronously and the service will emit the corresponding signal once it's done
+	enum CommandResult {
+		OperationCompleted, //!< The command was completed synchronously
+		OperationPending, //!< The command is beeing proccessed asynchronously and the service will emit the corresponding signal once it's done
+		OperationFailed,
+
+		OperationExit,
+
+		//MAJOR compat remove
+		Synchronous Q_DECL_DEPRECATED = OperationCompleted, //!< Deprecated. Use OperationCompleted instead
+		Asynchronous Q_DECL_DEPRECATED = OperationPending //!< Deprecated. Use OperationPending instead
 	};
-	Q_ENUM(CommandMode)
+	using CommandMode Q_DECL_DEPRECATED = CommandResult;//MAJOR compat remove
+	Q_ENUM(CommandResult)
 
 	//! The modes a terminal can be in
 	enum TerminalMode {
@@ -102,15 +110,19 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	//! Must be emitted when starting was completed if onStart returned Asynchronous
-	void started();
+	void started(bool success);
+	Q_DECL_DEPRECATED void started();
 	//! Must be emitted when stopping was completed if onStop returned Asynchronous
 	void stopped(int exitCode = EXIT_SUCCESS);
 	//! Must be emitted when reloading was completed if onReload returned Asynchronous
-	void reloaded();
+	void reloaded(bool success);
+	Q_DECL_DEPRECATED void reloaded();
 	//! Must be emitted when pausing was completed if onPause returned Asynchronous
-	void paused();
+	void paused(bool success);
+	Q_DECL_DEPRECATED void paused();
 	//! Must be emitted when resuming was completed if onResume returned Asynchronous
-	void resumed();
+	void resumed(bool success);
+	Q_DECL_DEPRECATED void resumed();
 
 	//! @notifyAcFn{Service::terminalActive}
 	void terminalActiveChanged(bool terminalActive, QPrivateSignal);
@@ -130,15 +142,15 @@ protected:
 	virtual bool preStart();
 
 	//! Is called by the backend to start the service
-	virtual CommandMode onStart() = 0;
+	virtual CommandResult onStart() = 0;
 	//! Is called by the backend to stop the service
-	virtual CommandMode onStop(int &exitCode);
+	virtual CommandResult onStop(int &exitCode);
 	//! Is called by the backend to reload the service
-	virtual CommandMode onReload();
+	virtual CommandResult onReload();
 	//! Is called by the backend to pause the service
-	virtual CommandMode onPause();
+	virtual CommandResult onPause();
 	//! Is called by the backend to resume the service
-	virtual CommandMode onResume();
+	virtual CommandResult onResume();
 
 	//! Is called by the backend if a platform specific callback was triggered
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);

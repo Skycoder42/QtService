@@ -24,8 +24,9 @@ public:
 	void reloadService() override;
 
 private Q_SLOTS:
-	void onRunning();
-	void onPaused();
+	void onStarted(bool success);
+	void onPaused(bool success);
+	void onResumed(bool success);
 
 private:
 	class SvcControlThread : public QThread
