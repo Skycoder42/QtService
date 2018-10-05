@@ -9,7 +9,7 @@ class StandardServiceControl : public QtService::ServiceControl
 	Q_OBJECT
 
 public:
-	explicit StandardServiceControl(QString &&serviceId, QObject *parent = nullptr);
+	explicit StandardServiceControl(bool debugMode, QString &&serviceId, QObject *parent = nullptr);
 
 	QString backend() const override;
 	SupportFlags supportFlags() const override;
@@ -24,6 +24,7 @@ protected:
 	QString serviceName() const override;
 
 private:
+	const bool _debugMode;
 	mutable QLockFile _statusLock;
 
 	qint64 getPid();

@@ -9,13 +9,17 @@
 #endif
 using namespace QtService;
 
-StandardServiceBackend::StandardServiceBackend(Service *service) :
-	ServiceBackend{service}
+StandardServiceBackend::StandardServiceBackend(bool debugMode, Service *service) :
+	ServiceBackend{service},
+	_debugMode{debugMode}
 {}
 
 int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	//setup logging
+	QString filePrefix;
+	if(_debugMode)
+		filePrefix = QStringLiteral("%{file}:%{line} ");
 #ifdef Q_OS_WIN
 	qSetMessagePattern(QStringLiteral("[%{time} "
 									  "%{if-debug}Debug]    %{endif}"
@@ -23,8 +27,8 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 									  "%{if-warning}Warning]  %{endif}"
 									  "%{if-critical}Critical] %{endif}"
 									  "%{if-fatal}Fatal]    %{endif}"
-									  "%{if-category}%{category}: %{endif}"
-									  "%{message}"));
+									  "%1%{if-category}%{category}: %{endif}"
+									  "%{message}").arg(filePrefix));
 #else
 	qSetMessagePattern(QStringLiteral("[%{time} "
 									  "%{if-debug}\033[32mDebug\033[0m]    %{endif}"
@@ -32,8 +36,8 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 									  "%{if-warning}\033[33mWarning\033[0m]  %{endif}"
 									  "%{if-critical}\033[31mCritical\033[0m] %{endif}"
 									  "%{if-fatal}\033[35mFatal\033[0m]    %{endif}"
-									  "%{if-category}%{category}: %{endif}"
-									  "%{message}"));
+									  "%1%{if-category}%{category}: %{endif}"
+									  "%{message}").arg(filePrefix));
 #endif
 
 	QCoreApplication app(argc, argv, flags);

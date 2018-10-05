@@ -4,13 +4,13 @@ QT += service
 QT -= gui
 
 HEADERS += \
-	standardservicebackend.h \
 	standardserviceplugin.h \
+	standardservicebackend.h \
 	standardservicecontrol.h
 
 SOURCES += \
-	standardservicebackend.cpp \
 	standardserviceplugin.cpp \
+	standardservicebackend.cpp \
 	standardservicecontrol.cpp
 
 DISTFILES += standard.json
@@ -21,3 +21,8 @@ PLUGIN_TYPE = servicebackends
 PLUGIN_EXTENDS = service
 PLUGIN_CLASS_NAME = StandardServicePlugin
 load(qt_plugin)
+
+DISTFILES += standard.json
+json_target.target = $$OBJECTS_DIR/moc_standardserviceplugin.o
+json_target.depends += $$PWD/standard.json
+QMAKE_EXTRA_TARGETS += json_target

@@ -14,7 +14,11 @@ protected:
 
 QString TestStandardService::backend()
 {
+#ifdef QT_NO_DEBUG
 	return QStringLiteral("standard");
+#else
+	return QStringLiteral("debug");
+#endif
 }
 
 QString TestStandardService::name()

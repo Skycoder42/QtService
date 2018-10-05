@@ -12,8 +12,9 @@
 #endif
 using namespace QtService;
 
-StandardServiceControl::StandardServiceControl(QString &&serviceId, QObject *parent) :
+StandardServiceControl::StandardServiceControl(bool debugMode, QString &&serviceId, QObject *parent) :
 	ServiceControl{std::move(serviceId), parent},
+	_debugMode{debugMode},
 	_statusLock{runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock"))}
 {
 	_statusLock.setStaleLockTime(std::numeric_limits<int>::max()); //disable stale locks
@@ -21,7 +22,7 @@ StandardServiceControl::StandardServiceControl(QString &&serviceId, QObject *par
 
 QString StandardServiceControl::backend() const
 {
-	return QStringLiteral("standard");
+	return _debugMode ? QStringLiteral("debug") : QStringLiteral("standard");
 }
 
 ServiceControl::SupportFlags StandardServiceControl::supportFlags() const
@@ -65,19 +66,43 @@ bool StandardServiceControl::start()
 		return false;
 	}
 
-	QProcess svcProc;
-	svcProc.setProgram(bin);
-	svcProc.setArguments({QStringLiteral("--backend"), QStringLiteral("standard")});
-	svcProc.setWorkingDirectory(QDir::rootPath());
-	svcProc.setStandardInputFile(QProcess::nullDevice());
-	svcProc.setStandardOutputFile(QProcess::nullDevice());
-	svcProc.setStandardErrorFile(QProcess::nullDevice());
+	const auto prepareProc = [&](QProcess *svcProc){
+		svcProc->setProgram(bin);
+		svcProc->setArguments({QStringLiteral("--backend"), backend()});
+		svcProc->setWorkingDirectory(QDir::rootPath());
+	};
+
+	auto ok = false;
 	qint64 pid = 0;
-	auto ok = svcProc.startDetached(&pid);
+	QString errorString;
+	if(_debugMode) {
+		auto svcProc = new QProcess{nullptr}; //detached instance
+		connect(svcProc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+				svcProc, &QProcess::deleteLater);
+		prepareProc(svcProc);
+		svcProc->setProcessChannelMode(QProcess::ForwardedChannels);
+		svcProc->setInputChannelMode(QProcess::ForwardedInputChannel);
+		svcProc->start();
+		ok = svcProc->waitForStarted();
+		if(ok)
+			pid = svcProc->processId();
+		else
+			errorString = svcProc->errorString();
+	} else {
+		QProcess svcProc;
+		prepareProc(&svcProc);
+		svcProc.setStandardInputFile(QProcess::nullDevice());
+		svcProc.setStandardOutputFile(QProcess::nullDevice());
+		svcProc.setStandardErrorFile(QProcess::nullDevice());
+		ok = svcProc.startDetached(&pid);
+		if(!ok)
+			errorString = svcProc.errorString();
+	}
+
 	if(ok)
 		qCDebug(logQtService) << "Started service process with PID" << pid;
 	else
-		setError(tr("Failed to start service process with error: %1").arg(svcProc.errorString()));
+		setError(tr("Failed to start service process with error: %1").arg(errorString));
 	return ok;
 #else
 	return ServiceControl::start();

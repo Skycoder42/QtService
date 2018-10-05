@@ -9,7 +9,7 @@ class StandardServiceBackend : public QtService::ServiceBackend
 	Q_OBJECT
 
 public:
-	explicit StandardServiceBackend(QtService::Service *service);
+	explicit StandardServiceBackend(bool debugMode, QtService::Service *service);
 
 	int runService(int &argc, char **argv, int flags) override;
 	void quitService() override;
@@ -21,6 +21,9 @@ protected Q_SLOTS:
 private Q_SLOTS:
 	void onStarted(bool success);
 	void onPaused(bool success);
+
+private:
+	const bool _debugMode;
 };
 
 #endif // STANDARDSERVICEBACKEND_H
