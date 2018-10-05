@@ -327,8 +327,6 @@ void ServicePrivate::startTerminals()
 
 void ServicePrivate::stopTerminals()
 {
-	if(!isRunning)
-		return;
-
-	//TODO implement
+	if(termServer)
+		termServer->stop();
 }

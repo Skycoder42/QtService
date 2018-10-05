@@ -11,6 +11,7 @@ public:
 	ServiceBackendPrivate(Service *service);
 
 	Service *service;
+	bool operating = false;
 };
 
 }

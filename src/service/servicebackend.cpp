@@ -18,6 +18,8 @@ ServiceBackend::ServiceBackend(Service *service) :
 			this, &ServiceBackend::onSvcStarted);
 	connect(d->service, &Service::stopped,
 			this, &ServiceBackend::onSvcStopped);
+	connect(d->service, QOverload<bool>::of(&Service::reloaded),
+			this, &ServiceBackend::onSvcReloaded);
 	connect(d->service, QOverload<bool>::of(&Service::resumed),
 			this, &ServiceBackend::onSvcResumed);
 	connect(d->service, QOverload<bool>::of(&Service::paused),
@@ -50,8 +52,12 @@ void ServiceBackend::signalTriggered(int signal)
 
 void ServiceBackend::processServiceCommand(ServiceCommand code)
 {
-	//TODO add support for "pending" commands
-	// => ignore new commands if an old one of the same kind has not yet been processed???
+	if(d->operating && code != StopCommand) { //always allow stopping
+		qCWarning(logQtService) << "Ignoring command of type" << code << "as another command is currently beeing processed";
+		return;
+	}
+
+	d->operating = true;
 	switch(code) {
 	case StartCommand:
 		switch(d->service->onStart()) {
@@ -68,6 +74,7 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();
+			break;
 		}
 		break;
 	case StopCommand:
@@ -78,13 +85,14 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			emit d->service->stopped(exitCode);
 			break;
 		case Service::OperationFailed:
-			qWarning() << "The stop-operation should never fail. The result is ignored and the service will stop anyways";
+			qCWarning(logQtService) << "The stop-operation should never fail. The result is ignored and the service will stop anyways";
 			emit d->service->stopped(exitCode == EXIT_SUCCESS ? EXIT_FAILURE : exitCode);
 			break;
 		case Service::OperationPending:
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();
+			break;
 		}
 		break;
 	}
@@ -100,6 +108,7 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();
+			break;
 		}
 		break;
 	case PauseCommand:
@@ -115,6 +124,7 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 				break;
 			default: //all other cases should never happen
 				Q_UNREACHABLE();
+				break;
 			}
 		}
 		break;
@@ -131,8 +141,12 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 				break;
 			default: //all other cases should never happen
 				Q_UNREACHABLE();
+				break;
 			}
 		}
+		break;
+	default:
+		Q_UNREACHABLE();
 		break;
 	}
 }
@@ -168,6 +182,7 @@ bool ServiceBackend::preStartService()
 
 void ServiceBackend::onSvcStarted(bool success)
 {
+	d->operating = false;
 	if(success) {
 		d->service->d->isRunning = true;
 		d->service->d->startTerminals();
@@ -176,18 +191,27 @@ void ServiceBackend::onSvcStarted(bool success)
 
 void ServiceBackend::onSvcStopped()
 {
+	d->operating = false;
 	d->service->d->stopTerminals();
 	d->service->d->isRunning = false;
 }
 
+void ServiceBackend::onSvcReloaded(bool success)
+{
+	d->operating = false;
+	Q_UNUSED(success)
+}
+
 void ServiceBackend::onSvcResumed(bool success)
 {
+	d->operating = false;
 	if(success)
 		d->service->d->wasPaused = false;
 }
 
 void ServiceBackend::onSvcPaused(bool success)
 {
+	d->operating = false;
 	if(success)
 		d->service->d->wasPaused = true;
 }

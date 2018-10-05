@@ -155,7 +155,7 @@ void WindowsServiceBackend::onStarted(bool success)
 	if(success)
 		setStatus(SERVICE_RUNNING);
 	else {
-		setStatus(SERVICE_STOP_PENDING); //TODO followup with the actual stopping
+		setStatus(SERVICE_STOP_PENDING);
 		qApp->exit(EXIT_FAILURE);
 	}
 }

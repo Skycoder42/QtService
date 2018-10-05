@@ -79,6 +79,7 @@ protected:
 private Q_SLOTS:
 	void onSvcStarted(bool success);
 	void onSvcStopped();
+	void onSvcReloaded(bool success);
 	void onSvcResumed(bool success);
 	void onSvcPaused(bool success);
 
