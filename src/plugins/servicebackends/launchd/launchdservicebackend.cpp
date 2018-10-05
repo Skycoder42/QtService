@@ -18,11 +18,9 @@ int LaunchdServiceBackend::runService(int &argc, char **argv, int flags)
 		return EXIT_FAILURE;
 
 	connect(service(), QOverload<bool>::of(&Service::started),
-			this, &LaunchdServiceBackend::onStarted,
-			Qt::QueuedConnection);
+			this, &LaunchdServiceBackend::onStarted);
 	connect(service(), QOverload<bool>::of(&Service::paused),
-			this, &LaunchdServiceBackend::onPaused,
-			Qt::QueuedConnection);
+			this, &LaunchdServiceBackend::onPaused);
 
 	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2})
 		registerForSignal(signal);

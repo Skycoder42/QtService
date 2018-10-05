@@ -128,7 +128,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	//! Must be emitted when starting was completed if onStart returned Asynchronous
-	void started(bool success);
+	void started(bool success); //TODO doc should be direct connected
 	Q_DECL_DEPRECATED void started();
 	//! Must be emitted when stopping was completed if onStop returned Asynchronous
 	void stopped(int exitCode = EXIT_SUCCESS);

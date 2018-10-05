@@ -64,11 +64,9 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 		lock.unlock();
 	});
 	connect(service(), QOverload<bool>::of(&Service::started),
-			this, &StandardServiceBackend::onStarted,
-			Qt::QueuedConnection);
+			this, &StandardServiceBackend::onStarted);
 	connect(service(), QOverload<bool>::of(&Service::paused),
-			this, &StandardServiceBackend::onPaused,
-			Qt::QueuedConnection);
+			this, &StandardServiceBackend::onPaused);
 
 #ifdef Q_OS_WIN
 	for(const auto signal : {CTRL_C_EVENT, CTRL_BREAK_EVENT}) {

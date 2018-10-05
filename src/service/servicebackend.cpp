@@ -70,7 +70,8 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 		case Service::OperationPending:
 			break;
 		case Service::OperationExit:
-			Q_UNIMPLEMENTED(); //TODO implement
+			emit d->service->started(true);
+			quitService();
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();

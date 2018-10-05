@@ -145,8 +145,7 @@ int SystemdServiceBackend::run(int &argc, char **argv, int flags)
 	connect(service(), QOverload<bool>::of(&Service::reloaded),
 			this, &SystemdServiceBackend::onReloaded);
 	connect(service(), QOverload<bool>::of(&Service::paused),
-			this, &SystemdServiceBackend::onPaused,
-			Qt::QueuedConnection);
+			this, &SystemdServiceBackend::onPaused);
 
 	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2})
 		registerForSignal(signal);
