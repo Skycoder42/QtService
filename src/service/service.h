@@ -14,6 +14,18 @@
 #include "QtService/qtservice_global.h"
 #include "QtService/qtservice_helpertypes.h"
 
+#if defined(Q_OS_UNIX)
+#ifdef Q_OS_ANDROID
+#define QT_SERVICE_POST_ENUM_DEPRECATED
+#else
+#define QT_SERVICE_POST_ENUM_DEPRECATED Q_DECL_DEPRECATED
+#endif
+#define QT_SERVICE_POST_USING_DEPRECATED Q_DECL_DEPRECATED
+#else
+#define QT_SERVICE_POST_ENUM_DEPRECATED
+#define QT_SERVICE_POST_USING_DEPRECATED
+#endif
+
 //! The primary namespace of the QtService library
 namespace QtService {
 
@@ -50,11 +62,17 @@ public:
 		OperationExit,
 
 		//MAJOR compat remove
-		Synchronous Q_DECL_DEPRECATED = OperationCompleted, //!< Deprecated. Use OperationCompleted instead
-		Asynchronous Q_DECL_DEPRECATED = OperationPending //!< Deprecated. Use OperationPending instead
+		Synchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationCompleted, //!< Deprecated. Use OperationCompleted instead
+		Asynchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationPending //!< Deprecated. Use OperationPending instead
 	};
-	using CommandMode Q_DECL_DEPRECATED = CommandResult;//MAJOR compat remove
+	using CommandMode QT_SERVICE_POST_USING_DEPRECATED = CommandResult;//MAJOR compat remove
 	Q_ENUM(CommandResult)
+
+#ifdef Q_CC_MSVC
+#pragma deprecated(CommandMode)
+#pragma deprecated(Synchronous)
+#pragma deprecated(Asynchronous)
+#endif
 
 	//! The modes a terminal can be in
 	enum TerminalMode {
