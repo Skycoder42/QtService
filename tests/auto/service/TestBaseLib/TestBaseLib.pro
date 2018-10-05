@@ -16,4 +16,7 @@ HEADERS += \
 SOURCES += \
 	basicservicetest.cpp
 
-mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''
+runtarget.target = run-tests
+win32: runtarget.depends += $(DESTDIR_TARGET)
+else: runtarget.depends += $(TARGET)
+QMAKE_EXTRA_TARGETS += runtarget

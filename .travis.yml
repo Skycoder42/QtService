@@ -12,6 +12,7 @@ env:
     - QPMX_CACHE_DIR=$HOME/.qpmx-cache
     - QT_VER=5.11.2
     - DOCKER_IMAGE=base
+    - MAKE_RUN_TESTS=true
 
 matrix:
   include:
@@ -56,9 +57,9 @@ deploy:
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-  - rm -fr $QPMX_CACHE_DIR/locks
-  - rm -fr $QPMX_CACHE_DIR/tmp
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -rf $QPMX_CACHE_DIR/locks
+  - rm -rf $QPMX_CACHE_DIR/tmp
 cache:
   directories:
     - $HOME/.gradle/caches/

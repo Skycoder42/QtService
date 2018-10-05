@@ -12,4 +12,4 @@ DEFINES += SRCDIR=\\\"$$_PRO_FILE_PWD_/\\\"
 SOURCES += \
 		tst_terminalservice.cpp
 
-mac: QMAKE_LFLAGS += '-Wl,-rpath,\'$$OUT_PWD/../../../../lib\''
+include(../../testrun.pri)
