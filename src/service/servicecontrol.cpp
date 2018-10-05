@@ -32,7 +32,8 @@ ServiceControl *ServiceControl::create(const QString &backend, QString serviceId
 {
 	auto control = ServicePrivate::createControl(backend, std::move(serviceId), parent);
 	// set the correct default value
-	control->d->blocking = control->supportFlags().testFlag(SupportsBlocking);
+	if(control)
+		control->d->blocking = control->supportFlags().testFlag(SupportsBlocking);
 	return control;
 }
 

@@ -27,5 +27,5 @@
     "publishers": {
     },
     "qbsFile": "",
-    "source": false
+    "source": true
 }
