@@ -218,12 +218,12 @@ Terminal::Awaitable::Awaitable(Terminal *terminal, qint64 readCnt) :
 	Q_ASSERT_X(readCnt >= 0, Q_FUNC_INFO, "Cannot read negative amounts of data");
 }
 
-Terminal::Awaitable::Awaitable(Terminal::Awaitable &&other)
+Terminal::Awaitable::Awaitable(Terminal::Awaitable &&other) noexcept
 {
 	d.swap(other.d);
 }
 
-Terminal::Awaitable &Terminal::Awaitable::operator=(Terminal::Awaitable &&other)
+Terminal::Awaitable &Terminal::Awaitable::operator=(Terminal::Awaitable &&other) noexcept
 {
 	d.swap(other.d);
 	return *this;

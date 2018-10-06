@@ -16,6 +16,8 @@ public:
 	bool serviceExists() const override;
 	ServiceStatus status() const override;
 
+	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
+
 public Q_SLOTS:
 	bool start() override;
 	bool stop() override;

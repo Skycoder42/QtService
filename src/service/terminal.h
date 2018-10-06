@@ -37,9 +37,9 @@ public:
 		//! Create an awaitable for the given terminal and specify how much data should be read
 		Awaitable(Terminal *terminal, qint64 readCnt = ReadSingle);
 		//! Move constructor
-		Awaitable(Awaitable &&other);
+		Awaitable(Awaitable &&other) noexcept;
 		//! Move assignment operator
-		Awaitable &operator=(Awaitable &&other);
+		Awaitable &operator=(Awaitable &&other) noexcept;
 		~Awaitable();
 
 		//! @private

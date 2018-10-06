@@ -27,7 +27,8 @@
 	- QtService::ServiceControl::SupportsStart (only on platforms that provice QProcess)
 	- QtService::ServiceControl::SupportsStop
 	- QtService::ServiceControl::SupportsStatus
-- Custom commands: none
+- Custom commands:
+	- `qint64 getPid()`: Returns the PID auf the currently running instance, or -1 if none is running
 - Starting is done by simply running the service executable as detached process
 - The lockfile is used to determine the service state - which means only services that use the
 backend can be controlled properly

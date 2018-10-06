@@ -48,6 +48,7 @@ private:
 
 class TerminalAwaitablePrivate
 {
+	Q_DISABLE_COPY(TerminalAwaitablePrivate)
 public:
 	TerminalAwaitablePrivate(Terminal *terminal, qint64 readCnt);
 

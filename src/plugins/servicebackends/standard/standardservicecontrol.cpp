@@ -52,6 +52,15 @@ ServiceControl::ServiceStatus StandardServiceControl::status() const
 	}
 }
 
+QVariant StandardServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
+{
+	Q_UNUSED(args)
+	if(kind == "getPid")
+		return getPid();
+	else
+		return {};
+}
+
 bool StandardServiceControl::start()
 {
 #if QT_CONFIG(process)

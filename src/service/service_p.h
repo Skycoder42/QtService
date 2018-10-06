@@ -12,6 +12,7 @@ namespace QtService {
 class ServiceControl;
 class ServicePrivate
 {
+	Q_DISABLE_COPY(ServicePrivate)
 public:
 	ServicePrivate(Service *q_ptr, int &argc, char **argv, int flags);
 

@@ -7,6 +7,7 @@ namespace QtService {
 
 class ServiceBackendPrivate
 {
+	Q_DISABLE_COPY(ServiceBackendPrivate)
 public:
 	ServiceBackendPrivate(Service *service);
 
