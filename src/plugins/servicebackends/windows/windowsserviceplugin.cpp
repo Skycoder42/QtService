@@ -23,6 +23,10 @@ QtService::ServiceBackend *WindowsServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *WindowsServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
+	auto parts = detectNamedService(serviceId);
+	if(!parts.first.isEmpty())
+		serviceId = parts.first;
+
 	if(backend == QStringLiteral("windows"))
 		return new WindowsServiceControl{std::move(serviceId), parent};
 	else

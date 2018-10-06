@@ -28,6 +28,10 @@ QtService::ServiceBackend *AndroidServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *AndroidServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
+	auto parts = detectNamedService(serviceId);
+	if(!parts.first.isEmpty())
+		serviceId = parts.second + QLatin1Char('.') + parts.first;
+
 	if(backend == QStringLiteral("android"))
 		return new AndroidServiceControl{std::move(serviceId), parent};
 	else

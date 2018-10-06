@@ -26,6 +26,14 @@ void BasicServiceTest::cleanupTestCase()
 	cleanup();
 }
 
+void BasicServiceTest::testNameDetection()
+{
+	auto nameControl = ServiceControl::createFromName(backend(), QStringLiteral("testservice"), QStringLiteral("de.skycoder42.qtservice.tests"), this);
+	QVERIFY(nameControl);
+	QVERIFY(nameControl->serviceExists());
+	QCOMPARE(nameControl->serviceId(), control->serviceId());
+}
+
 void BasicServiceTest::testStart()
 {
 	TEST_STATUS(ServiceControl::ServiceStopped);

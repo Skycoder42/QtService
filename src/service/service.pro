@@ -25,7 +25,8 @@ SOURCES += \
 	servicecontrol.cpp \
 	terminal.cpp \
 	terminalserver.cpp \
-	terminalclient.cpp
+	terminalclient.cpp \
+    serviceplugin.cpp
 
 MODULE_PLUGIN_TYPES = servicebackends
 load(qt_module)

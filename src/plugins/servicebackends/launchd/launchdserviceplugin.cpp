@@ -23,6 +23,10 @@ QtService::ServiceBackend *LaunchdServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *LaunchdServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
+	auto parts = detectNamedService(serviceId);
+	if(!parts.first.isEmpty())
+		serviceId = parts.second + QLatin1Char('.') + parts.first;
+
 	if(backend == QStringLiteral("launchd"))
 		return new LaunchdServiceControl{std::move(serviceId), parent};
 	else

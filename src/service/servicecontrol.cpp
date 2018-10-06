@@ -37,6 +37,17 @@ ServiceControl *ServiceControl::create(const QString &backend, QString serviceId
 	return control;
 }
 
+ServiceControl *ServiceControl::createFromName(const QString &backend, const QString &serviceName, QObject *parent)
+{
+	return createFromName(backend, serviceName, QCoreApplication::organizationDomain(), parent);
+}
+
+ServiceControl *ServiceControl::createFromName(const QString &backend, const QString &serviceName, const QString &domain, QObject *parent)
+{
+	//MAJOR change plugin interface to have 2 seperate methods. for now, string detection is used...
+	return create(backend, QStringLiteral("<<%1*%2>>").arg(serviceName, domain), parent);
+}
+
 ServiceControl::ServiceControl(QString &&serviceId, QObject *parent) :
 	QObject{parent},
 	d{new ServiceControlPrivate{std::move(serviceId)}}

@@ -16,8 +16,8 @@ class Q_SERVICE_EXPORT ServicePlugin
 	Q_DISABLE_COPY(ServicePlugin)
 
 public:
-	inline ServicePlugin() = default;
-	virtual inline ~ServicePlugin() = default;
+	ServicePlugin();
+	virtual ~ServicePlugin();
 
 	//! Return the ID of the currently setup service
 	virtual QString currentServiceId() const = 0;
@@ -26,6 +26,9 @@ public:
 	virtual ServiceBackend *createServiceBackend(const QString &backend, Service *service) = 0;
 	//! Create a new service backend for the given backend, name and parent
 	virtual ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) = 0;
+
+protected:
+	QPair<QString, QString> detectNamedService(const QString &serviceId) const;
 };
 
 }

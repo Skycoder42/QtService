@@ -100,7 +100,7 @@ bool AndroidServiceControl::stop()
 
 QString AndroidServiceControl::serviceName() const
 {
-	return serviceId().split(QLatin1Char('/')).last();
+	return serviceId().split(QLatin1Char('.')).last();
 }
 
 QByteArray AndroidServiceControl::jniServiceId() const
