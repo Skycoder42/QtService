@@ -1,7 +1,7 @@
 TARGET = QtService
 
 QT = core network
-android: QT += androidextras
+#android: QT += androidextras
 
 HEADERS += \
 	qtservice_global.h \
@@ -26,7 +26,7 @@ SOURCES += \
 	terminal.cpp \
 	terminalserver.cpp \
 	terminalclient.cpp \
-    serviceplugin.cpp
+	serviceplugin.cpp
 
 MODULE_PLUGIN_TYPES = servicebackends
 load(qt_module)

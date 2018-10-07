@@ -3,7 +3,7 @@
 #include "standardservicecontrol.h"
 #include <QtCore/QStandardPaths>
 
-Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.standard"); //TODO, QtInfoMsg);
+Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.standard", QtInfoMsg);
 
 StandardServicePlugin::StandardServicePlugin(QObject *parent) :
 	QObject{parent}

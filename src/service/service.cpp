@@ -49,7 +49,7 @@ Q_GLOBAL_STATIC_WITH_ARGS(PluginObjectFactory, factory, (QString::fromUtf8("serv
 
 using namespace QtService;
 
-Q_LOGGING_CATEGORY(logQtService, "qtservice"); //TODO, QtInfoMsg);
+Q_LOGGING_CATEGORY(logQtService, "qtservice", QtInfoMsg);
 
 Service::Service(int &argc, char **argv, int flags) :
 	QObject{},

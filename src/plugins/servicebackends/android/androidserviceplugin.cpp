@@ -2,7 +2,7 @@
 #include "androidservicebackend.h"
 #include "androidservicecontrol.h"
 
-Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.android"); //TODO, QtInfoMsg);
+Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.android", QtInfoMsg);
 
 AndroidServicePlugin::AndroidServicePlugin(QObject *parent) :
 	QObject{parent}
