@@ -2,7 +2,9 @@
 #include <QtService/Terminal>
 
 #include <QTimer>
+#include <QThread>
 #include <QTcpSocket>
+#include <QUuid>
 using namespace QtService;
 
 TestService::TestService(int &argc, char **argv) :
@@ -22,6 +24,20 @@ Service::CommandResult TestService::onStart()
 {
 	qDebug() << Q_FUNC_INFO;
 
+	// step 1: connect to the prepared shared memory to read the mode of operation
+	_opInfo = QIpcPointer<const OpInfo>::attach(QStringLiteral("de.skycoder42.qtservice.tests.testservice.sharedmem"));
+	if(!_opInfo) {
+		qWarning() << "No shared memory attached - assuming terminal test and falling back to standard settings";
+		_opInfo = QIpcPointer<const OpInfo>::create(QUuid::createUuid().toString(), OpInfo{
+														Service::OperationCompleted
+													});
+	}
+
+	QIpcPointerLocker locker{_opInfo};
+	qDebug() << _opInfo->mode;
+	locker.unlock();
+
+	// step 2: start the tests
 	_server = new QLocalServer(this);
 	_server->setSocketOptions(QLocalServer::WorldAccessOption);
 	connect(_server, &QLocalServer::newConnection, this, [this](){
@@ -56,8 +72,11 @@ Service::CommandResult TestService::onStart()
 		_activatedServer->setSocketDescriptor(socket);
 	}
 
+	//last: if pending mode,
+
+	locker.relock();
 	qDebug() << "start ready";
-	return OperationCompleted;
+	return _opInfo->mode;
 }
 
 Service::CommandResult TestService::onStop(int &exitCode)
@@ -69,7 +88,9 @@ Service::CommandResult TestService::onStop(int &exitCode)
 		_socket->flush();
 		_socket->waitForBytesWritten(2500);
 	}
-	return OperationCompleted;
+
+	QIpcPointerLocker locker{_opInfo};
+	return _opInfo->mode;
 }
 
 Service::CommandResult TestService::onReload()
@@ -77,7 +98,9 @@ Service::CommandResult TestService::onReload()
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("reloading");
 	_socket->flush();
-	return OperationCompleted;
+
+	QIpcPointerLocker locker{_opInfo};
+	return _opInfo->mode;
 }
 
 Service::CommandResult TestService::onPause()
@@ -86,7 +109,9 @@ Service::CommandResult TestService::onPause()
 	_stream << QByteArray("pausing");
 	_socket->flush();
 	_socket->waitForBytesWritten(2500);
-	return OperationCompleted;
+
+	QIpcPointerLocker locker{_opInfo};
+	return _opInfo->mode;
 }
 
 Service::CommandResult TestService::onResume()
@@ -94,7 +119,9 @@ Service::CommandResult TestService::onResume()
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("resuming");
 	_socket->flush();
-	return OperationCompleted;
+
+	QIpcPointerLocker locker{_opInfo};
+	return _opInfo->mode;
 }
 
 QVariant TestService::onCallback(const QByteArray &kind, const QVariantList &args)
