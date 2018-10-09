@@ -11,6 +11,7 @@ protected:
 	void init() override;
 	QString backend() override;
 	QString name() override;
+	bool reportsStartErrors() override;
 };
 
 void TestStandardService::init()
@@ -50,6 +51,11 @@ QString TestStandardService::name()
 	QString svcPath = QCoreApplication::applicationDirPath() + QStringLiteral("/../TestService/testservice");
 #endif
 	return QDir::cleanPath(svcPath);
+}
+
+bool TestStandardService::reportsStartErrors()
+{
+	return false;
 }
 
 QTEST_MAIN(TestStandardService)

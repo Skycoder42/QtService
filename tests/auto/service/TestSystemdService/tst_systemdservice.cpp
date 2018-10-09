@@ -28,6 +28,7 @@ private Q_SLOTS:
 
 private:
 	bool daemonReload();
+	bool resetFailed();
 };
 
 QString TestSystemdService::backend()
@@ -65,10 +66,12 @@ void TestSystemdService::init()
 		QVERIFY(QFile::copy(srcDir.absoluteFilePath(testsocket), systemdHome.absoluteFilePath(testsocket)));
 
 	QVERIFY(daemonReload());
+	resetFailed();
 }
 
 void TestSystemdService::cleanup()
 {
+	resetFailed();
 	auto systemdHome = QDir{QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)};
 	QVERIFY(systemdHome.cd(systemdpath));
 	QVERIFY(systemdHome.remove(testservice));
@@ -92,6 +95,8 @@ void TestSystemdService::testCustomImpl()
 
 void TestSystemdService::testSocketActivation()
 {
+	resetFailed();
+
 	auto socketControl = ServiceControl::create(backend(), QStringLiteral("testservice.socket"), this);
 	QVERIFY(socketControl->start());
 
@@ -106,6 +111,13 @@ bool TestSystemdService::daemonReload()
 	if(::geteuid() != 0)
 		args.prepend(QStringLiteral("--user"));
 	return QProcess::execute(QStringLiteral("systemctl"), args) == EXIT_SUCCESS;
+}
+
+bool TestSystemdService::resetFailed()
+{
+	if(!control)
+		return false;
+	return control->callCommand<int>("reset-failed") == EXIT_SUCCESS;
 }
 
 QTEST_MAIN(TestSystemdService)

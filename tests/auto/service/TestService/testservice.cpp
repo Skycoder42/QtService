@@ -3,6 +3,7 @@
 
 #include <QTimer>
 #include <QTcpSocket>
+#include <QSettings>
 using namespace QtService;
 
 TestService::TestService(int &argc, char **argv) :
@@ -21,6 +22,11 @@ bool TestService::preStart()
 Service::CommandResult TestService::onStart()
 {
 	qDebug() << Q_FUNC_INFO;
+
+	//first: read mode of operation:
+	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	if(config.value(QStringLiteral("fail")).toBool())
+		return TestService::OperationFailed;
 
 	_server = new QLocalServer(this);
 	_server->setSocketOptions(QLocalServer::WorldAccessOption);

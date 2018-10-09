@@ -10,8 +10,8 @@ unix:!android:!ios:system(pkg-config --exists libsystemd && systemctl --version)
 win32: SUBDIRS += TestWindowsService
 macx: SUBDIRS += TestLaunchdService
 
-TestStandardService.depends += TestService
-TestTerminalService.depends += TestBaseLib TestService
+TestStandardService.depends += TestBaseLib TestService
+TestTerminalService.depends += TestService
 TestSystemdService.depends += TestBaseLib TestService
 TestWindowsService.depends += TestBaseLib TestService
 TestLaunchdService.depends += TestBaseLib TestService

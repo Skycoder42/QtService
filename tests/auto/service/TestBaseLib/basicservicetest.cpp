@@ -17,12 +17,21 @@ void BasicServiceTest::initTestCase()
 	QVERIFY(control);
 	QVERIFY2(control->serviceExists(), qUtf8Printable(control->error()));
 	control->setBlocking(true);
+
+	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	config.clear();
+	config.sync();
 }
 
 void BasicServiceTest::cleanupTestCase()
 {
-	if(control)
+	if(control) {
 		control->stop();
+
+		QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+		config.clear();
+		config.sync();
+	}
 	cleanup();
 }
 
@@ -121,6 +130,27 @@ void BasicServiceTest::testStop()
 	TEST_STATUS(ServiceControl::ServiceStopped);
 }
 
+void BasicServiceTest::testStartFail()
+{
+	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	config.clear();
+	config.setValue(QStringLiteral("fail"), true);
+	config.sync();
+
+	TEST_STATUS(ServiceControl::ServiceStopped);
+
+	testFeature(ServiceControl::SupportsStart);
+	if(control->start()) {
+		if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+			QThread::sleep(3);
+	}
+
+	if(reportsStartErrors())
+		TEST_STATUS(ServiceControl::ServiceErrored);
+	else
+		TEST_STATUS(ServiceControl::ServiceStopped);
+}
+
 void BasicServiceTest::testAutostart()
 {
 	QVERIFY2(!control->isAutostartEnabled(), qUtf8Printable(control->error()));
@@ -135,6 +165,11 @@ void BasicServiceTest::testAutostart()
 QString BasicServiceTest::name()
 {
 	return QStringLiteral("testservice");
+}
+
+bool BasicServiceTest::reportsStartErrors()
+{
+	return true;
 }
 
 void BasicServiceTest::init() {}

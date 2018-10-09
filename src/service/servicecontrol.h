@@ -95,7 +95,7 @@ public:
 	QString error() const;
 
 	//! Calls the command of kind with the given arguments and returns it's result
-	Q_INVOKABLE virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args);
+	Q_INVOKABLE virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args = {});
 
 	/*! @copybrief ServiceControl::callGenericCommand
 	 * @tparam TRet The return value of the command

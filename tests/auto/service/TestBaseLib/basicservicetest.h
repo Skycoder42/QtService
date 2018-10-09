@@ -26,6 +26,7 @@ private Q_SLOTS:
 	void testResume();
 	void testCustom();
 	void testStop();
+	void testStartFail();
 	void testAutostart();
 
 protected:
@@ -35,6 +36,7 @@ protected:
 
 	virtual QString backend() = 0;
 	virtual QString name();
+	virtual bool reportsStartErrors();
 	virtual void init();
 	virtual void cleanup();
 
