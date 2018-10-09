@@ -6,7 +6,6 @@
 #include <QtNetwork/QLocalSocket>
 #include <QtNetwork/QTcpServer>
 #include <QtCore/QDataStream>
-#include <qipcpointer.h>
 
 class TestService : public QtService::Service
 {
@@ -31,11 +30,6 @@ protected Q_SLOTS:
 	void terminalConnected(QtService::Terminal *terminal) override;
 
 private:
-	struct OpInfo {
-		QtService::Service::CommandResult mode;
-	};
-	QIpcPointer<const OpInfo> _opInfo;
-
 	QLocalServer *_server = nullptr;
 	QLocalSocket *_socket = nullptr;
 	QDataStream _stream;

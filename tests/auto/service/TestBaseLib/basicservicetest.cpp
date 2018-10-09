@@ -1,31 +1,17 @@
 #include "basicservicetest.h"
 #include <QtTest/QtTest>
-#include <qipcpointer.h>
 using namespace QtService;
 
-struct Data
-{
-	struct OpInfo {
-		QtService::Service::CommandResult mode;
-	};
-	QIpcPointer<OpInfo> opInfo;
-};
-
 BasicServiceTest::BasicServiceTest(QObject *parent) :
-	QObject{parent},
-	d{new Data{}}
+	QObject(parent)
 {}
-
-BasicServiceTest::~BasicServiceTest() = default;
 
 void BasicServiceTest::initTestCase()
 {
-	d->opInfo = QIpcPointer<Data::OpInfo>::create(QStringLiteral("de.skycoder42.qtservice.tests.testservice.sharedmem"));
-	QVERIFY(d->opInfo.isValid());
-	QIpcPointerLocker locker{d->opInfo};
-	d->opInfo->mode = QtService::Service::OperationCompleted;
-	locker.unlock();
-
+#ifdef Q_OS_LINUX
+	if(!qgetenv("LD_PRELOAD").contains("Qt5Service"))
+		qWarning() << "No LD_PRELOAD set - this may fail on systems with multiple version of the modules";
+#endif
 	init();
 	control = ServiceControl::create(backend(), name(), this);
 	QVERIFY(control);

@@ -88,11 +88,9 @@ void TestTerminalService::testTermStop()
 
 QProcess *TestTerminalService::createProc(QStringList args)
 {
-	args = QStringList {
-		QStringLiteral("--backend"),
-		QStringLiteral("standard"),
-		QStringLiteral("--terminal")
-	} + args;
+	args.prepend(QStringLiteral("--terminal"));
+	args.prepend(QStringLiteral("standard"));
+	args.prepend(QStringLiteral("--backend"));
 
 	auto proc = new QProcess{this};
 	proc->setProgram(svcPath);

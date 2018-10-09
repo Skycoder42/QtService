@@ -5,9 +5,6 @@
 #include <QtService/ServiceControl>
 #include <QtNetwork/QLocalSocket>
 #include <QtCore/QDataStream>
-#include <QtCore/QSharedMemory>
-
-struct Data;
 
 class BasicServiceTest : public QObject
 {
@@ -15,7 +12,6 @@ class BasicServiceTest : public QObject
 
 public:
 	explicit BasicServiceTest(QObject *parent = nullptr);
-	~BasicServiceTest() override;
 
 private Q_SLOTS:
 	void initTestCase();
@@ -47,9 +43,6 @@ protected:
 	void performSocketTest();
 	void testFeature(QtService::ServiceControl::SupportFlag flag);
 	void waitAsLongAs(QtService::ServiceControl::ServiceStatus status);
-
-private:
-	QScopedPointer<Data> d;
 };
 
 #define READ_LOOP(...) do { \
