@@ -17,6 +17,7 @@ void BasicServiceTest::initTestCase()
 	QVERIFY(control);
 	QVERIFY2(control->serviceExists(), qUtf8Printable(control->error()));
 	control->setBlocking(true);
+	qDebug() << control->serviceId() << control->runtimeDir().absolutePath();
 
 	resetSettings();
 }
