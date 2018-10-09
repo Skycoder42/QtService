@@ -18,18 +18,19 @@ SOURCES += \\
 	main.cpp \\
 	%{SvcSrcName}
 
+DISTFILES += \
 @if '%{CreateSystemd}'
-DISTFILES += %{SvcSystemdName}
+	%{SvcSystemdName} \
 @if '%{SocketPort}'
-DISTFILES += %{SvcSystemdSocketName}
+	%{SvcSystemdSocketName} \
 @endif
 @endif
 @if '%{CreateWindows}'
-DISTFILES += %{SvcWindowsName}
+	%{SvcWindowsName} \
 @endif
 @if '%{CreateLaunchd}'
-DISTFILES += %{SvcLaunchdName}
+	%{SvcLaunchdName} \
 @endif
 @if '%{CreateAndroid}'
-DISTFILES += AndroidManifest-service.part.xml
+	AndroidManifest-service.part.xml
 @endif

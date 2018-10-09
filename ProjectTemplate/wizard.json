@@ -91,9 +91,10 @@
 	 				"name": "SocketPort",
 					"trDisplayName": "Socket-Activation port:",
 					"type": "LineEdit",
+					"mandatory": false,
 					"data":  {
 						"trText": "",
-						"validator": "[0-9]*"
+						"validator": "^[0-9]*$"
 					}
 				},
 				{
@@ -102,7 +103,7 @@
 					"type": "LineEdit",
 					"data":  {
 						"trText": "com.example",
-						"validator": "[a-z][a-z0-9\-]*(?:\.[a-z0-9\-]+)*",
+						"validator": "^[a-z][a-z0-9\-]*(?:\.[a-z0-9\-]+)*$",
 						"enabled": "%{JS: %{CreateLaunchd} == 'CreateLaunchd'}"
 					}
 				}

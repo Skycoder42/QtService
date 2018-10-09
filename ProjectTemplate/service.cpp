@@ -8,16 +8,16 @@
 	//...
 }
 
-QtService::Service::CommandMode %{SvcCn}::onStart()
+QtService::Service::CommandResult %{SvcCn}::onStart()
 {
 @if '%{SocketPort}'
 	auto socket = getSocket();
 @endif
-	return Synchronous;
+	return OperationCompleted;
 }
 
-QtService::Service::CommandMode %{SvcCn}::onStop(int &exitCode)
+QtService::Service::CommandResult %{SvcCn}::onStop(int &exitCode)
 {
 	exitCode = EXIT_SUCCESS;
-	return Synchronous;
+	return OperationCompleted;
 }

@@ -11,8 +11,8 @@ public:
 	explicit %{SvcCn}(int &argc, char **argv);
 
 protected:
-	CommandMode onStart() override;
-	CommandMode onStop(int &exitCode) override;
+	CommandResult onStart() override;
+	CommandResult onStop(int &exitCode) override;
 };
 
 #undef qService
