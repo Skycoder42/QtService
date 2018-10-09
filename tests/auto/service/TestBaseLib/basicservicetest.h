@@ -39,9 +39,11 @@ protected:
 	virtual bool reportsStartErrors();
 	virtual void init();
 	virtual void cleanup();
+	virtual bool resetFailed();
 
 	virtual void testCustomImpl();
 
+	void resetSettings(const QVariantHash &args = {});
 	void performSocketTest();
 	void testFeature(QtService::ServiceControl::SupportFlag flag);
 	void waitAsLongAs(QtService::ServiceControl::ServiceStatus status);

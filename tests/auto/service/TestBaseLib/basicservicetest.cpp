@@ -18,19 +18,14 @@ void BasicServiceTest::initTestCase()
 	QVERIFY2(control->serviceExists(), qUtf8Printable(control->error()));
 	control->setBlocking(true);
 
-	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
-	config.clear();
-	config.sync();
+	resetSettings();
 }
 
 void BasicServiceTest::cleanupTestCase()
 {
 	if(control) {
 		control->stop();
-
-		QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
-		config.clear();
-		config.sync();
+		resetSettings();
 	}
 	cleanup();
 }
@@ -132,10 +127,7 @@ void BasicServiceTest::testStop()
 
 void BasicServiceTest::testStartFail()
 {
-	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
-	config.clear();
-	config.setValue(QStringLiteral("fail"), true);
-	config.sync();
+	resetSettings({{QStringLiteral("fail"), true}});
 
 	TEST_STATUS(ServiceControl::ServiceStopped);
 
@@ -149,6 +141,9 @@ void BasicServiceTest::testStartFail()
 		TEST_STATUS(ServiceControl::ServiceErrored);
 	else
 		TEST_STATUS(ServiceControl::ServiceStopped);
+
+	QVERIFY(resetFailed());
+	resetSettings();
 }
 
 void BasicServiceTest::testAutostart()
@@ -176,9 +171,24 @@ void BasicServiceTest::init() {}
 
 void BasicServiceTest::cleanup() {}
 
+bool BasicServiceTest::resetFailed()
+{
+	return true;
+}
+
 void BasicServiceTest::testCustomImpl()
 {
 	QVERIFY2(false, "testCustomImpl not implemented");
+}
+
+void BasicServiceTest::resetSettings(const QVariantHash &args)
+{
+	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	config.clear();
+	config.setValue(QStringLiteral("testval"), true);
+	for(auto it = args.constBegin(); it != args.constEnd(); ++it)
+		config.setValue(it.key(), it.value());
+	config.sync();
 }
 
 void BasicServiceTest::performSocketTest()

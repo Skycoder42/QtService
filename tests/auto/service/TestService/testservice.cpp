@@ -25,6 +25,8 @@ Service::CommandResult TestService::onStart()
 
 	//first: read mode of operation:
 	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	if(!config.contains(QStringLiteral("testval")))
+		return TestService::OperationFailed;
 	if(config.value(QStringLiteral("fail")).toBool())
 		return TestService::OperationFailed;
 

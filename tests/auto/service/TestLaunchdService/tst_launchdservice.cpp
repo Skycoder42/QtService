@@ -74,6 +74,9 @@ void TestLaunchdService::testCustomImpl()
 
 void TestLaunchdService::testSocketActivation()
 {
+	auto launchdHome = QDir{QStandardPaths::writableLocation(QStandardPaths::HomeLocation)};
+	QVERIFY(launchdLoad(launchdHome.absoluteFilePath(testservice), false));
+	QVERIFY(launchdLoad(launchdHome.absoluteFilePath(testservice), true));
 	performSocketTest();
 }
 

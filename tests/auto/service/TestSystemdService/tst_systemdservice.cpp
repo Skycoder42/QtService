@@ -22,13 +22,13 @@ protected:
 	void init() override;
 	void cleanup() override;
 	void testCustomImpl() override;
+	bool resetFailed() override;
 
 private Q_SLOTS:
 	void testSocketActivation();
 
 private:
 	bool daemonReload();
-	bool resetFailed();
 };
 
 QString TestSystemdService::backend()
@@ -95,7 +95,7 @@ void TestSystemdService::testCustomImpl()
 
 void TestSystemdService::testSocketActivation()
 {
-	resetFailed();
+	QVERIFY(resetFailed());
 
 	auto socketControl = ServiceControl::create(backend(), QStringLiteral("testservice.socket"), this);
 	QVERIFY(socketControl->start());
