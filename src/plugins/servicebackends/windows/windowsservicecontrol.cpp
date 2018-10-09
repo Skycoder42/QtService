@@ -52,7 +52,10 @@ ServiceControl::ServiceStatus WindowsServiceControl::status() const
 	case SERVICE_STOP_PENDING:
 		return ServiceStopping;
 	case SERVICE_STOPPED:
-		return ServiceStopped;
+		if(status.dwWin32ExitCode == NO_ERROR)
+			return ServiceStopped;
+		else
+			return ServiceErrored;
 	case SERVICE_PAUSE_PENDING:
 		return ServicePausing;
 	case SERVICE_PAUSED:

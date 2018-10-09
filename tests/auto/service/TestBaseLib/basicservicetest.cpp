@@ -242,7 +242,8 @@ void BasicServiceTest::waitAsLongAs(ServiceControl::ServiceStatus status)
 	static const QHash<ServiceControl::ServiceStatus, QList<ServiceControl::ServiceStatus>> statusMap {
 		{ServiceControl::ServiceStopped, {ServiceControl::ServiceStopping}},
 		{ServiceControl::ServiceRunning, {ServiceControl::ServiceStarting, ServiceControl::ServiceResuming, ServiceControl::ServiceReloading}},
-		{ServiceControl::ServicePaused, {ServiceControl::ServicePausing}}
+		{ServiceControl::ServicePaused, {ServiceControl::ServicePausing}},
+		{ServiceControl::ServiceErrored, {ServiceControl::ServiceStopping, ServiceControl::ServiceStarting}}
 	};
 	for(auto i = 0; i < 20 && statusMap[status].contains(control->status()); i++)
 		QThread::msleep(500);
