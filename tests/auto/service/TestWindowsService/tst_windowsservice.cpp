@@ -44,7 +44,7 @@ void TestWindowsService::init()
 	QDir svcDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../TestService/debug")};
 #endif
 	QVERIFY(svcDir.exists(QStringLiteral("testservice.exe")));
-	auto svcPath = QDir::toNativeSeparators(QStringLiteral("\"%1\" --backend windows").arg(svcDir.absoluteFilePath(QStringLiteral("testservice.exe"))));
+	auto svcPath = QStringLiteral("\"%1\" --backend windows").arg(QDir::toNativeSeparators(svcDir.absoluteFilePath(QStringLiteral("testservice.exe"))));
 
 	// copy Qt libs
 	QDir qtLibDir{QLibraryInfo::location(QLibraryInfo::BinariesPath)};
@@ -79,7 +79,7 @@ void TestWindowsService::init()
 								 reinterpret_cast<const wchar_t*>(name().utf16()),
 								 L"Test Service",
 								 SERVICE_CHANGE_CONFIG,
-								 SERVICE_WIN32_OWN_PROCESS,
+								 SERVICE_USER_OWN_PROCESS,
 								 SERVICE_DEMAND_START,
 								 SERVICE_ERROR_IGNORE,
 								 reinterpret_cast<const wchar_t*>(svcPath.utf16()),
