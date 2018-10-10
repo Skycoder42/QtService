@@ -43,7 +43,7 @@
 <context>
     <name>QtService::ServiceControl</name>
     <message>
-        <location filename="../servicecontrol.cpp" line="+64"/>
+        <location filename="../servicecontrol.cpp" line="+76"/>
         <source>Operation custom command for kind %1 is not implemented for backend %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -96,17 +96,17 @@
 <context>
     <name>StandardServiceControl</name>
     <message>
-        <location filename="../../plugins/servicebackends/standard/standardservicecontrol.cpp" line="+49"/>
+        <location filename="../../plugins/servicebackends/standard/standardservicecontrol.cpp" line="+50"/>
         <source>Failed to access lockfile with error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+24"/>
         <source>Unabled to find executable for service with id &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+40"/>
         <source>Failed to start service process with error: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -173,7 +173,7 @@
     </message>
     <message>
         <location line="+32"/>
-        <location line="+35"/>
+        <location line="+38"/>
         <source>Failed to query service status with error: %1</source>
         <translation type="unfinished"></translation>
     </message>
