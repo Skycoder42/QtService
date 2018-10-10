@@ -17,16 +17,19 @@ private Q_SLOTS:
 	void initTestCase();
 	void cleanupTestCase();
 
+	void testBasics();
 	void testNameDetection();
 
-	//TODO test static stuff, i.e. supported flags and backend name
 	void testStart();
 	void testReload();
 	void testPause();
 	void testResume();
 	void testCustom();
 	void testStop();
+
+	void testStartExit();
 	void testStartFail();
+
 	void testAutostart();
 
 protected:

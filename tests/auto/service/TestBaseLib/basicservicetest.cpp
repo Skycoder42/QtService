@@ -17,7 +17,6 @@ void BasicServiceTest::initTestCase()
 	QVERIFY(control);
 	QVERIFY2(control->serviceExists(), qUtf8Printable(control->error()));
 	control->setBlocking(true);
-	qDebug() << control->serviceId() << control->runtimeDir().absolutePath();
 
 	resetSettings();
 }
@@ -29,6 +28,12 @@ void BasicServiceTest::cleanupTestCase()
 		resetSettings();
 	}
 	cleanup();
+}
+
+void BasicServiceTest::testBasics()
+{
+	QCOMPARE(control->backend(), backend());
+	QCOMPARE(control->serviceId(), name());
 }
 
 void BasicServiceTest::testNameDetection()
@@ -124,6 +129,22 @@ void BasicServiceTest::testStop()
 	QVERIFY(socket->waitForDisconnected(5000));
 
 	TEST_STATUS(ServiceControl::ServiceStopped);
+}
+
+void BasicServiceTest::testStartExit()
+{
+	resetSettings({{QStringLiteral("exit"), true}});
+
+	TEST_STATUS(ServiceControl::ServiceStopped);
+
+	testFeature(ServiceControl::SupportsStart);
+	if(control->start()) {
+		if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+			QThread::sleep(3);
+	}
+
+	TEST_STATUS(ServiceControl::ServiceStopped);
+	resetSettings();
 }
 
 void BasicServiceTest::testStartFail()
@@ -241,7 +262,7 @@ void BasicServiceTest::testFeature(ServiceControl::SupportFlag flag)
 void BasicServiceTest::waitAsLongAs(ServiceControl::ServiceStatus status)
 {
 	static const QHash<ServiceControl::ServiceStatus, QList<ServiceControl::ServiceStatus>> statusMap {
-		{ServiceControl::ServiceStopped, {ServiceControl::ServiceStopping}},
+		{ServiceControl::ServiceStopped, {ServiceControl::ServiceStopping, ServiceControl::ServiceStarting}},
 		{ServiceControl::ServiceRunning, {ServiceControl::ServiceStarting, ServiceControl::ServiceResuming, ServiceControl::ServiceReloading}},
 		{ServiceControl::ServicePaused, {ServiceControl::ServicePausing}},
 		{ServiceControl::ServiceErrored, {ServiceControl::ServiceStopping, ServiceControl::ServiceStarting}}

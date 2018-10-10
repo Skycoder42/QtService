@@ -114,7 +114,7 @@ void SystemdServiceBackend::onStarted(bool success)
 
 void SystemdServiceBackend::onReloaded(bool success)
 {
-	if(!success) //TODO test
+	if(!success) //TODO does not work! modify commands instead
 		sd_notify(false, "ERRNO=1");
 	sd_notify(false, "READY=1");
 }
