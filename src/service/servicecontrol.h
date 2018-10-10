@@ -76,7 +76,9 @@ public:
 	static QString likelyBackend();
 	//! Creates a new ServiceControl for the given service on the service manager defined by backend
 	static ServiceControl *create(const QString &backend, QString serviceId, QObject *parent = nullptr);
+	//! Creates a new ServiceControl by guessing the service id from the given name and this applications domain
 	static ServiceControl *createFromName(const QString &backend, const QString &serviceName, QObject *parent = nullptr);
+	//! Creates a new ServiceControl by guessing the service id from the given name and domain
 	static ServiceControl *createFromName(const QString &backend, const QString &serviceName, const QString &domain, QObject *parent = nullptr);
 
 	//! @private

@@ -296,20 +296,26 @@ At the point this method is called first thing after the eventloop has started a
 part of the backends has been completed. The service can now start doing it's actual work. Use this
 method to create the stuff your service needs to run, like starting servers etc.
 
-This method can behave in 2 ways. If you return Service::Synchronous, that the service engine assumes
-that startup has successfully been completed and the service leaves the "starting" state and enters
-the "running" state. However, you might need to perform an asynchronous operation during startup
-(like connecting to some dependend service). In that case Service::Asynchronous can be returned to
-indicate that starting has not been completed yet. The service will remain in the starting state
-until you emit Servie::started. Please note that beeing in the starting state is also known by the
-service manager. Depending on the service backend this state may time out leading to the manager
-killing off your process if it takes to long.
+This method can behave in 4 ways. If you return Service::OperationCompleted, the service engine
+assumes that startup has successfully been completed and the service leaves the "starting" state and
+enters the "running" state. However, you might need to perform an asynchronous operation during
+startup (like connecting to some dependend service). In that case Service::OperationPending can be
+returned to indicate that starting has not been completed yet. The service will remain in the
+starting state until you emit Servie::started. Please note that beeing in the starting state is also
+known by the service manager. Depending on the service backend this state may time out leading to
+the manager killing off your process if it takes to long. In case the application encounters an
+error, you can abort the command by either returning Service::OperationFailed for a synchronous fail
+or emit started with a fals result for asynchronous operations.
 
-@attention Never emit the started signal and return Service::Synchronous - this will most likely
-crash your application. You can always emit the started signal from within this method and simply
-return Service::Asynchronous - it will give you the same result as only returning
-Service::Synchronous, but allows you to emit the signal yourself. This is useful if the startup
-operation may or may not be asynchronous.
+One special return value for the start command only is Service::OperationExit. It's the same as
+Service::OperationCompleted, but tells the system to stop the service immediatly after. This allows
+you to create "one-shot" style services that only do something when started and the quit.
+
+@attention Never emit the started signal and return anything but Service::OperationPending - this
+will most likely crash your application. You can always emit the started signal from within this
+method and simply return Service::OperationPending - it will give you the same result as only
+returning Service::OperationCompleted (or Service::OperationFailed), but allows you to emit the
+signal yourself. This is useful if the startup operation may or may not be asynchronous.
 
 @sa Service::CommandMode, Service::started, Service::onStop
 */
@@ -323,11 +329,11 @@ operation may or may not be asynchronous.
 This method is called by the backends if the service received a request to stop. Use this method to
 clean up stuff, close connections etc.
 
-This method can behave in 2 ways. If you return Service::Synchronous, that the service engine assumes
-that stop has successfully been completed and the service leaves the "stopping" state and the
-proccess will quit after the backend completed it's internal cleanups. However, you might need to
-perform an asynchronous operation during the stop (like writing remaining data). In that case
-Service::Asynchronous can be returned to indicate that stopping has not been completed yet. The
+This method can behave in 3 ways. If you return Service::OperationCompleted, that the service
+engine assumes that stop has successfully been completed and the service leaves the "stopping" state
+and the proccess will quit after the backend completed it's internal cleanups. However, you might need
+to perform an asynchronous operation during the stop (like writing remaining data). In that case
+Service::OperationPending can be returned to indicate that stopping has not been completed yet. The
 service will remain in the stopping state until you emit Servie::stopped. Please note that beeing in
 the stopping state is also known by the service manager. Depending on the service backend this state
 may time out leading to the manager killing off your process if it takes to long.
@@ -336,11 +342,11 @@ In case you run the method synchronous, you can report an exit code to the param
 set it, it will be set to `EXIT_SUCCESS` - aka `0` on most platforms. For asynchronous stopping, use
 the signal parameter instead.
 
-@attention Never emit the stopped signal and return Service::Synchronous - this will most likely
-crash your application. You can always emit the stopped signal from within this method and simply
-return Service::Asynchronous - it will give you the same result as only returning
-Service::Synchronous, but allows you to emit the signal yourself. This is useful if the stop
-operation may or may not be asynchronous.
+@attention Never emit the stopped signal and return anything but Service::OperationPending - this
+will most likely crash your application. You can always emit the stopped signal from within this
+method and simply return Service::OperationPending - it will give you the same result as only
+returning Service::OperationCompleted (or Service::OperationFailed), but allows you to emit the
+signal yourself. This is useful if the stopping operation may or may not be asynchronous.
 
 @sa Service::CommandMode, Service::stopped, Service::onStart
 */
@@ -354,20 +360,22 @@ This method can be called any time while the service is in it's running state. I
 by the service manager to tell the service that some configurations have changed and that it should
 reload those - it's basically a faster alternative to restarting the whole service.
 
-This method can behave in 2 ways. If you return Service::Synchronous, that the service engine assumes
+This method can behave in 2 ways. If you return Service::OperationCompleted, that the service engine assumes
 that reload has successfully been completed and the service leaves the "reloading" state and goes
 back to the the "running" state. However, you might need to perform an asynchronous operation during
-the reload (like reconnecting to some dependend service). In that case Service::Asynchronous can be
+the reload (like reconnecting to some dependend service). In that case Service::OperationPending can be
 returned to indicate that reloading has not been completed yet. The service will remain in the
 reloading state until you emit Servie::reloaded. Please note that beeing in the reloading state is
 also known by the service manager. Depending on the service backend this state may time out leading
-to the manager killing off your process if it takes to long.
+to the manager killing off your process if it takes to long. In case the application encounters an
+error, you can abort the command by either returning Service::OperationFailed for a synchronous fail
+or emit started with a fals result for asynchronous operations.
 
-@attention Never emit the reloaded signal and return Service::Synchronous - this will most likely
-crash your application. You can always emit the reloaded signal from within this method and simply
-return Service::Asynchronous - it will give you the same result as only returning
-Service::Synchronous, but allows you to emit the signal yourself. This is useful if the reload
-operation may or may not be asynchronous.
+@attention Never emit the reloaded signal and return anything but Service::OperationPending - this
+will most likely crash your application. You can always emit the reloaded signal from within this
+method and simply return Service::OperationPending - it will give you the same result as only
+returning Service::OperationCompleted (or Service::OperationFailed), but allows you to emit the
+signal yourself. This is useful if the reloading operation may or may not be asynchronous.
 
 @sa Service::CommandMode, Service::reloaded
 */
@@ -385,19 +393,21 @@ Also, depending on the serice backend your process may halt excution after enter
 which means your service will actually stop running until it is resumed - however this behaviour is
 inconsistent on different platforms and you should never rely on it, only be prepared.
 
-This method can behave in 2 ways. If you return Service::Synchronous, that the service engine assumes
+This method can behave in 2 ways. If you return Service::OperationCompleted, that the service engine assumes
 that pause has successfully been completed and the service leaves the "pausing" state and enters the
 "paused" state. However, you might need to perform an asynchronous operation during the pause. In
-that case Service::Asynchronous can be returned to indicate that pausing has not been completed yet.
+that case Service::OperationPending can be returned to indicate that pausing has not been completed yet.
 The service will remain in the pausing state until you emit Servie::paused. Please note that beeing
 in the pausing state is also known by the service manager. Depending on the service backend this
-state may time out leading to the manager killing off your process if it takes to long.
+state may time out leading to the manager killing off your process if it takes to long. In case the
+application encounters an error, you can abort the command by either returning Service::OperationFailed
+for a synchronous fail or emit started with a fals result for asynchronous operations.
 
-@attention Never emit the paused signal and return Service::Synchronous - this will most likely
-crash your application. You can always emit the paused signal from within this method and simply
-return Service::Asynchronous - it will give you the same result as only returning
-Service::Synchronous, but allows you to emit the signal yourself. This is useful if the pause
-operation may or may not be asynchronous.
+@attention Never emit the paused signal and return anything but Service::OperationPending - this
+will most likely crash your application. You can always emit the paused signal from within this
+method and simply return Service::OperationPending - it will give you the same result as only
+returning Service::OperationCompleted (or Service::OperationFailed), but allows you to emit the
+signal yourself. This is useful if the pausing operation may or may not be asynchronous.
 
 @sa Service::CommandMode, Service::paused, Service::onResume
 */
@@ -411,19 +421,22 @@ This method is called by the service manager if the service should resume it's w
 been paused. This method is called by the backend as soon as the process continues it's execution.
 You can use the method to continue whatever you paused in Service::onPause.
 
-This method can behave in 2 ways. If you return Service::Synchronous, that the service engine assumes
+This method can behave in 2 ways. If you return Service::OperationCompleted, that the service engine assumes
 that resume has successfully been completed and the service leaves the "resuming" state and enters
 the "running" state again. However, you might need to perform an asynchronous operation during the
-resume. In that case Service::Asynchronous can be returned to indicate that resuming has not been
+resume. In that case Service::OperationPending can be returned to indicate that resuming has not been
 completed yet. The service will remain in the resuming state until you emit Servie::resumed. Please
 note that beeing in the resuming state is also known by the service manager. Depending on the service
 backend this state may time out leading to the manager killing off your process if it takes to long.
+In case the application encounters an error, you can abort the command by either returning
+Service::OperationFailed for a synchronous fail or emit started with a fals result for asynchronous
+operations.
 
-@attention Never emit the resumed signal and return Service::Synchronous - this will most likely
-crash your application. You can always emit the resumed signal from within this method and simply
-return Service::Asynchronous - it will give you the same result as only returning
-Service::Synchronous, but allows you to emit the signal yourself. This is useful if the resume
-operation may or may not be asynchronous.
+@attention Never emit the resumed signal and return anything but Service::OperationPending - this
+will most likely crash your application. You can always emit the resumed signal from within this
+method and simply return Service::OperationPending - it will give you the same result as only
+returning Service::OperationCompleted (or Service::OperationFailed), but allows you to emit the
+signal yourself. This is useful if the resuming operation may or may not be asynchronous.
 
 @sa Service::CommandMode, Service::resumed, Service::onPause
 */

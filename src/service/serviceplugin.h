@@ -28,6 +28,7 @@ public:
 	virtual ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) = 0;
 
 protected:
+	//! Check if the given service id is an encoded name and domain, and if yes decode them
 	QPair<QString, QString> detectNamedService(const QString &serviceId) const;
 };
 

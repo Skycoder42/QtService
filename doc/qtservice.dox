@@ -1,0 +1,13 @@
+/*!
+@namespace de::skycoder42::QtService
+@brief The QML import for the QtService QML module
+
+<b>Current Version</b><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.1
+
+<b>Available Types</b>
+- QtService (singleton)
+- @ref QtService::Service "Service" (uncreatable)
+- @ref QtService::ServiceControl "ServiceControl" (uncreatable)
+- @ref QtService::Terminal "Terminal" (uncreatable)
+*/

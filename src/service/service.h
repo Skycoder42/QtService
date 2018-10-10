@@ -14,16 +14,16 @@
 #include "QtService/qtservice_global.h"
 #include "QtService/qtservice_helpertypes.h"
 
-#if defined(Q_OS_UNIX)
-#ifdef Q_OS_ANDROID
-#define QT_SERVICE_POST_ENUM_DEPRECATED
+#ifdef Q_OS_UNIX
+#  ifdef Q_OS_ANDROID
+#    define QT_SERVICE_POST_ENUM_DEPRECATED
+#  else
+#    define QT_SERVICE_POST_ENUM_DEPRECATED Q_DECL_DEPRECATED
+#  endif
+#  define QT_SERVICE_POST_USING_DEPRECATED Q_DECL_DEPRECATED
 #else
-#define QT_SERVICE_POST_ENUM_DEPRECATED Q_DECL_DEPRECATED
-#endif
-#define QT_SERVICE_POST_USING_DEPRECATED Q_DECL_DEPRECATED
-#else
-#define QT_SERVICE_POST_ENUM_DEPRECATED
-#define QT_SERVICE_POST_USING_DEPRECATED
+#  define QT_SERVICE_POST_ENUM_DEPRECATED
+#  define QT_SERVICE_POST_USING_DEPRECATED
 #endif
 
 //! The primary namespace of the QtService library
@@ -55,16 +55,17 @@ class Q_SERVICE_EXPORT Service : public QObject
 public:
 	//! Indicates whether a service command has finished or needs to run asynchronously
 	enum CommandResult {
-		OperationCompleted, //!< The command was completed synchronously
+		OperationCompleted, //!< The command was successfully completed synchronously
 		OperationPending, //!< The command is beeing proccessed asynchronously and the service will emit the corresponding signal once it's done
-		OperationFailed,
+		OperationFailed, //!< The command failed synchronously. The system may exit the service afterwards
 
-		OperationExit,
+		OperationExit, //!< The command executed successfully, but the service should still exit. Only usable from onStart()
 
 		//MAJOR compat remove
-		Synchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationCompleted, //!< Deprecated. Use OperationCompleted instead
-		Asynchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationPending //!< Deprecated. Use OperationPending instead
+		Synchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationCompleted, //!< @deprecated Deprecated. Use OperationCompleted instead
+		Asynchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationPending //!< @deprecated Deprecated. Use OperationPending instead
 	};
+	//! @deprecated Deprecated. Use CommandResult instead
 	using CommandMode QT_SERVICE_POST_USING_DEPRECATED = CommandResult;//MAJOR compat remove
 	Q_ENUM(CommandResult)
 
@@ -127,19 +128,23 @@ public Q_SLOTS:
 	void setStartWithTerminal(bool startWithTerminal);
 
 Q_SIGNALS:
-	//! Must be emitted when starting was completed if onStart returned Asynchronous
+	//! Must be emitted when starting was completed if onStart returned OperationPending
 	void started(bool success); //TODO doc should be direct connected
+	//! @deprecated Use started(bool) instead
 	Q_DECL_DEPRECATED void started();
-	//! Must be emitted when stopping was completed if onStop returned Asynchronous
+	//! Must be emitted when stopping was completed if onStop returned OperationPending
 	void stopped(int exitCode = EXIT_SUCCESS);
-	//! Must be emitted when reloading was completed if onReload returned Asynchronous
+	//! Must be emitted when reloading was completed if onReload returned OperationPending
 	void reloaded(bool success);
+	//! @deprecated Use reloaded(bool) instead
 	Q_DECL_DEPRECATED void reloaded();
-	//! Must be emitted when pausing was completed if onPause returned Asynchronous
+	//! Must be emitted when pausing was completed if onPause returned OperationPending
 	void paused(bool success);
+	//! @deprecated Use paused(bool) instead
 	Q_DECL_DEPRECATED void paused();
-	//! Must be emitted when resuming was completed if onResume returned Asynchronous
+	//! Must be emitted when resuming was completed if onResume returned OperationPending
 	void resumed(bool success);
+	//! @deprecated Use resumed(bool) instead
 	Q_DECL_DEPRECATED void resumed();
 
 	//! @notifyAcFn{Service::terminalActive}

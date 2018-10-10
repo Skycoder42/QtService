@@ -153,7 +153,43 @@ but actually loading it and creating the control failed, an exception is thrown.
 The returned instance is owned by the caller. To check if the control operates on a valid
 service, use ServiceControl::serviceExists
 
-@sa ServiceControl::serviceExists, ServiceControl::supportFlags, ServiceControl::likelyBackend
+@sa ServiceControl::createFromName, ServiceControl::serviceExists, ServiceControl::supportFlags,
+ServiceControl::likelyBackend
+*/
+
+/*!
+@fn QtService::ServiceControl::createFromName(const QString &, const QString &, QObject *)
+
+@param backend The backend to create a control from
+@param serviceName The generic name of the service to control
+@param parent The parent object of the new control
+@returns The newly created backend, or nullptr
+@throws QException In case loading fails
+
+Uses the plugin defined by backend to create a service control for the given service. If no
+plugin can be found that provides this backend, nullptr is returned. If a plugin was found,
+but actually loading it and creating the control failed, an exception is thrown.
+
+The service identity is derived from the name and domain. The actual method depends on the backend:
+ Backend	| Deriviation method
+------------|--------------------
+ standard	| Searches for an executable named `<serviceName>` next to the app and in the path
+ systemd	| First tries `<domain>.<serviceName>.service`, if not found `<serviceName>.service`
+ windows	| Simply `<serviceName>`
+ launchd	| Uses `<domain>.<serviceName>`
+ android	| Generates the java class name `<domain>.<serviceName>`
+
+The returned instance is owned by the caller. To check if the control operates on a valid
+service, use ServiceControl::serviceExists
+
+@sa ServiceControl::create, mServiceControl::serviceExists, ServiceControl::supportFlags,
+ServiceControl::likelyBackend
+*/
+
+/*!
+@fn QtService::ServiceControl::createFromName(const QString &, const QString &, const QString &, QObject *)
+@param domain The domain of the service, instead of the domain of this application
+@copydetails QtService::ServiceControl::createFromName(const QString &, const QString &, QObject *)
 */
 
 /*!

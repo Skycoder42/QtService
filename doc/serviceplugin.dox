@@ -50,5 +50,24 @@ You should always return a valid backend for all valid providers and don't need 
 additional validity checks. It is save to return `nullptr` in case the store cannot be created.
 The backends passed to this method are the ones defined in the json file.
 
-@sa ServiceControl::create, ServiceControl
+@attention You should always use detectNamedService() in this method to be able to handle controls
+that are created via ServiceControl::createFromName instead of a service id.
+
+@sa ServiceControl::create, ServiceControl::createFromName, ServiceControl,
+ServicePlugin::detectNamedService
+*/
+
+/*!
+@fn QtService::ServicePlugin::detectNamedService
+
+This method was only introduced to keep binary compability. For now, it is used to differentiate
+between a service control created from the service id and one created from a name.
+
+You should call this method at the beginning of createServiceControl(). If the pair is empty, you
+can assume an actual service id was passed and treat it like that. If the pair however does hold
+something and thus is not empty, first will be the services name and second the domain. You
+should then use these two to generate a valid service id and try to create a service control from
+it.
+
+@sa ServicePlugin::createServiceControl, ServiceControl::createFromName
 */
