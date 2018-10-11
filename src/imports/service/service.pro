@@ -8,28 +8,30 @@ DEFINES += "VERSION_MAJOR=$$MODULE_VERSION_MAJOR"
 DEFINES += "VERSION_MINOR=$$MODULE_VERSION_MINOR"
 
 HEADERS += \
-		qtservice_plugin.h \
-    qmlservicesingleton.h
+	qtservice_plugin.h \
+	qmlservicesingleton.h
 
 SOURCES += \
-		qtservice_plugin.cpp \
-    qmlservicesingleton.cpp
+	qtservice_plugin.cpp \
+	qmlservicesingleton.cpp
 
 OTHER_FILES += qmldir
-
-generate_qmltypes {
-	typeextra1.target = qmltypes
-	typeextra1.depends += export LD_LIBRARY_PATH := "$$shadowed($$dirname(_QMAKE_CONF_))/lib/:$$[QT_INSTALL_LIBS]:$(LD_LIBRARY_PATH)"
-	typeextra2.target = qmltypes
-	typeextra2.depends += export QML2_IMPORT_PATH := "$$shadowed($$dirname(_QMAKE_CONF_))/qml/"
-	QMAKE_EXTRA_TARGETS += typeextra1 typeextra2
-}
 
 CONFIG += qmlcache
 load(qml_plugin)
 
+# overwrite the plugindump wrapper
+ldpath.name = LD_LIBRARY_PATH
+ldpath.value = "$$shadowed($$dirname(_QMAKE_CONF_))/lib/:$$[QT_INSTALL_LIBS]:$$(LD_LIBRARY_PATH)"
+qmlpath.name = QML2_IMPORT_PATH
+qmlpath.value = "$$shadowed($$dirname(_QMAKE_CONF_))/qml/:$$[QT_INSTALL_QML]:$$(QML2_IMPORT_PATH)"
+QT_TOOL_ENV = ldpath qmlpath
+qtPrepareTool(QMLPLUGINDUMP, qmlplugindump)
+QT_TOOL_ENV =
+
 generate_qmltypes {
-	qmltypes.depends = ../../../qml/$$TARGETPATH/$(TARGET)  #overwrite the target deps
+	#overwrite the target deps as make target is otherwise not detected
+	qmltypes.depends = ../../../qml/$$TARGETPATH/$(TARGET)
 
 	mfirst.target = all
 	mfirst.depends += qmltypes
