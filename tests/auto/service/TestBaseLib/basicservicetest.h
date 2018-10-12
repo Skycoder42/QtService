@@ -40,8 +40,6 @@ protected:
 	virtual QString backend() = 0;
 	virtual QString name();
 	virtual bool reportsStartErrors();
-	virtual QDir runtimeDir();
-
 	virtual void init();
 	virtual void cleanup();
 	virtual bool resetFailed();

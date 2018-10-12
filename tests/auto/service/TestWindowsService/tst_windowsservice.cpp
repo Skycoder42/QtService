@@ -18,8 +18,6 @@ class TestWindowsService : public BasicServiceTest
 protected:
 	QString backend() override;
 	QString name() override;
-	QDir runtimeDir() override;
-
 	void init() override;
 	void cleanup() override;
 	void testCustomImpl() override;
@@ -36,11 +34,6 @@ QString TestWindowsService::backend()
 QString TestWindowsService::name()
 {
 	return QStringLiteral("testservice");
-}
-
-QDir TestWindowsService::runtimeDir()
-{
-	return QStringLiteral("C:/WINDOWS/system32/config/systemprofile/testservice");
 }
 
 void TestWindowsService::init()

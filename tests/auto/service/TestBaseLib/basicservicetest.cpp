@@ -189,11 +189,6 @@ bool BasicServiceTest::reportsStartErrors()
 	return true;
 }
 
-QDir BasicServiceTest::runtimeDir()
-{
-	return control->runtimeDir();
-}
-
 void BasicServiceTest::init() {}
 
 void BasicServiceTest::cleanup() {}
