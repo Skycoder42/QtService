@@ -131,6 +131,7 @@ void BasicServiceTest::testStop()
 	TEST_STATUS(ServiceControl::ServiceStopped);
 }
 
+#ifndef Q_OS_WIN
 void BasicServiceTest::testStartExit()
 {
 	resetSettings({{QStringLiteral("exit"), true}});
@@ -167,6 +168,7 @@ void BasicServiceTest::testStartFail()
 	QVERIFY(resetFailed());
 	resetSettings();
 }
+#endif
 
 void BasicServiceTest::testAutostart()
 {

@@ -24,11 +24,8 @@ Service::CommandResult TestService::onStart()
 	qDebug() << Q_FUNC_INFO;
 
 	//first: read mode of operation:
-	QSettings config{runtimeDirTst().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
-#ifdef Q_OS_WIN
-	if(config.fileName() != QStringLiteral("C:/Users/appveyor/testservice/test.conf"))
-		return OperationExit;
-#else
+#ifndef Q_OS_WIN
+	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
 	if(!config.contains(QStringLiteral("testval")))
 		return OperationFailed;
 	if(config.value(QStringLiteral("exit")).toBool())
@@ -151,12 +148,4 @@ void TestService::terminalConnected(Terminal *terminal)
 			terminal->write(data);
 		});
 	}
-}
-
-QDir TestService::runtimeDirTst()
-{
-	if(backend() == QStringLiteral("windows"))
-		return QDir{QStringLiteral("C:/Users/appveyor/testservice")};
-	else
-		return runtimeDir();
 }

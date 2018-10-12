@@ -27,8 +27,10 @@ private Q_SLOTS:
 	void testCustom();
 	void testStop();
 
+#ifndef Q_OS_WIN
 	void testStartExit();
 	void testStartFail();
+#endif
 
 	void testAutostart();
 
