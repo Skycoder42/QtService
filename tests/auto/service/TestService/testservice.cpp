@@ -25,12 +25,17 @@ Service::CommandResult TestService::onStart()
 
 	//first: read mode of operation:
 	QSettings config{runtimeDirTst().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+#ifdef Q_OS_WIN
+	if(config.fileName() != QStringLiteral("C:/Users/appveyor/testservice"))
+		return OperationExit;
+#else
 	if(!config.contains(QStringLiteral("testval")))
 		return OperationFailed;
 	if(config.value(QStringLiteral("exit")).toBool())
 		return OperationExit;
 	if(config.value(QStringLiteral("fail")).toBool())
 		return OperationFailed;
+#endif
 
 	_server = new QLocalServer(this);
 	_server->setSocketOptions(QLocalServer::WorldAccessOption);
