@@ -35,6 +35,8 @@ private:
 	QDataStream _stream;
 
 	QTcpServer *_activatedServer = nullptr;
+
+	QDir runtimeDirTst();
 };
 
 #endif // TESTSERVICE_H
