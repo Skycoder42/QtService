@@ -1,7 +1,7 @@
 TARGET = QtService
 
 QT = core network
-#android: QT += androidextras
+android: QT += androidextras
 
 HEADERS += \
 	qtservice_global.h \
