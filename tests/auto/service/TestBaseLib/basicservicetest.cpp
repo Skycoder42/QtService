@@ -189,6 +189,11 @@ bool BasicServiceTest::reportsStartErrors()
 	return true;
 }
 
+QDir BasicServiceTest::runtimeDir()
+{
+	return control->runtimeDir();
+}
+
 void BasicServiceTest::init() {}
 
 void BasicServiceTest::cleanup() {}
@@ -205,7 +210,8 @@ void BasicServiceTest::testCustomImpl()
 
 void BasicServiceTest::resetSettings(const QVariantHash &args)
 {
-	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	QVERIFY(config.isWritable());
 	config.clear();
 	config.setValue(QStringLiteral("testval"), true);
 	for(auto it = args.constBegin(); it != args.constEnd(); ++it)
