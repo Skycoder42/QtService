@@ -72,6 +72,7 @@ void TestSystemdService::init()
 void TestSystemdService::cleanup()
 {
 	resetFailed();
+	control->disableAutostart();
 	auto systemdHome = QDir{QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)};
 	QVERIFY(systemdHome.cd(systemdpath));
 	QVERIFY(systemdHome.remove(testservice));
@@ -95,7 +96,7 @@ void TestSystemdService::testCustomImpl()
 
 void TestSystemdService::testSocketActivation()
 {
-	QVERIFY(resetFailed());
+	resetFailed();
 
 	auto socketControl = ServiceControl::create(backend(), QStringLiteral("testservice.socket"), this);
 	QVERIFY(socketControl->start());
