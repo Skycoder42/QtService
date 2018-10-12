@@ -205,7 +205,7 @@ void BasicServiceTest::testCustomImpl()
 
 void BasicServiceTest::resetSettings(const QVariantHash &args)
 {
-	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
 	QVERIFY(config.isWritable());
 	config.clear();
 	config.setValue(QStringLiteral("testval"), true);
