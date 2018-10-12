@@ -26,7 +26,7 @@ Service::CommandResult TestService::onStart()
 	//first: read mode of operation:
 	QSettings config{runtimeDirTst().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
 #ifdef Q_OS_WIN
-	if(config.fileName() != QStringLiteral("C:/Users/appveyor/testservice"))
+	if(config.fileName() != QStringLiteral("C:/Users/appveyor/testservice/test.conf"))
 		return OperationExit;
 #else
 	if(!config.contains(QStringLiteral("testval")))
