@@ -46,8 +46,6 @@ void BasicServiceTest::testNameDetection()
 
 void BasicServiceTest::testStart()
 {
-	TEST_STATUS(ServiceControl::ServiceStopped);
-
 	testFeature(ServiceControl::SupportsStart);
 	QVERIFY2(control->start(), qUtf8Printable(control->error()));
 	// blocking should only return after the server started, but for non blocking this may not be the case...
