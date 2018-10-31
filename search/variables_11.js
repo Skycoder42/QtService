@@ -10,6 +10,7 @@ var searchData=
   ['regexpmode',['RegexpMode',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_data_store.html#aeab660dbab47360b7ba4f7f87620778fae37ab7cefd4c486319a4d8549bc15cb1',0,'QtDataSync::DataStore']]],
   ['relation',['Relation',['https://doc.qt.io/qt-5/qaccessible.html#RelationFlag-enum',0,'QAccessible']]],
   ['remoteconfiguration',['RemoteConfiguration',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_defaults.html#ab141dc12df2cd9395e3e5b1fc31c1c39a3049ae8f050bb7996701672046a240f1',0,'QtDataSync::Defaults']]],
+  ['remoteobjectnamefilter',['RemoteObjectNameFilter',['https://doc.qt.io/qt-5/qremoteobjecthostbase.html#RemoteObjectNameFilter-typedef',0,'QRemoteObjectHostBase']]],
   ['renderflags',['RenderFlags',['https://doc.qt.io/qt-5/qwidget.html#RenderFlag-enum',0,'QWidget::RenderFlags()'],['https://doc.qt.io/qt-5/qtextitem.html#RenderFlag-enum',0,'QTextItem::RenderFlags()']]],
   ['renderhints',['RenderHints',['https://doc.qt.io/qt-5/qpainter.html#RenderHint-enum',0,'QPainter']]],
   ['renderingflags',['RenderingFlags',['https://doc.qt.io/qt-5/qsgrendernode.html#RenderingFlag-enum',0,'QSGRenderNode']]],

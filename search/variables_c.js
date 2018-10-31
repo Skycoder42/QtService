@@ -15,5 +15,6 @@ var searchData=
   ['migratewithcleanup',['MigrateWithCleanup',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_migration_helper.html#a457b9c2031edcb01b74580b208e518aba9603a88ef64468f28d632ed566396ad6',0,'QtDataSync::MigrationHelper']]],
   ['modifyparametersfunction',['ModifyParametersFunction',['https://doc.qt.io/qt-5/qabstractoauth.html#ModifyParametersFunction-typedef',0,'QAbstractOAuth']]],
   ['mousebuttons',['MouseButtons',['https://doc.qt.io/qt-5/qt.html#MouseButton-enum',0,'Qt']]],
-  ['mouseeventflags',['MouseEventFlags',['https://doc.qt.io/qt-5/qt.html#MouseEventFlag-enum',0,'Qt']]]
+  ['mouseeventflags',['MouseEventFlags',['https://doc.qt.io/qt-5/qt.html#MouseEventFlag-enum',0,'Qt']]],
+  ['multiprocess',['MultiProcess',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_android_settings_accessor.html#a276ec59e4084327849f9612a3fd95020a6907e9a10b0c422a01319ee4798a3c48',0,'QtMvvm::AndroidSettingsAccessor']]]
 ];

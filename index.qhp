@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-  <namespace>de.skycoder42.qtservice.100</namespace>
+  <namespace>de.skycoder42.qtservice.110</namespace>
   <virtualFolder>doc_qtservice</virtualFolder>
-  <customFilter name="Service 1.0.0">
+  <customFilter name="Service 1.1.0">
     <filterAttribute>qtservice</filterAttribute>
-    <filterAttribute>1.0.0</filterAttribute>
+    <filterAttribute>1.1.0</filterAttribute>
   </customFilter>
   <filterSection>
     <filterAttribute>doxygen</filterAttribute>
     <toc>
-      <section title="QtService 1.0.0" ref="index.html">
+      <section title="QtService 1.1.0" ref="index.html">
         <section title="Features" ref="index.html#qtservice_readme_label_0" />
         <section title="Download/Installation" ref="index.html#qtservice_readme_label_1" />
         <section title="Usage" ref="index.html#qtservice_readme_label_2">
@@ -40,18 +40,41 @@
             <section title="Service Control" ref="qtservice_backends.html#qtservice_backends_android_control" />
           </section>
         </section>
+        <section title="Deprecated List" ref="deprecated.html" />
         <section title="Namespaces" ref="namespaces.html">
           <section title="Namespace List" ref="namespaces.html">
+            <section title="de">
+              <section title="skycoder42">
+                <section title="QtService" ref="namespacede_1_1skycoder42_1_1_qt_service.html" />
+              </section>
+            </section>
             <section title="QtService" ref="namespace_qt_service.html" />
           </section>
         </section>
         <section title="Classes" ref="annotated.html">
           <section title="Class List" ref="annotated.html">
+            <section title="de">
+              <section title="skycoder42">
+                <section title="QtService" ref="namespacede_1_1skycoder42_1_1_qt_service.html">
+                  <section title="QtService" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html">
+                    <section title="createControl" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#af8caf917f7a1139424ff3e5928bbce89" />
+                    <section title="createControlFromName" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#ac481285e9a7555c8bbc0ac28cf1a2ab7" />
+                    <section title="createControlFromName" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#a4044b8f20c8de5f3dd97e603c99db795" />
+                    <section title="service" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#adf36dcfe14654568509c8238cc45ad06" />
+                  </section>
+                </section>
+              </section>
+            </section>
             <section title="QtService" ref="namespace_qt_service.html">
               <section title="Service" ref="class_qt_service_1_1_service.html">
-                <section title="CommandMode" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9">
-                  <section title="Synchronous" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9ae7cafd37ee8ca6ab14d8482d2be8a64d" />
-                  <section title="Asynchronous" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9a5bc5c42d7802d95725ea38eb5a294079" />
+                <section title="QT_SERVICE_POST_USING_DEPRECATED" ref="class_qt_service_1_1_service.html#ad0996c5c5e41285e08fe0dd926c4f913" />
+                <section title="CommandResult" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649e">
+                  <section title="OperationCompleted" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649eab158ad1f7d6ea5cc4dec3f3a3b1b3fdf" />
+                  <section title="OperationPending" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea32508f4828ab4a7326780ec3043de44e" />
+                  <section title="OperationFailed" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea64ed0c57845b65f7c0ba3e5bf6451f4a" />
+                  <section title="OperationExit" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ead32e565fa94be868a7f6d5b76cb1d8d8" />
+                  <section title="QT_SERVICE_POST_ENUM_DEPRECATED" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8" />
+                  <section title="QT_SERVICE_POST_ENUM_DEPRECATED" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8" />
                 </section>
                 <section title="TerminalMode" ref="class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2">
                   <section title="ReadOnly" ref="class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2a9b40c2e9bfa0044d5248f133fe74240f" />
@@ -77,18 +100,22 @@
                 <section title="onResume" ref="class_qt_service_1_1_service.html#a5b2015da891eb4f31ffef0ca113a4cee" />
                 <section title="onStart" ref="class_qt_service_1_1_service.html#a511ad3160fbdf5791db906072ffc091a" />
                 <section title="onStop" ref="class_qt_service_1_1_service.html#a144aa7e5018a37d30f86be9757663fa7" />
-                <section title="paused" ref="class_qt_service_1_1_service.html#af88b03394beb885950942fafc6470080" />
+                <section title="paused" ref="class_qt_service_1_1_service.html#a68ac94da606846d6845a35abc9ebb66b" />
+                <section title="paused" ref="class_qt_service_1_1_service.html#adce0b5030a90f641b404b7e0d25e0300" />
                 <section title="preStart" ref="class_qt_service_1_1_service.html#aabfeb679b453be1c812bf9bf23e8a70f" />
                 <section title="quit" ref="class_qt_service_1_1_service.html#a660c2d3cc0e6d6bc4b5550efac74b0ea" />
                 <section title="reload" ref="class_qt_service_1_1_service.html#a2eaf96952546bbebdf246a766e871eb7" />
-                <section title="reloaded" ref="class_qt_service_1_1_service.html#a3edf18c53e1c34ab56dba01750b54b96" />
-                <section title="resumed" ref="class_qt_service_1_1_service.html#a60b05e10d8ceca239d74cb337e684aaa" />
+                <section title="reloaded" ref="class_qt_service_1_1_service.html#a99f673de21631908093b824100420c0e" />
+                <section title="reloaded" ref="class_qt_service_1_1_service.html#aa2d48e3f7f356b81ba097a6dfe114fc2" />
+                <section title="resumed" ref="class_qt_service_1_1_service.html#af5915087a844abb80428a631dbb97fd1" />
+                <section title="resumed" ref="class_qt_service_1_1_service.html#a76b29258de2cff7bc972b053f5c2f893" />
                 <section title="runtimeDir" ref="class_qt_service_1_1_service.html#a1e01cebc3ecc5a4cb80e7fd2598e1874" />
                 <section title="setGlobalTerminal" ref="class_qt_service_1_1_service.html#ab11738e5476eeaa3d7bc8b079962440d" />
                 <section title="setStartWithTerminal" ref="class_qt_service_1_1_service.html#a6d38becd2d3dd627da1dd961bcd85df0" />
                 <section title="setTerminalActive" ref="class_qt_service_1_1_service.html#a4cc1e1ab4c9efa9c1c91e1b04ea982db" />
                 <section title="setTerminalMode" ref="class_qt_service_1_1_service.html#a327ee7a22b7daf148d712b4e9274833a" />
-                <section title="started" ref="class_qt_service_1_1_service.html#a893971790ec721395c029bbd2d69d20e" />
+                <section title="started" ref="class_qt_service_1_1_service.html#aaa6b7b10a9cc6355bceea4b8025e77f0" />
+                <section title="started" ref="class_qt_service_1_1_service.html#a1973960b7befc0a21efd5928989379c5" />
                 <section title="startWithTerminal" ref="class_qt_service_1_1_service.html#acc553aea91b84b62a20e1a41b94e92a7" />
                 <section title="startWithTerminalChanged" ref="class_qt_service_1_1_service.html#a58c7c85f5159c273598bc00bdc37f8ea" />
                 <section title="stopped" ref="class_qt_service_1_1_service.html#a1d967420b3b868cce39f814c22f275e5" />
@@ -166,7 +193,7 @@
                 <section title="blockingChanged" ref="class_qt_service_1_1_service_control.html#aaf1a9d6b4f6df95ac91d6cee82917ba7" />
                 <section title="callCommand" ref="class_qt_service_1_1_service_control.html#add2e8f49e22f8deed45a11651f125b5f" />
                 <section title="callCommand" ref="class_qt_service_1_1_service_control.html#a45e2327c6f7c9dae06ece21706d7faa3" />
-                <section title="callGenericCommand" ref="class_qt_service_1_1_service_control.html#a4c03422db2fcf3ef1ed785685c81746a" />
+                <section title="callGenericCommand" ref="class_qt_service_1_1_service_control.html#a5850c9237ae95d2b1c7282fadc2fabe3" />
                 <section title="clearError" ref="class_qt_service_1_1_service_control.html#a50f456aad44c58f2a603864e5eab834c" />
                 <section title="disableAutostart" ref="class_qt_service_1_1_service_control.html#aac8c5a0018da8813c37660fc302031f2" />
                 <section title="enableAutostart" ref="class_qt_service_1_1_service_control.html#ad6520a76027acf05eb5673221036a211" />
@@ -194,11 +221,12 @@
                 <section title="supportFlags" ref="class_qt_service_1_1_service_control.html#a58837e8f71b8cf90fd6d1d335f326326" />
               </section>
               <section title="ServicePlugin" ref="class_qt_service_1_1_service_plugin.html">
-                <section title="ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#af520831bcb8529c652469274f029c9fd" />
-                <section title="~ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#abc11d866dcbf365800a4b77775a33cbd" />
+                <section title="ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#a12ce589748d9fd995cb4a6826e63f417" />
+                <section title="~ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#ab00dc25945c1b7133ea8600894479cf0" />
                 <section title="createServiceBackend" ref="class_qt_service_1_1_service_plugin.html#a3b5cb74675570be53bd7117d62af5340" />
                 <section title="createServiceControl" ref="class_qt_service_1_1_service_plugin.html#ab73bee105e15e90eb869a66c97d1ad14" />
                 <section title="currentServiceId" ref="class_qt_service_1_1_service_plugin.html#ae60b3d7149283547c36706b47e60e56b" />
+                <section title="detectNamedService" ref="class_qt_service_1_1_service_plugin.html#ad1665dbb5c5c373915cb11b04909fd1e" />
               </section>
               <section title="Terminal" ref="class_qt_service_1_1_terminal.html">
                 <section title="Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html">
@@ -207,9 +235,9 @@
                     <section title="ReadSingle" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a36d246fb9fa15583e6726cac5e7cd28dabcd50df970a5d8ad962d99d19bfc2631" />
                   </section>
                   <section title="Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#af044c4be992987a4d455954fe8bc21ee" />
-                  <section title="Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a47aae1b6a8dd7241198e9b7d57ae5d34" />
+                  <section title="Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#aacc6dadda73a5c4cb95c063913b3e81f" />
                   <section title="~Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a9df4ab8edb5916626c7a31a686199c6f" />
-                  <section title="operator=" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a1fd42cc70e7676e5d0c36309c1f2a7b4" />
+                  <section title="operator=" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#afcbcafb06541fd045b7c29048de52444" />
                 </section>
                 <section title="~Terminal" ref="class_qt_service_1_1_terminal.html#aa75804151522a619118fb4190d2a7ace" />
                 <section title="atEnd" ref="class_qt_service_1_1_terminal.html#ae953ec583b7519e6b14ce20cea540f26" />
@@ -256,6 +284,9 @@
               <section title="QtService::ServiceBackend" ref="class_qt_service_1_1_service_backend.html" />
               <section title="QtService::ServiceControl" ref="class_qt_service_1_1_service_control.html" />
             </section>
+            <section title="QtQml.QtObject" ref="qml-qtqml-qtobject.html">
+              <section title="de::skycoder42::QtService::QtService" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html" />
+            </section>
             <section title="QtService::ServicePlugin" ref="class_qt_service_1_1_service_plugin.html" />
           </section>
           <section title="Class Members" ref="functions.html">
@@ -270,13 +301,20 @@
           <section title="File List" ref="files.html">
             <section title="AndroidService.java" ref="_android_service_8java_source.html" />
             <section title="doxme.py" ref="doxme_8py_source.html" />
+            <section title="qmlservicesingleton.h" ref="qmlservicesingleton_8h_source.html" />
             <section title="qtservice_global.h" ref="qtservice__global_8h_source.html" />
             <section title="qtservice_helpertypes.h" ref="qtservice__helpertypes_8h_source.html" />
+            <section title="qtservice_plugin.h" ref="qtservice__plugin_8h_source.html" />
             <section title="service.h" ref="service_8h.html">
               <section title="Service" ref="class_qt_service_1_1_service.html">
-                <section title="CommandMode" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9">
-                  <section title="Synchronous" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9ae7cafd37ee8ca6ab14d8482d2be8a64d" />
-                  <section title="Asynchronous" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9a5bc5c42d7802d95725ea38eb5a294079" />
+                <section title="QT_SERVICE_POST_USING_DEPRECATED" ref="class_qt_service_1_1_service.html#ad0996c5c5e41285e08fe0dd926c4f913" />
+                <section title="CommandResult" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649e">
+                  <section title="OperationCompleted" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649eab158ad1f7d6ea5cc4dec3f3a3b1b3fdf" />
+                  <section title="OperationPending" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea32508f4828ab4a7326780ec3043de44e" />
+                  <section title="OperationFailed" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea64ed0c57845b65f7c0ba3e5bf6451f4a" />
+                  <section title="OperationExit" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ead32e565fa94be868a7f6d5b76cb1d8d8" />
+                  <section title="QT_SERVICE_POST_ENUM_DEPRECATED" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8" />
+                  <section title="QT_SERVICE_POST_ENUM_DEPRECATED" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8" />
                 </section>
                 <section title="TerminalMode" ref="class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2">
                   <section title="ReadOnly" ref="class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2a9b40c2e9bfa0044d5248f133fe74240f" />
@@ -302,18 +340,22 @@
                 <section title="onResume" ref="class_qt_service_1_1_service.html#a5b2015da891eb4f31ffef0ca113a4cee" />
                 <section title="onStart" ref="class_qt_service_1_1_service.html#a511ad3160fbdf5791db906072ffc091a" />
                 <section title="onStop" ref="class_qt_service_1_1_service.html#a144aa7e5018a37d30f86be9757663fa7" />
-                <section title="paused" ref="class_qt_service_1_1_service.html#af88b03394beb885950942fafc6470080" />
+                <section title="paused" ref="class_qt_service_1_1_service.html#a68ac94da606846d6845a35abc9ebb66b" />
+                <section title="paused" ref="class_qt_service_1_1_service.html#adce0b5030a90f641b404b7e0d25e0300" />
                 <section title="preStart" ref="class_qt_service_1_1_service.html#aabfeb679b453be1c812bf9bf23e8a70f" />
                 <section title="quit" ref="class_qt_service_1_1_service.html#a660c2d3cc0e6d6bc4b5550efac74b0ea" />
                 <section title="reload" ref="class_qt_service_1_1_service.html#a2eaf96952546bbebdf246a766e871eb7" />
-                <section title="reloaded" ref="class_qt_service_1_1_service.html#a3edf18c53e1c34ab56dba01750b54b96" />
-                <section title="resumed" ref="class_qt_service_1_1_service.html#a60b05e10d8ceca239d74cb337e684aaa" />
+                <section title="reloaded" ref="class_qt_service_1_1_service.html#a99f673de21631908093b824100420c0e" />
+                <section title="reloaded" ref="class_qt_service_1_1_service.html#aa2d48e3f7f356b81ba097a6dfe114fc2" />
+                <section title="resumed" ref="class_qt_service_1_1_service.html#af5915087a844abb80428a631dbb97fd1" />
+                <section title="resumed" ref="class_qt_service_1_1_service.html#a76b29258de2cff7bc972b053f5c2f893" />
                 <section title="runtimeDir" ref="class_qt_service_1_1_service.html#a1e01cebc3ecc5a4cb80e7fd2598e1874" />
                 <section title="setGlobalTerminal" ref="class_qt_service_1_1_service.html#ab11738e5476eeaa3d7bc8b079962440d" />
                 <section title="setStartWithTerminal" ref="class_qt_service_1_1_service.html#a6d38becd2d3dd627da1dd961bcd85df0" />
                 <section title="setTerminalActive" ref="class_qt_service_1_1_service.html#a4cc1e1ab4c9efa9c1c91e1b04ea982db" />
                 <section title="setTerminalMode" ref="class_qt_service_1_1_service.html#a327ee7a22b7daf148d712b4e9274833a" />
-                <section title="started" ref="class_qt_service_1_1_service.html#a893971790ec721395c029bbd2d69d20e" />
+                <section title="started" ref="class_qt_service_1_1_service.html#aaa6b7b10a9cc6355bceea4b8025e77f0" />
+                <section title="started" ref="class_qt_service_1_1_service.html#a1973960b7befc0a21efd5928989379c5" />
                 <section title="startWithTerminal" ref="class_qt_service_1_1_service.html#acc553aea91b84b62a20e1a41b94e92a7" />
                 <section title="startWithTerminalChanged" ref="class_qt_service_1_1_service.html#a58c7c85f5159c273598bc00bdc37f8ea" />
                 <section title="stopped" ref="class_qt_service_1_1_service.html#a1d967420b3b868cce39f814c22f275e5" />
@@ -333,16 +375,19 @@
                 <section title="terminalMode" ref="class_qt_service_1_1_service.html#aa3054ed0679a460359bccfbb3771d44f" />
               </section>
               <section title="qService" ref="service_8h.html#aea6ad960ca40d641a84a4e652be17a7f" />
+              <section title="QT_SERVICE_POST_ENUM_DEPRECATED" ref="service_8h.html#a5fb11eb5408599192589c9ae9728fa2c" />
+              <section title="QT_SERVICE_POST_USING_DEPRECATED" ref="service_8h.html#a154c1ea2cbd5a9f8da6cab51fa779e15" />
             </section>
             <section title="servicebackend.h" ref="servicebackend_8h_source.html" />
             <section title="servicecontrol.h" ref="servicecontrol_8h_source.html" />
             <section title="serviceplugin.h" ref="serviceplugin_8h.html">
               <section title="ServicePlugin" ref="class_qt_service_1_1_service_plugin.html">
-                <section title="ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#af520831bcb8529c652469274f029c9fd" />
-                <section title="~ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#abc11d866dcbf365800a4b77775a33cbd" />
+                <section title="ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#a12ce589748d9fd995cb4a6826e63f417" />
+                <section title="~ServicePlugin" ref="class_qt_service_1_1_service_plugin.html#ab00dc25945c1b7133ea8600894479cf0" />
                 <section title="createServiceBackend" ref="class_qt_service_1_1_service_plugin.html#a3b5cb74675570be53bd7117d62af5340" />
                 <section title="createServiceControl" ref="class_qt_service_1_1_service_plugin.html#ab73bee105e15e90eb869a66c97d1ad14" />
                 <section title="currentServiceId" ref="class_qt_service_1_1_service_plugin.html#ae60b3d7149283547c36706b47e60e56b" />
+                <section title="detectNamedService" ref="class_qt_service_1_1_service_plugin.html#ad1665dbb5c5c373915cb11b04909fd1e" />
               </section>
               <section title="QtService_ServicePlugin_Iid" ref="serviceplugin_8h.html#ad32c2e8308084fd8c410e7f86fe61538" />
             </section>
@@ -356,22 +401,36 @@
       </section>
     </toc>
     <keywords>
+      <keyword name="QT_SERVICE_POST_ENUM_DEPRECATED" id="service.h::QT_SERVICE_POST_ENUM_DEPRECATED" ref="service_8h.html#a5fb11eb5408599192589c9ae9728fa2c" />
+      <keyword name="QT_SERVICE_POST_USING_DEPRECATED" id="service.h::QT_SERVICE_POST_USING_DEPRECATED" ref="service_8h.html#a154c1ea2cbd5a9f8da6cab51fa779e15" />
       <keyword name="qService" id="service.h::qService" ref="service_8h.html#aea6ad960ca40d641a84a4e652be17a7f" />
       <keyword name="QtService_ServicePlugin_Iid" id="serviceplugin.h::QtService_ServicePlugin_Iid" ref="serviceplugin_8h.html#ad32c2e8308084fd8c410e7f86fe61538" />
       <keyword name="Supported Service Backends" id="Supported Service Backends" ref="qtservice_backends.html" />
+      <keyword name="Deprecated List" id="Deprecated List" ref="deprecated.html" />
+      <keyword name="de::skycoder42::QtService" id="de::skycoder42::QtService" ref="namespacede_1_1skycoder42_1_1_qt_service.html" />
+      <keyword name="de::skycoder42::QtService::QtService" id="de::skycoder42::QtService::QtService" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html" />
+      <keyword name="createControl" id="de::skycoder42::QtService::QtService::createControl" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#af8caf917f7a1139424ff3e5928bbce89" />
+      <keyword name="createControlFromName" id="de::skycoder42::QtService::QtService::createControlFromName" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#ac481285e9a7555c8bbc0ac28cf1a2ab7" />
+      <keyword name="createControlFromName" id="de::skycoder42::QtService::QtService::createControlFromName" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#a4044b8f20c8de5f3dd97e603c99db795" />
+      <keyword name="service" id="de::skycoder42::QtService::QtService::service" ref="classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html#adf36dcfe14654568509c8238cc45ad06" />
       <keyword name="QtService" id="QtService" ref="namespace_qt_service.html" />
       <keyword name="QtService::Service" id="QtService::Service" ref="class_qt_service_1_1_service.html" />
+      <keyword name="QT_SERVICE_POST_USING_DEPRECATED" id="QtService::Service::QT_SERVICE_POST_USING_DEPRECATED" ref="class_qt_service_1_1_service.html#ad0996c5c5e41285e08fe0dd926c4f913" />
       <keyword name="quit" id="QtService::Service::quit" ref="class_qt_service_1_1_service.html#a660c2d3cc0e6d6bc4b5550efac74b0ea" />
       <keyword name="reload" id="QtService::Service::reload" ref="class_qt_service_1_1_service.html#a2eaf96952546bbebdf246a766e871eb7" />
       <keyword name="setTerminalActive" id="QtService::Service::setTerminalActive" ref="class_qt_service_1_1_service.html#a4cc1e1ab4c9efa9c1c91e1b04ea982db" />
       <keyword name="setTerminalMode" id="QtService::Service::setTerminalMode" ref="class_qt_service_1_1_service.html#a327ee7a22b7daf148d712b4e9274833a" />
       <keyword name="setGlobalTerminal" id="QtService::Service::setGlobalTerminal" ref="class_qt_service_1_1_service.html#ab11738e5476eeaa3d7bc8b079962440d" />
       <keyword name="setStartWithTerminal" id="QtService::Service::setStartWithTerminal" ref="class_qt_service_1_1_service.html#a6d38becd2d3dd627da1dd961bcd85df0" />
-      <keyword name="started" id="QtService::Service::started" ref="class_qt_service_1_1_service.html#a893971790ec721395c029bbd2d69d20e" />
+      <keyword name="started" id="QtService::Service::started" ref="class_qt_service_1_1_service.html#aaa6b7b10a9cc6355bceea4b8025e77f0" />
+      <keyword name="started" id="QtService::Service::started" ref="class_qt_service_1_1_service.html#a1973960b7befc0a21efd5928989379c5" />
       <keyword name="stopped" id="QtService::Service::stopped" ref="class_qt_service_1_1_service.html#a1d967420b3b868cce39f814c22f275e5" />
-      <keyword name="reloaded" id="QtService::Service::reloaded" ref="class_qt_service_1_1_service.html#a3edf18c53e1c34ab56dba01750b54b96" />
-      <keyword name="paused" id="QtService::Service::paused" ref="class_qt_service_1_1_service.html#af88b03394beb885950942fafc6470080" />
-      <keyword name="resumed" id="QtService::Service::resumed" ref="class_qt_service_1_1_service.html#a60b05e10d8ceca239d74cb337e684aaa" />
+      <keyword name="reloaded" id="QtService::Service::reloaded" ref="class_qt_service_1_1_service.html#a99f673de21631908093b824100420c0e" />
+      <keyword name="reloaded" id="QtService::Service::reloaded" ref="class_qt_service_1_1_service.html#aa2d48e3f7f356b81ba097a6dfe114fc2" />
+      <keyword name="paused" id="QtService::Service::paused" ref="class_qt_service_1_1_service.html#a68ac94da606846d6845a35abc9ebb66b" />
+      <keyword name="paused" id="QtService::Service::paused" ref="class_qt_service_1_1_service.html#adce0b5030a90f641b404b7e0d25e0300" />
+      <keyword name="resumed" id="QtService::Service::resumed" ref="class_qt_service_1_1_service.html#af5915087a844abb80428a631dbb97fd1" />
+      <keyword name="resumed" id="QtService::Service::resumed" ref="class_qt_service_1_1_service.html#a76b29258de2cff7bc972b053f5c2f893" />
       <keyword name="terminalActiveChanged" id="QtService::Service::terminalActiveChanged" ref="class_qt_service_1_1_service.html#a03391ded8622fdcb5d9ae6d1c735da34" />
       <keyword name="terminalModeChanged" id="QtService::Service::terminalModeChanged" ref="class_qt_service_1_1_service.html#a73d0690ec9f8b56222378f75c62493c4" />
       <keyword name="globalTerminalChanged" id="QtService::Service::globalTerminalChanged" ref="class_qt_service_1_1_service.html#a447c4fa0f7d996778cf46f36b2c87ed7" />
@@ -466,8 +525,12 @@
       <keyword name="globalTerminal" id="QtService::Service::globalTerminal" ref="class_qt_service_1_1_service.html#aa111dc994bcef733db1edaa143bf439c" />
       <keyword name="startWithTerminal" id="QtService::Service::startWithTerminal" ref="class_qt_service_1_1_service.html#a0684f20530470043570891b371977c98" />
       <keyword name="objectName" id="QObject::objectName" ref="class_q_object.html#objectName-prop" />
-      <keyword name="Synchronous" id="QtService::Service::Synchronous" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9ae7cafd37ee8ca6ab14d8482d2be8a64d" />
-      <keyword name="Asynchronous" id="QtService::Service::Asynchronous" ref="class_qt_service_1_1_service.html#ac80c603a10d06224f3e75604920642d9a5bc5c42d7802d95725ea38eb5a294079" />
+      <keyword name="OperationCompleted" id="QtService::Service::OperationCompleted" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649eab158ad1f7d6ea5cc4dec3f3a3b1b3fdf" />
+      <keyword name="OperationPending" id="QtService::Service::OperationPending" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea32508f4828ab4a7326780ec3043de44e" />
+      <keyword name="OperationFailed" id="QtService::Service::OperationFailed" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea64ed0c57845b65f7c0ba3e5bf6451f4a" />
+      <keyword name="OperationExit" id="QtService::Service::OperationExit" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ead32e565fa94be868a7f6d5b76cb1d8d8" />
+      <keyword name="QT_SERVICE_POST_ENUM_DEPRECATED" id="QtService::Service::QT_SERVICE_POST_ENUM_DEPRECATED" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8" />
+      <keyword name="QT_SERVICE_POST_ENUM_DEPRECATED" id="QtService::Service::QT_SERVICE_POST_ENUM_DEPRECATED" ref="class_qt_service_1_1_service.html#a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8" />
       <keyword name="ReadOnly" id="QtService::Service::ReadOnly" ref="class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2a9b40c2e9bfa0044d5248f133fe74240f" />
       <keyword name="WriteOnly" id="QtService::Service::WriteOnly" ref="class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2a7958a709864139c47529227383af8363" />
       <keyword name="ReadWritePassive" id="QtService::Service::ReadWritePassive" ref="class_qt_service_1_1_service.html#a4d4e2022cf06e670e6ae4159809c5df2ac17e78711daad85a853fc51f6759464c" />
@@ -570,7 +633,7 @@
       <keyword name="supportFlags" id="QtService::ServiceControl::supportFlags" ref="class_qt_service_1_1_service_control.html#a87fc80aed0b93e60f3f5aa6da9810aa3" />
       <keyword name="isBlocking" id="QtService::ServiceControl::isBlocking" ref="class_qt_service_1_1_service_control.html#a78fdf8973da3ad204ad89230ff07b871" />
       <keyword name="error" id="QtService::ServiceControl::error" ref="class_qt_service_1_1_service_control.html#ada052f024ce59ef05cb5e01f23576fc7" />
-      <keyword name="callGenericCommand" id="QtService::ServiceControl::callGenericCommand" ref="class_qt_service_1_1_service_control.html#a4c03422db2fcf3ef1ed785685c81746a" />
+      <keyword name="callGenericCommand" id="QtService::ServiceControl::callGenericCommand" ref="class_qt_service_1_1_service_control.html#a5850c9237ae95d2b1c7282fadc2fabe3" />
       <keyword name="callCommand" id="QtService::ServiceControl::callCommand" ref="class_qt_service_1_1_service_control.html#add2e8f49e22f8deed45a11651f125b5f" />
       <keyword name="callCommand" id="QtService::ServiceControl::callCommand" ref="class_qt_service_1_1_service_control.html#a45e2327c6f7c9dae06ece21706d7faa3" />
       <keyword name="serviceExists" id="QtService::ServiceControl::serviceExists" ref="class_qt_service_1_1_service_control.html#aac67a458d0cabd9d8487710b0bdb8c7a" />
@@ -620,6 +683,8 @@
       <keyword name="listBackends" id="QtService::ServiceControl::listBackends" ref="class_qt_service_1_1_service_control.html#a8edd714388baf4a3e8e8a555c9a70b62" />
       <keyword name="likelyBackend" id="QtService::ServiceControl::likelyBackend" ref="class_qt_service_1_1_service_control.html#a0f5711052c8bf5def154d58c48a31d28" />
       <keyword name="create" id="QtService::ServiceControl::create" ref="class_qt_service_1_1_service_control.html#a87bea6e486b1f665d28ea3e664631fd6" />
+      <keyword name="createFromName" id="QtService::ServiceControl::createFromName" ref="class_qt_service_1_1_service_control.html#a0a7aaef5420c988bc5787ae5123b2f07" />
+      <keyword name="createFromName" id="QtService::ServiceControl::createFromName" ref="class_qt_service_1_1_service_control.html#a708f38e86ba71c7414052f64a14caf88" />
       <keyword name="tr" id="QObject::tr" ref="class_q_object.html#tr" />
       <keyword name="trUtf8" id="QObject::trUtf8" ref="class_q_object.html#trUtf8" />
       <keyword name="connect" id="QObject::connect" ref="class_q_object.html#connect" />
@@ -677,6 +742,7 @@
       <keyword name="currentServiceId" id="QtService::ServicePlugin::currentServiceId" ref="class_qt_service_1_1_service_plugin.html#ae60b3d7149283547c36706b47e60e56b" />
       <keyword name="createServiceBackend" id="QtService::ServicePlugin::createServiceBackend" ref="class_qt_service_1_1_service_plugin.html#a3b5cb74675570be53bd7117d62af5340" />
       <keyword name="createServiceControl" id="QtService::ServicePlugin::createServiceControl" ref="class_qt_service_1_1_service_plugin.html#ab73bee105e15e90eb869a66c97d1ad14" />
+      <keyword name="detectNamedService" id="QtService::ServicePlugin::detectNamedService" ref="class_qt_service_1_1_service_plugin.html#ad1665dbb5c5c373915cb11b04909fd1e" />
       <keyword name="QtService::Terminal" id="QtService::Terminal" ref="class_qt_service_1_1_terminal.html" />
       <keyword name="disconnectTerminal" id="QtService::Terminal::disconnectTerminal" ref="class_qt_service_1_1_terminal.html#ad7d3cbca2bd084be4ad5500747c01e43" />
       <keyword name="requestChar" id="QtService::Terminal::requestChar" ref="class_qt_service_1_1_terminal.html#ad2e467d396edc0b85ea5119334f74e2a" />
@@ -819,8 +885,8 @@
       <keyword name="OpenMode" id="QIODevice::OpenMode" ref="qiodevice.html#OpenModeFlag-enum" />
       <keyword name="QtService::Terminal::Awaitable" id="QtService::Terminal::Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html" />
       <keyword name="Awaitable" id="QtService::Terminal::Awaitable::Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#af044c4be992987a4d455954fe8bc21ee" />
-      <keyword name="Awaitable" id="QtService::Terminal::Awaitable::Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a47aae1b6a8dd7241198e9b7d57ae5d34" />
-      <keyword name="operator=" id="QtService::Terminal::Awaitable::operator=" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a1fd42cc70e7676e5d0c36309c1f2a7b4" />
+      <keyword name="Awaitable" id="QtService::Terminal::Awaitable::Awaitable" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#aacc6dadda73a5c4cb95c063913b3e81f" />
+      <keyword name="operator=" id="QtService::Terminal::Awaitable::operator=" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#afcbcafb06541fd045b7c29048de52444" />
       <keyword name="ReadLine" id="QtService::Terminal::Awaitable::ReadLine" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a36d246fb9fa15583e6726cac5e7cd28dacdcc158609ffc881d236c6a3cbc8de90" />
       <keyword name="ReadSingle" id="QtService::Terminal::Awaitable::ReadSingle" ref="class_qt_service_1_1_terminal_1_1_awaitable.html#a36d246fb9fa15583e6726cac5e7cd28dabcd50df970a5d8ad962d99d19bfc2631" />
     </keywords>
@@ -851,8 +917,10 @@
       <file>search/search.js</file>
       <file>_android_service_8java_source.html</file>
       <file>doxme_8py_source.html</file>
+      <file>qmlservicesingleton_8h_source.html</file>
       <file>qtservice__global_8h_source.html</file>
       <file>qtservice__helpertypes_8h_source.html</file>
+      <file>qtservice__plugin_8h_source.html</file>
       <file>_r_e_a_d_m_e_8md_source.html</file>
       <file>service_8h_source.html</file>
       <file>servicebackend_8h_source.html</file>
@@ -862,6 +930,11 @@
       <file>service_8h.html</file>
       <file>serviceplugin_8h.html</file>
       <file>qtservice_backends.html</file>
+      <file>deprecated.html</file>
+      <file>namespacede_1_1skycoder42_1_1_qt_service.html</file>
+      <file>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html</file>
+      <file>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.png</file>
+      <file>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service-members.html</file>
       <file>namespace_qt_service.html</file>
       <file>class_qt_service_1_1_service.html</file>
       <file>class_qt_service_1_1_service.png</file>
@@ -880,8 +953,10 @@
       <file>class_qt_service_1_1_terminal_1_1_awaitable.html</file>
       <file>class_qt_service_1_1_terminal_1_1_awaitable-members.html</file>
       <file>dir_d6039d64d5654f8348c5feb9d340e51d.html</file>
+      <file>dir_a8bd8bcf293c2ab1210f2c2ecd8006f3.html</file>
       <file>dir_a3016bf19aa28451207b266e9b24d523.html</file>
       <file>dir_8341c9ca5608b7ce242d25d107fb092e.html</file>
+      <file>dir_74d326f205206c3276476a360b7c3c1a.html</file>
       <file>dir_4f691f982165d1317925cee58b4b4f56.html</file>
       <file>dir_9ef9909afc451175032ee7f626f4f279.html</file>
       <file>dir_1f9defd76cf361f61e0940bd987c1f57.html</file>
@@ -931,6 +1006,7 @@
       <file>functions_enum.html</file>
       <file>functions_enum.html</file>
       <file>functions_enum.html</file>
+      <file>functions_eval.html</file>
       <file>functions_eval.html</file>
       <file>functions_eval.html</file>
       <file>functions_eval.html</file>

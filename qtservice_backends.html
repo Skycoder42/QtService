@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">QtService
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.1.0</span>
    </div>
    <div id="projectbrief">A platform independent library to easily create system services and use some of their features</div>
   </td>
@@ -101,7 +101,7 @@ Standard Backend</h1>
 Service Backend</h2>
 <ul>
 <li>Is a dummy that simply runs as a normal console process</li>
-<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
+<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
 <li>Logging is done formatted to stderr</li>
 <li>Ensures only 1 instance is running by using a lockfile</li>
 <li>Maps common unix signals to commands:<ul>
@@ -125,12 +125,15 @@ Service Backend</h2>
 Service Control</h2>
 <ul>
 <li>Support Flags:<ul>
-<li><a class="el" href="class_qt_service_1_1_service_control.html#a0d8ff1b5bd65cd9edeac8c9256f182faa01e6e415ac751b351281b9b2d6927f64" title="Can start services via ServiceControl::start. ">QtService::ServiceControl::SupportsStart</a> (only on platforms that provice <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qprocess.html">QProcess</a>)</li>
+<li><a class="el" href="class_qt_service_1_1_service_control.html#a0d8ff1b5bd65cd9edeac8c9256f182faa01e6e415ac751b351281b9b2d6927f64" title="Can start services via ServiceControl::start. ">QtService::ServiceControl::SupportsStart</a> (only on platforms that provice <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qprocess.html">QProcess</a>)</li>
 <li><a class="el" href="class_qt_service_1_1_service_control.html#a0d8ff1b5bd65cd9edeac8c9256f182faa66de204706111b2111c52f64af7cd382" title="Can stop services via ServiceControl::stop. ">QtService::ServiceControl::SupportsStop</a></li>
 <li><a class="el" href="class_qt_service_1_1_service_control.html#a0d8ff1b5bd65cd9edeac8c9256f182faac8b064ab419e077165dfa89ce745a442" title="Can read the current status of a service. ">QtService::ServiceControl::SupportsStatus</a></li>
 </ul>
 </li>
-<li>Custom commands: none</li>
+<li>Custom commands:<ul>
+<li><code>qint64 getPid()</code>: Returns the PID auf the currently running instance, or -1 if none is running</li>
+</ul>
+</li>
 <li>Starting is done by simply running the service executable as detached process</li>
 <li>The lockfile is used to determine the service state - which means only services that use the backend can be controlled properly</li>
 <li>Stopping is done by sending a signal to the service</li>
@@ -140,8 +143,8 @@ Systemd Backend</h1>
 <h2><a class="anchor" id="qtservice_backends_systemd_backend"></a>
 Service Backend</h2>
 <ul>
-<li>All <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qdebug.html">QDebug</a> is logged into journald</li>
-<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
+<li>All <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qdebug.html">QDebug</a> is logged into journald</li>
+<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
 <li>Can be used for user and system services</li>
 <li>should be used with <code>-platform minimal</code> to avoid any dependencies to the windowing system</li>
 <li>supported systemd commands:<ul>
@@ -193,7 +196,7 @@ Windows Backend</h1>
 Service Backend</h2>
 <ul>
 <li>Logging: The service registers as eventsource and reports event to the windows event log</li>
-<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
+<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
 <li>supported windows commands:<ul>
 <li>start</li>
 <li>stop</li>
@@ -235,8 +238,8 @@ Launchd Backend</h1>
 <h2><a class="anchor" id="qtservice_backends_launchd_backend"></a>
 Service Backend</h2>
 <ul>
-<li>All <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qdebug.html">QDebug</a> is logged with syslog</li>
-<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
+<li>All <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qdebug.html">QDebug</a> is logged with syslog</li>
+<li>Uses <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qcoreapplication.html">QCoreApplication</a> as application</li>
 <li>Supports named socket activation (via the plist files <code>Sockets</code> category)</li>
 <li>Maps common unix signals to commands:<ul>
 <li><code>SIGINT</code>, <code>SIGTERM</code>, <code>SIGQUIT</code>: stop</li>
@@ -273,7 +276,7 @@ Android Backend</h1>
 <h2><a class="anchor" id="qtservice_backends_android_backend"></a>
 Service Backend</h2>
 <ul>
-<li>Logging is done to logcat, as usual for <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> for android</li>
+<li>Logging is done to logcat, as usual for <a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qt.html">Qt</a> for android</li>
 <li>Uses QAndroidService as application</li>
 <li>Handles Android service commands:<ul>
 <li>"service is started" (either via binding or explicit start): start</li>
@@ -308,7 +311,7 @@ Service Control</h2>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 16 2018 19:29:43 for QtService by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 31 2018 12:09:16 for QtService by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

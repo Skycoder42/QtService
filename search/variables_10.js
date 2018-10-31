@@ -4,6 +4,7 @@ var searchData=
   ['qbackendnodemapperptr',['QBackendNodeMapperPtr',['https://doc.qt.io/qt-5/qt3dcore-qabstractaspect.html#QBackendNodeMapperPtr-typedef',0,'Qt3DCore']]],
   ['qbufferdatageneratorptr',['QBufferDataGeneratorPtr',['https://doc.qt.io/qt-5/qt3drender-qbuffer.html#QBufferDataGeneratorPtr-typedef',0,'Qt3DRender']]],
   ['qbufferptr',['QBufferPtr',['https://doc.qt.io/qt-5/qt3drender-qattribute.html#QBufferPtr-typedef',0,'Qt3DRender']]],
+  ['qchannelmappingcreatedchangebaseptr',['QChannelMappingCreatedChangeBasePtr',['https://doc.qt.io/qt-5/qt3danimation.html#QChannelMappingCreatedChangeBasePtr-typedef',0,'Qt3DAnimation']]],
   ['qclipblendnodecreatedchangebaseptr',['QClipBlendNodeCreatedChangeBasePtr',['https://doc.qt.io/qt-5/qt3danimation.html#QClipBlendNodeCreatedChangeBasePtr-typedef',0,'Qt3DAnimation']]],
   ['qcomponentaddedchangeptr',['QComponentAddedChangePtr',['https://doc.qt.io/qt-5/qt3dcore-qcomponentaddedchange.html#QComponentAddedChangePtr-typedef',0,'Qt3DCore']]],
   ['qcomponentremovedchangeptr',['QComponentRemovedChangePtr',['https://doc.qt.io/qt-5/qt3dcore-qcomponentremovedchange.html#QComponentRemovedChangePtr-typedef',0,'Qt3DCore']]],

@@ -13,6 +13,7 @@ var searchData=
   ['upvector',['upVector',['https://doc.qt.io/qt-5/qt3drender-qcamera.html#upVector-prop',0,'Qt3DRender::QCamera']]],
   ['url',['url',['https://doc.qt.io/qt-5/qqmlcomponent.html#url-prop',0,'QQmlComponent::url()'],['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_remote_config.html#afc17a78a6dc7f21e33f87b84cb942fea',0,'QtDataSync::RemoteConfig::url()'],['https://doc.qt.io/qt-5/qwebenginepage.html#url-prop',0,'QWebEnginePage::url()'],['https://doc.qt.io/qt-5/qwebengineview.html#url-prop',0,'QWebEngineView::url()'],['https://doc.qt.io/qt-5/qquickitemgrabresult.html#url-prop',0,'QQuickItemGrabResult::url()']]],
   ['usage',['usage',['https://doc.qt.io/qt-5/qt3drender-qbuffer.html#usage-prop',0,'Qt3DRender::QBuffer']]],
+  ['use24hourformat',['use24HourFormat',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_quick_1_1_time_edit.html#adab21eb4aebc31b823421664aacbe28a',0,'de::skycoder42::QtMvvm::Quick::TimeEdit']]],
   ['usebcp47locale',['useBcp47Locale',['https://doc.qt.io/qt-5/class_q_json_serializer.html#a692f59d493de527e5373db2975a46cc2',0,'QJsonSerializer']]],
   ['usedesignmetrics',['useDesignMetrics',['https://doc.qt.io/qt-5/qtextdocument.html#useDesignMetrics-prop',0,'QTextDocument']]],
   ['usehovereffects',['useHoverEffects',['https://doc.qt.io/qt-5/qstylehints.html#useHoverEffects-prop',0,'QStyleHints']]],

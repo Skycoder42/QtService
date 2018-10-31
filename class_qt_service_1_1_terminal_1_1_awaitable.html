@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">QtService
-   &#160;<span id="projectnumber">1.0.0</span>
+   &#160;<span id="projectnumber">1.1.0</span>
    </div>
    <div id="projectbrief">A platform independent library to easily create system services and use some of their features</div>
   </td>
@@ -99,14 +99,14 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html#af044c4be992987a4d455954fe8bc21ee">Awaitable</a> (<a class="el" href="class_qt_service_1_1_terminal.html">Terminal</a> *terminal, qint64 readCnt=<a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html#a36d246fb9fa15583e6726cac5e7cd28dabcd50df970a5d8ad962d99d19bfc2631">ReadSingle</a>)</td></tr>
 <tr class="memdesc:af044c4be992987a4d455954fe8bc21ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an awaitable for the given terminal and specify how much data should be read. <br /></td></tr>
 <tr class="separator:af044c4be992987a4d455954fe8bc21ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47aae1b6a8dd7241198e9b7d57ae5d34"><td class="memItemLeft" align="right" valign="top"><a id="a47aae1b6a8dd7241198e9b7d57ae5d34"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html#a47aae1b6a8dd7241198e9b7d57ae5d34">Awaitable</a> (<a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html">Awaitable</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a47aae1b6a8dd7241198e9b7d57ae5d34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor. <br /></td></tr>
-<tr class="separator:a47aae1b6a8dd7241198e9b7d57ae5d34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fd42cc70e7676e5d0c36309c1f2a7b4"><td class="memItemLeft" align="right" valign="top"><a id="a1fd42cc70e7676e5d0c36309c1f2a7b4"></a>
-<a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html">Awaitable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html#a1fd42cc70e7676e5d0c36309c1f2a7b4">operator=</a> (<a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html">Awaitable</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a1fd42cc70e7676e5d0c36309c1f2a7b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator. <br /></td></tr>
-<tr class="separator:a1fd42cc70e7676e5d0c36309c1f2a7b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacc6dadda73a5c4cb95c063913b3e81f"><td class="memItemLeft" align="right" valign="top"><a id="aacc6dadda73a5c4cb95c063913b3e81f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html#aacc6dadda73a5c4cb95c063913b3e81f">Awaitable</a> (<a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html">Awaitable</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memdesc:aacc6dadda73a5c4cb95c063913b3e81f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor. <br /></td></tr>
+<tr class="separator:aacc6dadda73a5c4cb95c063913b3e81f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcbcafb06541fd045b7c29048de52444"><td class="memItemLeft" align="right" valign="top"><a id="afcbcafb06541fd045b7c29048de52444"></a>
+<a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html">Awaitable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html#afcbcafb06541fd045b7c29048de52444">operator=</a> (<a class="el" href="class_qt_service_1_1_terminal_1_1_awaitable.html">Awaitable</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memdesc:afcbcafb06541fd045b7c29048de52444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator. <br /></td></tr>
+<tr class="separator:afcbcafb06541fd045b7c29048de52444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A helper class to be used with <a href="https://github.com/Skycoder42/QtCoroutines">QtCoroutines</a> to await io from a coroutine. </p>
@@ -127,7 +127,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Special read modes. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a36d246fb9fa15583e6726cac5e7cd28dacdcc158609ffc881d236c6a3cbc8de90"></a>ReadLine&#160;</td><td class="fielddoc"><p>Read until the next newline (<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.0/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qiodevice.html#readLine">QIODevice::readLine</a>) </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a36d246fb9fa15583e6726cac5e7cd28dacdcc158609ffc881d236c6a3cbc8de90"></a>ReadLine&#160;</td><td class="fielddoc"><p>Read until the next newline (<a class="elRef" target="_blank" doxygen="/home/sky/Qt/Docs/Qt-5.11.2/qtcore/qtcore.tags:https://doc.qt.io/qt-5/" href="https://doc.qt.io/qt-5/qiodevice.html#readLine">QIODevice::readLine</a>) </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a36d246fb9fa15583e6726cac5e7cd28dabcd50df970a5d8ad962d99d19bfc2631"></a>ReadSingle&#160;</td><td class="fielddoc"><p>Read only a single character. </p>
 </td></tr>
@@ -143,7 +143,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jun 16 2018 19:29:43 for QtService by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 31 2018 12:09:16 for QtService by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

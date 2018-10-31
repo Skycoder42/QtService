@@ -26,5 +26,6 @@ var searchData=
   ['qwebsocketprotocol',['QWebSocketProtocol',['https://doc.qt.io/qt-5/qwebsocketprotocol.html',0,'']]],
   ['render',['Render',['https://doc.qt.io/qt-5/qt3drender-render.html',0,'Qt3DRender']]],
   ['settingselements',['SettingsElements',['https://doc.qt.io/qt-5/namespace_qt_mvvm_1_1_settings_elements.html',0,'QtMvvm']]],
+  ['settingslistnode',['SettingsListNode',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_settings_list_node_1_1_deferred.html',0,'QtMvvm']]],
   ['updater',['Updater',['https://doc.qt.io/qt-5/struct_qt_auto_updater_1_1_updater_1_1_update_info.html',0,'QtAutoUpdater']]]
 ];

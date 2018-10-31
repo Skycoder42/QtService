@@ -13,5 +13,6 @@ var searchData=
   ['messageconfig',['MessageConfig',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_message_config.html',0,'QtMvvm']]],
   ['messageresult',['MessageResult',['https://doc.qt.io/qt-5/class_qt_mvvm_1_1_message_result.html',0,'QtMvvm']]],
   ['migrationhelper',['MigrationHelper',['https://doc.qt.io/qt-5/class_qt_data_sync_1_1_migration_helper.html',0,'QtDataSync']]],
+  ['msgdelegate',['MsgDelegate',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_quick_1_1_msg_delegate.html',0,'de::skycoder42::QtMvvm::Quick']]],
   ['mvvmbinding',['MvvmBinding',['https://doc.qt.io/qt-5/classde_1_1skycoder42_1_1_qt_mvvm_1_1_core_1_1_mvvm_binding.html',0,'de::skycoder42::QtMvvm::Core']]]
 ];

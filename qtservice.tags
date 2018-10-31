@@ -73,15 +73,48 @@
       <type></type>
       <name>Awaitable</name>
       <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
-      <anchor>a47aae1b6a8dd7241198e9b7d57ae5d34</anchor>
-      <arglist>(Awaitable &amp;&amp;other)</arglist>
+      <anchor>aacc6dadda73a5c4cb95c063913b3e81f</anchor>
+      <arglist>(Awaitable &amp;&amp;other) noexcept</arglist>
     </member>
     <member kind="function">
       <type>Awaitable &amp;</type>
       <name>operator=</name>
       <anchorfile>class_qt_service_1_1_terminal_1_1_awaitable.html</anchorfile>
-      <anchor>a1fd42cc70e7676e5d0c36309c1f2a7b4</anchor>
-      <arglist>(Awaitable &amp;&amp;other)</arglist>
+      <anchor>afcbcafb06541fd045b7c29048de52444</anchor>
+      <arglist>(Awaitable &amp;&amp;other) noexcept</arglist>
+    </member>
+  </compound>
+  <compound kind="class">
+    <name>de::skycoder42::QtService::QtService</name>
+    <filename>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html</filename>
+    <base>QtQml.QtObject</base>
+    <member kind="function">
+      <type>Q_INVOKABLE QtService::ServiceControl *</type>
+      <name>createControl</name>
+      <anchorfile>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html</anchorfile>
+      <anchor>af8caf917f7a1139424ff3e5928bbce89</anchor>
+      <arglist>(const QString &amp;backend, QString serviceId, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>Q_INVOKABLE QtService::ServiceControl *</type>
+      <name>createControlFromName</name>
+      <anchorfile>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html</anchorfile>
+      <anchor>ac481285e9a7555c8bbc0ac28cf1a2ab7</anchor>
+      <arglist>(const QString &amp;backend, const QString &amp;serviceName, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="function">
+      <type>Q_INVOKABLE QtService::ServiceControl *</type>
+      <name>createControlFromName</name>
+      <anchorfile>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html</anchorfile>
+      <anchor>a4044b8f20c8de5f3dd97e603c99db795</anchor>
+      <arglist>(const QString &amp;backend, const QString &amp;serviceName, const QString &amp;domain, QObject *parent=nullptr) const</arglist>
+    </member>
+    <member kind="property">
+      <type>QtService::Service</type>
+      <name>service</name>
+      <anchorfile>classde_1_1skycoder42_1_1_qt_service_1_1_qt_service.html</anchorfile>
+      <anchor>adf36dcfe14654568509c8238cc45ad06</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -90,21 +123,45 @@
     <base>QObject</base>
     <member kind="enumeration">
       <type></type>
-      <name>CommandMode</name>
+      <name>CommandResult</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>ac80c603a10d06224f3e75604920642d9</anchor>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649e</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Synchronous</name>
+      <name>OperationCompleted</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>ac80c603a10d06224f3e75604920642d9ae7cafd37ee8ca6ab14d8482d2be8a64d</anchor>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649eab158ad1f7d6ea5cc4dec3f3a3b1b3fdf</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Asynchronous</name>
+      <name>OperationPending</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>ac80c603a10d06224f3e75604920642d9a5bc5c42d7802d95725ea38eb5a294079</anchor>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ea32508f4828ab4a7326780ec3043de44e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OperationFailed</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ea64ed0c57845b65f7c0ba3e5bf6451f4a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OperationExit</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ead32e565fa94be868a7f6d5b76cb1d8d8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>QT_SERVICE_POST_ENUM_DEPRECATED</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>QT_SERVICE_POST_ENUM_DEPRECATED</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
@@ -139,15 +196,33 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Synchronous</name>
+      <name>OperationCompleted</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>ac80c603a10d06224f3e75604920642d9ae7cafd37ee8ca6ab14d8482d2be8a64d</anchor>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649eab158ad1f7d6ea5cc4dec3f3a3b1b3fdf</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>Asynchronous</name>
+      <name>OperationPending</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>ac80c603a10d06224f3e75604920642d9a5bc5c42d7802d95725ea38eb5a294079</anchor>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ea32508f4828ab4a7326780ec3043de44e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OperationFailed</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ea64ed0c57845b65f7c0ba3e5bf6451f4a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>OperationExit</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ead32e565fa94be868a7f6d5b76cb1d8d8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>QT_SERVICE_POST_ENUM_DEPRECATED</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a51705e52f2b7ae200f5940a9f9b2649ea163a7e661947ac83d1a281dd7b6d1de8</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -220,7 +295,14 @@
       <type>void</type>
       <name>started</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>a893971790ec721395c029bbd2d69d20e</anchor>
+      <anchor>aaa6b7b10a9cc6355bceea4b8025e77f0</anchor>
+      <arglist>(bool success)</arglist>
+    </member>
+    <member kind="signal">
+      <type>Q_DECL_DEPRECATED void</type>
+      <name>started</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a1973960b7befc0a21efd5928989379c5</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="signal">
@@ -234,21 +316,42 @@
       <type>void</type>
       <name>reloaded</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>a3edf18c53e1c34ab56dba01750b54b96</anchor>
+      <anchor>a99f673de21631908093b824100420c0e</anchor>
+      <arglist>(bool success)</arglist>
+    </member>
+    <member kind="signal">
+      <type>Q_DECL_DEPRECATED void</type>
+      <name>reloaded</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>aa2d48e3f7f356b81ba097a6dfe114fc2</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="signal">
       <type>void</type>
       <name>paused</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>af88b03394beb885950942fafc6470080</anchor>
+      <anchor>a68ac94da606846d6845a35abc9ebb66b</anchor>
+      <arglist>(bool success)</arglist>
+    </member>
+    <member kind="signal">
+      <type>Q_DECL_DEPRECATED void</type>
+      <name>paused</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>adce0b5030a90f641b404b7e0d25e0300</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="signal">
       <type>void</type>
       <name>resumed</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
-      <anchor>a60b05e10d8ceca239d74cb337e684aaa</anchor>
+      <anchor>af5915087a844abb80428a631dbb97fd1</anchor>
+      <arglist>(bool success)</arglist>
+    </member>
+    <member kind="signal">
+      <type>Q_DECL_DEPRECATED void</type>
+      <name>resumed</name>
+      <anchorfile>class_qt_service_1_1_service.html</anchorfile>
+      <anchor>a76b29258de2cff7bc972b053f5c2f893</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="signal">
@@ -371,35 +474,35 @@
       <arglist>()</arglist>
     </member>
     <member kind="function" protection="protected" virtualness="pure">
-      <type>virtual CommandMode</type>
+      <type>virtual CommandResult</type>
       <name>onStart</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
       <anchor>a511ad3160fbdf5791db906072ffc091a</anchor>
       <arglist>()=0</arglist>
     </member>
     <member kind="function" protection="protected" virtualness="virtual">
-      <type>virtual CommandMode</type>
+      <type>virtual CommandResult</type>
       <name>onStop</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
       <anchor>a144aa7e5018a37d30f86be9757663fa7</anchor>
       <arglist>(int &amp;exitCode)</arglist>
     </member>
     <member kind="function" protection="protected" virtualness="virtual">
-      <type>virtual CommandMode</type>
+      <type>virtual CommandResult</type>
       <name>onReload</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
       <anchor>a92c7d2aefe700433cd3f40b366f866b7</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="function" protection="protected" virtualness="virtual">
-      <type>virtual CommandMode</type>
+      <type>virtual CommandResult</type>
       <name>onPause</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
       <anchor>acfd382ae657c6e93a3817ec4668c81a2</anchor>
       <arglist>()</arglist>
     </member>
     <member kind="function" protection="protected" virtualness="virtual">
-      <type>virtual CommandMode</type>
+      <type>virtual CommandResult</type>
       <name>onResume</name>
       <anchorfile>class_qt_service_1_1_service.html</anchorfile>
       <anchor>a5b2015da891eb4f31ffef0ca113a4cee</anchor>
@@ -1087,8 +1190,8 @@
       <type>virtual Q_INVOKABLE QVariant</type>
       <name>callGenericCommand</name>
       <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
-      <anchor>a4c03422db2fcf3ef1ed785685c81746a</anchor>
-      <arglist>(const QByteArray &amp;kind, const QVariantList &amp;args)</arglist>
+      <anchor>a5850c9237ae95d2b1c7282fadc2fabe3</anchor>
+      <arglist>(const QByteArray &amp;kind, const QVariantList &amp;args={})</arglist>
     </member>
     <member kind="function">
       <type>TRet</type>
@@ -1152,6 +1255,20 @@
       <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
       <anchor>a87bea6e486b1f665d28ea3e664631fd6</anchor>
       <arglist>(const QString &amp;backend, QString serviceId, QObject *parent=nullptr)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static ServiceControl *</type>
+      <name>createFromName</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a0a7aaef5420c988bc5787ae5123b2f07</anchor>
+      <arglist>(const QString &amp;backend, const QString &amp;serviceName, QObject *parent=nullptr)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static ServiceControl *</type>
+      <name>createFromName</name>
+      <anchorfile>class_qt_service_1_1_service_control.html</anchorfile>
+      <anchor>a708f38e86ba71c7414052f64a14caf88</anchor>
+      <arglist>(const QString &amp;backend, const QString &amp;serviceName, const QString &amp;domain, QObject *parent=nullptr)</arglist>
     </member>
     <member kind="function" protection="protected" virtualness="virtual">
       <type>virtual QString</type>
@@ -1226,6 +1343,13 @@
       <anchorfile>class_qt_service_1_1_service_plugin.html</anchorfile>
       <anchor>ab73bee105e15e90eb869a66c97d1ad14</anchor>
       <arglist>(const QString &amp;backend, QString &amp;&amp;serviceId, QObject *parent)=0</arglist>
+    </member>
+    <member kind="function" protection="protected">
+      <type>QPair&lt; QString, QString &gt;</type>
+      <name>detectNamedService</name>
+      <anchorfile>class_qt_service_1_1_service_plugin.html</anchorfile>
+      <anchor>ad1665dbb5c5c373915cb11b04909fd1e</anchor>
+      <arglist>(const QString &amp;serviceId) const</arglist>
     </member>
   </compound>
   <compound kind="class">
@@ -1443,6 +1567,11 @@
       <anchor>af1e55e05a350d438c5ac5d96768a1c92</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="namespace">
+    <name>de::skycoder42::QtService</name>
+    <filename>namespacede_1_1skycoder42_1_1_qt_service.html</filename>
+    <class kind="class">de::skycoder42::QtService::QtService</class>
   </compound>
   <compound kind="namespace">
     <name>QtService</name>
