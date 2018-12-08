@@ -5,12 +5,12 @@ services:
 
 sudo: required
 dist: trusty
-osx_image: xcode10
+osx_image: xcode10.1
 
 env:
   global:
     - QPMX_CACHE_DIR=$HOME/.qpmx-cache
-    - QT_VER=5.11.2
+    - QT_VER=5.12.0
     - DOCKER_IMAGE=base
     - MAKE_RUN_TESTS=true
 
@@ -22,6 +22,9 @@ matrix:
         - BUILD_DOC=true
         - BUILD_EXAMPLES=true
         - EXTRA_PKG="libsystemd-dev" #in order to build the systemd plugin
+    - os: linux
+      env:
+        - PLATFORM=android_arm64_v8a
     - os: linux
       env:
         - PLATFORM=android_armv7
