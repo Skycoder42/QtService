@@ -33,7 +33,9 @@ load(qt_module)
 
 TRANSLATIONS += translations/qtservice_de.ts \
 	translations/qtservice_template.ts
-DISTFILES += $$TRANSLATIONS
+
+CONFIG += lrelease
+QM_FILES_INSTALL_PATH = $$[QT_INSTALL_TRANSLATIONS]
 
 win32 {
 	QMAKE_TARGET_PRODUCT = "QtService"
@@ -43,9 +45,7 @@ win32 {
 	QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
 }
 
-qpmx_ts_target.path = $$[QT_INSTALL_TRANSLATIONS]
-qpmx_ts_target.depends += lrelease
-INSTALLS += qpmx_ts_target
+QDEP_DEPENDS += Skycoder42/QCtrlSignals Skycoder42/QPluginFactory Skycoder42/QConsole
 
 # extra cpp files for translations
 never_true_lupdate_only {
@@ -54,11 +54,9 @@ never_true_lupdate_only {
 	for(plugin, PLUGINS): SOURCES += $$plugin/*.cpp
 }
 
-!ReleaseBuild:!DebugBuild:!system(qpmx -d $$shell_quote($$_PRO_FILE_PWD_) --qmake-run init $$QPMX_EXTRA_OPTIONS $$shell_quote($$QMAKE_QMAKE) $$shell_quote($$OUT_PWD)): error(qpmx initialization failed. Check the compilation log for details.)
-else: include($$OUT_PWD/qpmx_generated.pri)
+!load(qdep):error("Failed to load qdep feature! Run 'qdep.py prfgen --qmake $$QMAKE_QMAKE' to create it.")
 
 #replace template qm by ts
-qpmx_ts_target.files -= $$OUT_PWD/$$QPMX_WORKINGDIR/qtservice_template.qm
-qpmx_ts_target.files += translations/qtservice_template.ts
+QM_FILES -= $$__qdep_lrelease_real_dir/qtservice_template.qm
+QM_FILES += translations/qtservice_template.ts
 
-mingw: LIBS_PRIVATE += -lQt5Network -lQt5Core
