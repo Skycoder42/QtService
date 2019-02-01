@@ -14,18 +14,6 @@
 #include "QtService/qtservice_global.h"
 #include "QtService/qtservice_helpertypes.h"
 
-#ifdef Q_OS_UNIX
-#  ifdef Q_OS_ANDROID
-#    define QT_SERVICE_POST_ENUM_DEPRECATED
-#  else
-#    define QT_SERVICE_POST_ENUM_DEPRECATED Q_DECL_DEPRECATED
-#  endif
-#  define QT_SERVICE_POST_USING_DEPRECATED Q_DECL_DEPRECATED
-#else
-#  define QT_SERVICE_POST_ENUM_DEPRECATED
-#  define QT_SERVICE_POST_USING_DEPRECATED
-#endif
-
 //! The primary namespace of the QtService library
 namespace QtService {
 
@@ -62,11 +50,11 @@ public:
 		OperationExit, //!< The command executed successfully, but the service should still exit. Only usable from onStart()
 
 		//MAJOR compat remove
-		Synchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationCompleted, //!< @deprecated Deprecated. Use OperationCompleted instead
-		Asynchronous QT_SERVICE_POST_ENUM_DEPRECATED = OperationPending //!< @deprecated Deprecated. Use OperationPending instead
+		Synchronous Q_DECL_ENUMERATOR_DEPRECATED = OperationCompleted, //!< @deprecated Deprecated. Use OperationCompleted instead
+		Asynchronous Q_DECL_ENUMERATOR_DEPRECATED = OperationPending //!< @deprecated Deprecated. Use OperationPending instead
 	};
 	//! @deprecated Deprecated. Use CommandResult instead
-	using CommandMode QT_SERVICE_POST_USING_DEPRECATED = CommandResult;//MAJOR compat remove
+	using CommandMode Q_DECL_ENUMERATOR_DEPRECATED = CommandResult;//MAJOR compat remove
 	Q_ENUM(CommandResult)
 
 #ifdef Q_CC_MSVC
