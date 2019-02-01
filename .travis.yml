@@ -9,10 +9,11 @@ osx_image: xcode10.1
 
 env:
   global:
-    - QPMX_CACHE_DIR=$HOME/.qpmx-cache
+    - QDEP_CACHE_DIR=$HOME/.qdep-cache
     - QT_VER=5.12.1
     - DOCKER_IMAGE=base
     - MAKE_RUN_TESTS=true
+    - TARGET_NAME=qtservice
 
 matrix:
   include:
@@ -53,7 +54,7 @@ deploy:
   api_key:
     secure: L7v+psyo5lPcEcTTTj2AXuhVMptLy+xS/MUg7GlaT68f7H06e6pnj0jTc7uGDnIwHtkvPkFgCZwpR6Dh+mK2Uzz/1SmT0knVFJNVJAjVKCLPHtE4S4BKEv/qpae+pIAP9Ea9gQfIixdqb2rVmIZJr2pGT/BTExqxFTkcRAmKS61m/Rsyvv4GeEkbqEiQltAX3H9WyP62CWCcjGTBk9hqNnHnrZ4tdB4Cf0QM13B3imCUr2yaPqsPLuC4Ux1t0e58YRN4kU1pec2GrLMB0MWY1KIg3BbAdykcusC2ElS6t64NSlbDe6Zjj7N4TGkJTjda//D5Pyj6gkxfxErMH+QBq3W6/96tO/pxvrVbFjFCTf/NAU61Akwr9zoB+CWFku8XggMNQmKQtIxU3PE9h5YtXMDeExvF54MfIYOPbq38EJRp29mVICPprDchV5OZiz71HoBaq618+AIiawyoglghMPUOs93nRoqfyRAbRvjqU39aGp+5M9KrKOgEmNW+cN0E7/BfC11mTCFwpN9u0taZJNl8uCMCQgB+KCwkRQSYKahNSfwbTkw81lnRaeA4FCuD8czRwJIGaf5R33ZOesmhRKP1ZyAHS2cH1J63fSDH4kXC4lgFQafk30xfqIfAprCON7llABSajAkYd/4S/h4hAiIKt3BWgX7bzhE3gM/pXps=
   file_glob: true
-  file: install/build_*_$QT_VER.tar.xz
+  file: install/${TARGET_NAME}_*_$QT_VER.tar.xz
   on:
     repo: Skycoder42/QtService
     tags: true
@@ -61,11 +62,9 @@ deploy:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-  - rm -rf $QPMX_CACHE_DIR/locks
-  - rm -rf $QPMX_CACHE_DIR/tmp
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
-    - $QPMX_CACHE_DIR
+    - $QDEP_CACHE_DIR
