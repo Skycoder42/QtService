@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += standard
-unix:!android:!ios:system(pkg-config --exists libsystemd): SUBDIRS += systemd
+unix:!android:!ios:packagesExist(libsystemd): SUBDIRS += systemd
 android: SUBDIRS += android
 win32:!winrt: SUBDIRS += windows
 macx: SUBDIRS += launchd

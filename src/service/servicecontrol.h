@@ -5,7 +5,6 @@
 #include <QtCore/qscopedpointer.h>
 #include <QtCore/qdir.h>
 #include <QtCore/qvariant.h>
-#include <QtCore/qexception.h>
 
 #include "QtService/qtservice_global.h"
 

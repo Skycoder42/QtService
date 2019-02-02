@@ -6,7 +6,7 @@ SUBDIRS += \
 	TestStandardService \
 	TestTerminalService
 
-unix:!android:!ios:system(pkg-config --exists libsystemd && systemctl --version): SUBDIRS += TestSystemdService
+unix:!android:!ios:packagesExist(libsystemd):system(systemctl --version): SUBDIRS += TestSystemdService
 win32: SUBDIRS += TestWindowsService
 macx: SUBDIRS += TestLaunchdService
 
