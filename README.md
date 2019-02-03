@@ -52,13 +52,11 @@ Details on what exactly is supported by each backend can be found in the doxygen
 	3. You can install either all of my modules, or select the one you need: `Qt Service`
 	4. Continue the setup and thats it! you can now use the module for all of your installed Kits for that Qt Version
 3. Download the compiled modules from the release page. **Note:** You will have to add the correct ones yourself and may need to adjust some paths to fit your installation! In addition to that, you will have to download the modules this one depends on as well.
-4. Build it yourself! **Note:** This requires all build an runtime dependencies to be available. If you don't have/need cmake, you can ignore the related warnings. To automatically build and install to your Qt installation, run:
+4. Build it yourself! **Note:** This requires all build an runtime dependencies to be available. If you don't have/need cmake, you can ignore the related warnings. To automatically build and install into your Qt installation, run:
+	- Install and prepare [qdep](https://github.com/Skycoder42/qdep#installation)
 	- `qmake`
-	- `make qmake_all`
 	- `make` (If you want the tests/examples/etc. run `make all`)
-	- Optional steps:
-		- `make doxygen` to generate the documentation
-		- `make lrelease` to generate the translations
+	- Optional step: `make doxygen` to generate the documentation
 	- `make install`
 
 ## Usage
