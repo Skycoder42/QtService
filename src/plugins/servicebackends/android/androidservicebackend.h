@@ -18,19 +18,20 @@ public:
 	void reloadService() override;
 
 	// helper stuff
-	static jint onStartCommand(jobject intent, jint flags, jint startId, jint oldId);
+	static jint JNICALL callStartCommand(JNIEnv *env, jobject object, jobject intent, jint flags, jint startId, jint oldId);
+	static jboolean JNICALL exitService(JNIEnv *env, jobject object);
 
 private Q_SLOTS:
 	void onStarted(bool success);
 	void onExit();
+	void onStopped(int exitCode);
 
 private:
 	static QPointer<AndroidServiceBackend> _backendInstance;
 	QAndroidJniObject _javaService;
+	bool _startupFailed = false;
 
 	QAndroidBinder* onBind(const QAndroidIntent &intent);
 };
-
-jint JNICALL callStartCommand(JNIEnv *env, jobject object, jobject intent, jint flags, jint startId, jint oldId);
 
 #endif // ANDROIDSERVICEBACKEND_H

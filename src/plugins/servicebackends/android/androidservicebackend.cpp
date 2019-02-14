@@ -27,14 +27,17 @@ int AndroidServiceBackend::runService(int &argc, char **argv, int flags)
 	_javaService = QtAndroid::androidService();
 	QAndroidJniEnvironment env;
 	static const JNINativeMethod methods[] = {
-		{"callStartCommand", "(Landroid/content/Intent;III)I", reinterpret_cast<void*>(callStartCommand)}
+		{"callStartCommand", "(Landroid/content/Intent;III)I", reinterpret_cast<void*>(&AndroidServiceBackend::callStartCommand)},
+		{"exitService", "()Z", reinterpret_cast<void*>(&AndroidServiceBackend::exitService)}
 	};
-	env->RegisterNatives(env->FindClass("de/skycoder42/qtservice/AndroidService"), methods, 1);
+	env->RegisterNatives(env->FindClass("de/skycoder42/qtservice/AndroidService"),
+						 methods,
+						 sizeof(methods)/sizeof(JNINativeMethod));
 	_javaService.callMethod<void>("nativeReady");
 
-	connect(qApp, &QCoreApplication::aboutToQuit,
-			this, &AndroidServiceBackend::onExit,
-			Qt::DirectConnection);
+	// handle start result
+	connect(service(), QOverload<bool>::of(&Service::started),
+			this, &AndroidServiceBackend::onStarted);
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
@@ -53,9 +56,9 @@ void AndroidServiceBackend::reloadService()
 	processServiceCommand(ReloadCommand);
 }
 
-jint AndroidServiceBackend::onStartCommand(jobject intent, jint flags, jint startId, jint oldId)
+jint AndroidServiceBackend::callStartCommand(JNIEnv *, jobject, jobject intent, jint flags, jint startId, jint oldId)
 {
-	if(_backendInstance) {
+	if (_backendInstance) {
 		auto var = _backendInstance->processServiceCallbackImpl("onStartCommand", QVariantList {
 																	QVariant::fromValue(QAndroidIntent{intent}),
 																	static_cast<int>(flags),
@@ -70,32 +73,41 @@ jint AndroidServiceBackend::onStartCommand(jobject intent, jint flags, jint star
 	return oldId;
 }
 
+jboolean AndroidServiceBackend::exitService(JNIEnv *, jobject)
+{
+	if (_backendInstance)
+		return QMetaObject::invokeMethod(_backendInstance, "onExit", Qt::QueuedConnection);
+	else
+		return false;
+}
+
 void AndroidServiceBackend::onStarted(bool success)
 {
-	if(!success) {
-		disconnect(qApp, &QCoreApplication::aboutToQuit,
-				   this, &AndroidServiceBackend::onExit);
+	if (!success) {
+		_startupFailed = true;
 		quitService();
 	}
 }
 
 void AndroidServiceBackend::onExit()
 {
-	QEventLoop exitLoop;
-	connect(service(), &Service::stopped,
-			&exitLoop, &QEventLoop::exit);
-	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));
-	auto subRes = exitLoop.exec();
-	Q_UNUSED(subRes);
+	if (_startupFailed)
+		onStopped(EXIT_FAILURE);
+	else {
+		connect(service(), &Service::stopped,
+				this, &AndroidServiceBackend::onStopped,
+				Qt::UniqueConnection);
+		processServiceCommand(StopCommand);
+	}
+}
+
+void AndroidServiceBackend::onStopped(int exitCode)
+{
+	Q_UNUSED(exitCode)  //TODO print result or so
+	_javaService.callMethod<void>("nativeExited");
 }
 
 QAndroidBinder *AndroidServiceBackend::onBind(const QAndroidIntent &intent)
 {
 	return processServiceCallback<QAndroidBinder*>("onBind", intent);
-}
-
-jint JNICALL callStartCommand(JNIEnv*, jobject, jobject intent, jint flags, jint startId, jint oldId)
-{
-	return AndroidServiceBackend::onStartCommand(intent, flags, startId, oldId);
 }
