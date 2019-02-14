@@ -36,7 +36,7 @@ Window {
 		Label {
 			Layout.columnSpan: 2
 			Layout.fillWidth: true
-			text: "Service valid: " + control.serviceExists
+			text: "Service valid: " + control.serviceExists()
 		}
 
 		Button {
