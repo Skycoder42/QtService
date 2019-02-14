@@ -18,19 +18,49 @@ SOURCES += \\
 	main.cpp \\
 	%{SvcSrcName}
 
-DISTFILES += \
+target.path = $$[QT_INSTALL_BINS]
+INSTALLS += target
 @if '%{CreateSystemd}'
-	%{SvcSystemdName} \
+
+linux:!android {
+	# install targets for systemd service files
+	QMAKE_SUBSTITUTES += %{SvcSystemdName}.in
+
+	install_svcconf.files += $$shadowed(%{SvcSystemdName})
 @if '%{SocketPort}'
-	%{SvcSystemdSocketName} \
+	install_svcconf.files += %{SvcSystemdSocketName}
 @endif
+	install_svcconf.CONFIG += no_check_exist
+	install_svcconf.path = $$[QT_INSTALL_LIBS]/systemd/system/
+	INSTALLS += install_svcconf
+}
 @endif
 @if '%{CreateWindows}'
-	%{SvcWindowsName} \
+
+win32 {
+	# install targets for windows service files
+	QMAKE_SUBSTITUTES += %{SvcWindowsName}.in
+
+	install_svcconf.files += $$shadowed(%{SvcWindowsName})
+	install_svcconf.CONFIG += no_check_exist
+	install_svcconf.path = $$[QT_INSTALL_BINS]
+	INSTALLS += install_svcconf
+}
 @endif
 @if '%{CreateLaunchd}'
-	%{SvcLaunchdName} \
+
+macos {
+	# install targets for launchd service files
+	QMAKE_SUBSTITUTES += %{SvcLaunchdName}.in
+
+	install_svcconf.files += $$shadowed(%{SvcLaunchdName})
+	install_svcconf.CONFIG += no_check_exist
+	install_svcconf.path = /Library/LaunchDaemons
+	INSTALLS += install_svcconf
+}
 @endif
 @if '%{CreateAndroid}'
+
+OTHER_FILES += \\
 	AndroidManifest-service.part.xml
 @endif

@@ -8,12 +8,12 @@ After=network-online.target %{SvcSystemdSocketName}
 [Service]
 Type=notify
 NotifyAccess=exec
-ExecStart=/path/to/%{TargetName} -platform minimal --backend systemd
-ExecReload=/path/to/%{TargetName} -platform minimal --backend systemd reload $MAINPID
-ExecStop=/path/to/%{TargetName} -platform minimal --backend systemd stop $MAINPID
+ExecStart=$${target.path}/$$TARGET -platform minimal --backend systemd
+ExecReload=$${target.path}/$$TARGET -platform minimal --backend systemd reload $MAINPID
+ExecStop=$${target.path}/$$TARGET -platform minimal --backend systemd stop $MAINPID
 #WatchdogSec=10
 Restart=on-abnormal
-RuntimeDirectory=%{TargetName}
+RuntimeDirectory=$$TARGET
 
 [Install]
 # Use the following for a system service

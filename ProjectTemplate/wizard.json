@@ -13,10 +13,10 @@
 	[
 		{ "key": "TargetName", "value": "%{JS: '%{ProjectName}'.toLowerCase()}" },
 		{ "key": "ProFileName", "value": "%{JS: Util.fileName('%{ProjectDirectory}/%{ProjectName}', 'pro')}" },
-		
+
 		{ "key": "SvcCn", "value": "%{JS: Cpp.className('%{SvcName}')}" },
 		{ "key": "SvcGuard", "value": "%{JS: Cpp.headerGuard('%{SvcHdrName}')}" },
-		
+
 		{ "key": "SvcSystemdName", "value": "%{JS: Util.fileName('%{JS: '%{SvcName}'.toLowerCase()}', 'service')}" },
 		{ "key": "SvcSystemdSocketName", "value": "%{JS: Util.fileName('%{JS: '%{SvcName}'.toLowerCase()}', 'socket')}" },
 		{ "key": "SvcWindowsName", "value": "%{JS: Util.fileName('%{JS: '%{SvcName}'.toLowerCase()}-install', 'bat')}" },
@@ -88,7 +88,7 @@
 					"data": { "factor": 2 }
 				},
 				{
-	 				"name": "SocketPort",
+					"name": "SocketPort",
 					"trDisplayName": "Socket-Activation port:",
 					"type": "LineEdit",
 					"mandatory": false,
@@ -98,7 +98,7 @@
 					}
 				},
 				{
-	 				"name": "BundlePrefix",
+					"name": "BundlePrefix",
 					"trDisplayName": "Bundle prefix:",
 					"type": "LineEdit",
 					"data":  {
@@ -121,7 +121,7 @@
 					"mandatory": true,
 					"type": "LineEdit",
 					"data":
-					{ 
+					{
 						"trText": "%{ProjectName}Service",
 						"validator": "(?:(?:[a-zA-Z_][a-zA-Z_0-9]*::)*[a-zA-Z_][a-zA-Z_0-9]*|)"
 					}
@@ -187,8 +187,8 @@
 					"target": "%{ProjectDirectory}/%{SvcSrcName}"
 				},
 				{
-					"source": "service.service",
-					"target": "%{ProjectDirectory}/%{SvcSystemdName}",
+					"source": "service.service.in",
+					"target": "%{ProjectDirectory}/%{SvcSystemdName}.in",
 					"condition": "%{JS: '%{CreateSystemd}' !== ''}"
 				},
 				{
@@ -197,13 +197,13 @@
 					"condition": "%{JS: '%{CreateSystemd}' !== '' && '%{SocketPort}' !== ''}"
 				},
 				{
-					"source": "scinstall.bat",
-					"target": "%{ProjectDirectory}/%{SvcWindowsName}",
+					"source": "scinstall.bat.in",
+					"target": "%{ProjectDirectory}/%{SvcWindowsName}.in",
 					"condition": "%{JS: '%{CreateWindows}' !== ''}"
 				},
 				{
-					"source": "service.plist",
-					"target": "%{ProjectDirectory}/%{SvcLaunchdName}",
+					"source": "service.plist.in",
+					"target": "%{ProjectDirectory}/%{SvcLaunchdName}.in",
 					"condition": "%{JS: '%{CreateLaunchd}' !== ''}"
 				},
 				{

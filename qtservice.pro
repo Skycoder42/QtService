@@ -15,4 +15,5 @@ runtests.recurse += sub_tests sub_src
 QMAKE_EXTRA_TARGETS += runtests
 
 DISTFILES += .qmake.conf \
-	sync.profile
+	sync.profile \
+	ProjectTemplate/*

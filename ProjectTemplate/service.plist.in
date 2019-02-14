@@ -6,7 +6,7 @@
 	<string>%{SvcBundleName}</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/path/to/%{TargetName}</string>
+		<string>$${target.path}/$$TARGET</string>
 		<string>--backend</string>
 		<string>launchd</string>
 	</array>
