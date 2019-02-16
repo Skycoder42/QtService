@@ -2,6 +2,7 @@
 #define TERMINALSERVICE_H
 
 #include <QtService/Service>
+#include <QtCore/QCommandLineParser>
 
 class TerminalService : public QtService::Service
 {
@@ -14,11 +15,14 @@ public:
 protected:
 	CommandResult onStart() override;
 	CommandResult onStop(int &exitCode) override;
-	bool verifyCommand(const QStringList &arguments) override;
+	bool verifyCommand2(const QStringList &arguments) override;
 
 	// Service interface
 protected Q_SLOTS:
 	void terminalConnected(QtService::Terminal *terminal) override;
+
+private:
+	bool parseArguments(QCommandLineParser &parser, const QStringList &arguments);
 };
 
 #endif // TERMINALSERVICE_H

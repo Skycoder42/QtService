@@ -24,11 +24,21 @@ Service::CommandResult TerminalService::onStop(int &exitCode)
 	return OperationCompleted;
 }
 
-bool TerminalService::verifyCommand(const QStringList &arguments)
+bool TerminalService::verifyCommand2(const QStringList &arguments)
 {
-	if(arguments.contains(QStringLiteral("--passive")))
-		setTerminalMode(Service::ReadWritePassive);
-	return true;
+	QCommandLineParser parser;
+	if(parseArguments(parser, arguments)) {
+		// print help/version if requested. Quits the terminal before even trying to connect
+		if(parser.isSet(QStringLiteral("help")))
+			parser.showHelp();
+		if(parser.isSet(QStringLiteral("version")))
+			parser.showVersion();
+
+		if(parser.isSet(QStringLiteral("--passive")))
+			setTerminalMode(Service::ReadWritePassive);
+		return true;
+	} else
+		return false;
 }
 
 void TerminalService::terminalConnected(Terminal *terminal)
@@ -39,7 +49,13 @@ void TerminalService::terminalConnected(Terminal *terminal)
 		qDebug() << "A terminal just disconnected";
 	});
 
-	if(terminal->command2().mid(1).startsWith(QStringLiteral("stop")))
+	QCommandLineParser parser;
+	if(!parseArguments(parser, terminal->command2())) {
+		terminal->disconnectTerminal();
+		return;
+	}
+
+	if(parser.positionalArguments().startsWith(QStringLiteral("stop")))
 		quit();
 	else if(terminal->terminalMode() == Service::ReadWriteActive) {
 		connect(terminal, &Terminal::readyRead,
@@ -57,4 +73,19 @@ void TerminalService::terminalConnected(Terminal *terminal)
 			terminal->write(data);
 		});
 	}
+}
+
+bool TerminalService::parseArguments(QCommandLineParser &parser, const QStringList &arguments)
+{
+	parser.addHelpOption();
+	parser.addVersionOption();
+	parser.addOption({
+						 {QStringLiteral("p"), QStringLiteral("passive")},
+						 QStringLiteral("Run terminal service in passive (Non-Interactive) mode")
+					 });
+	parser.addPositionalArgument(QStringLiteral("stop"),
+								 QStringLiteral("Stop the the service"),
+								 QStringLiteral("[stop]"));
+
+	return parser.parse(arguments);
 }
