@@ -13,14 +13,17 @@ public class AndroidService extends QtService {
 	private static native int callStartCommand(Intent intent, int flags, int startId, int oldCode);
 	private static native boolean exitService();
 
+	//! Is called by the android service backend plugin to complete the service start
 	public void nativeReady() {
 		_startSem.release();
 	}
 
+	//! Is called by the android service backend plugin to complete the service stop
 	public void nativeExited() {
 		_exitSem.release();
 	}
 
+	//! @inherit{android.app.Service.onStartCommand}
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		int res = super.onStartCommand(intent, flags, startId);
@@ -35,6 +38,7 @@ public class AndroidService extends QtService {
 		return res;
 	}
 
+	//! @inherit{android.app.Service.onDestroy}
 	@Override
 	public void onDestroy() {
 		try {

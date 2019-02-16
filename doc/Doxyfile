@@ -928,7 +928,6 @@ EXCLUDE_PATTERNS       = moc_* \
 # exclude all test directories use the pattern */test/*
 
 EXCLUDE_SYMBOLS        = QtService::__helpertypes \
-						 de::skycoder42::qtservice::AndroidService \
 						 QtServiceDeclarativeModule \
 						 \
 						 QAbstractAspect \
