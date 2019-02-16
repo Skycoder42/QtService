@@ -167,7 +167,8 @@ protected:
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
 
 	//! Is called from the terminal process to perform early CLI validation
-	virtual bool verifyCommand(const QStringList &arguments);
+	Q_DECL_DEPRECATED virtual bool verifyCommand(const QStringList &arguments);
+	virtual bool verifyCommand2(const QStringList &arguments);
 
 	//! Adds a callback to be called by onCallback for the given kind
 	void addCallback(const QByteArray &kind, const std::function<QVariant(QVariantList)> &fn);

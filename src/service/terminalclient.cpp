@@ -184,7 +184,6 @@ void TerminalClient::consoleReady()
 bool TerminalClient::verifyArgs()
 {
 	_cmdArgs = QCoreApplication::arguments();
-	_cmdArgs.removeFirst();
 	auto backendIndex = _cmdArgs.indexOf(QStringLiteral("--backend"));
 	if(backendIndex >= 0) {
 		// remove --backend <backend> (2 args)
@@ -192,7 +191,8 @@ bool TerminalClient::verifyArgs()
 		_cmdArgs.removeAt(backendIndex);
 	}
 	_cmdArgs.removeOne(QStringLiteral("--terminal"));
-	auto ok = _service->verifyCommand(_cmdArgs);
+	auto ok = _service->verifyCommand2(_cmdArgs);
+	_cmdArgs.removeFirst();
 	// set mode after verify, as verify can change the mode
 	_mode = _service->terminalMode();
 	return ok;

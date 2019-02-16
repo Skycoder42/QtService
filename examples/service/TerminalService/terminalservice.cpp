@@ -33,13 +33,13 @@ bool TerminalService::verifyCommand(const QStringList &arguments)
 
 void TerminalService::terminalConnected(Terminal *terminal)
 {
-	qDebug() << "new terminal connected with args:" << terminal->command();
+	qDebug() << "new terminal connected with args:" << terminal->command2();
 	connect(terminal, &Terminal::terminalDisconnected,
 			this, [](){
 		qDebug() << "A terminal just disconnected";
 	});
 
-	if(terminal->command().startsWith(QStringLiteral("stop")))
+	if(terminal->command2().mid(1).startsWith(QStringLiteral("stop")))
 		quit();
 	else if(terminal->terminalMode() == Service::ReadWriteActive) {
 		connect(terminal, &Terminal::readyRead,

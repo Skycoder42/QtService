@@ -91,6 +91,11 @@ Service::TerminalMode Terminal::terminalMode() const
 
 QStringList Terminal::command() const
 {
+	return d->command.mid(1);
+}
+
+QStringList Terminal::command2() const
+{
 	return d->command;
 }
 
@@ -317,6 +322,7 @@ void TerminalPrivate::readyRead()
 		commandStream.startTransaction();
 		int tMode;
 		commandStream >> tMode >> command;
+		command.prepend(QCoreApplication::applicationFilePath());
 		if(commandStream.commitTransaction()) {
 			terminalMode = static_cast<Service::TerminalMode>(tMode);
 			isLoading = false;
