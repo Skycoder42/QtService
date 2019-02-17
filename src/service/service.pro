@@ -45,7 +45,10 @@ win32 {
 	QMAKE_TARGET_BUNDLE_PREFIX = "de.skycoder42."
 }
 
-QDEP_DEPENDS += Skycoder42/QCtrlSignals Skycoder42/QPluginFactory Skycoder42/QConsole
+QDEP_DEPENDS += \
+	Skycoder42/QCtrlSignals@1.2.0 \
+	Skycoder42/QPluginFactory@1.5.0 \
+	Skycoder42/QConsole@1.3.1
 
 # extra cpp files for translations
 never_true_lupdate_only {

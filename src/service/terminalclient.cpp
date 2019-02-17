@@ -245,6 +245,8 @@ void TerminalClient::setupChannels()
 		_inConsole = new QConsole{this};
 		connect(_inConsole, &QConsole::readyRead,
 				this, &TerminalClient::consoleReady);
+		connect(_inConsole, &QConsole::readChannelFinished,
+				qApp, &QCoreApplication::quit);
 	}
 
 	connect(_socket, &QLocalSocket::connected,

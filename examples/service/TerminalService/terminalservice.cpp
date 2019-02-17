@@ -34,7 +34,7 @@ bool TerminalService::verifyCommand2(const QStringList &arguments)
 		if(parser.isSet(QStringLiteral("version")))
 			parser.showVersion();
 
-		if(parser.isSet(QStringLiteral("--passive")))
+		if(parser.isSet(QStringLiteral("passive")))
 			setTerminalMode(Service::ReadWritePassive);
 		return true;
 	} else
