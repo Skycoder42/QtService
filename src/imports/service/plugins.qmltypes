@@ -270,6 +270,7 @@ Module {
         exportMetaObjectRevisions: [0]
         Property { name: "terminalMode"; type: "QtService::Service::TerminalMode"; isReadonly: true }
         Property { name: "command"; type: "QStringList"; isReadonly: true }
+        Property { name: "command2"; type: "QStringList"; isReadonly: true }
         Property { name: "autoDelete"; type: "bool" }
         Signal { name: "terminalDisconnected" }
         Signal {

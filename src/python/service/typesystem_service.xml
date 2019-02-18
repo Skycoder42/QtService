@@ -1,0 +1,44 @@
+<typesystem package="PySide2.QtService">
+	<load-typesystem name="typesystem_core.xml" generate="no"/>
+	<load-typesystem name="typesystem_network.xml" generate="no"/>
+
+	<namespace-type name="QtService">
+		<object-type name="Service">
+			<enum-type name="CommandResult"/>
+			<enum-type name="TerminalMode"/>
+
+			<!--add-function signature="Service(QStringList)">
+				<inject-code file="glue/qtservice.cpp" snippet="qtserver-service-1"/>
+			</add-function>
+			<add-function signature="Service()">
+				<inject-code file="glue/qtservice.cpp" snippet="qtserver-service-2"/>
+			</add-function-->
+			<modify-function signature="Service(int &amp;,char **,int)" access="private"/>
+		</object-type>
+
+		<object-type name="ServiceBackend">
+			<enum-type name="ServiceCommand"/>
+
+			<modify-function signature="runService(int &amp;,char **,int)" access="private"/>
+		</object-type>
+
+		<object-type name="ServiceControl">
+			<enum-type name="SupportFlag" flags="SupportFlags"/>
+			<enum-type name="ServiceStatus"/>
+
+			<modify-function signature="ServiceControl(QString &amp;&amp;, QObject *)" remove="all" />
+		</object-type>
+
+		<object-type name="Terminal">
+			<object-type name="Awaitable">
+				<enum-type name="SpecialReads"/>
+
+				<modify-function signature="Awaitable(QtService::Terminal *, qint64)">
+					<modify-argument index="2">
+						<replace-default-expression with="QtService::Terminal::Awaitable::ReadSingle"/>
+					</modify-argument>
+				</modify-function>
+			</object-type>
+		</object-type>
+	</namespace-type>
+</typesystem>
