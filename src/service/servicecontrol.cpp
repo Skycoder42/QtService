@@ -37,6 +37,14 @@ ServiceControl *ServiceControl::create(const QString &backend, QString serviceId
 	return control;
 }
 
+ServiceControl *ServiceControl::create(const QString &backend, QString serviceId, QString serviceNameOverride, QObject *parent)
+{
+	auto control = create(backend, std::move(serviceId), parent);
+	if(control)
+		control->d->serviceName = std::move(serviceNameOverride);
+	return control;
+}
+
 ServiceControl *ServiceControl::createFromName(const QString &backend, const QString &serviceName, QObject *parent)
 {
 	return createFromName(backend, serviceName, QCoreApplication::organizationDomain(), parent);
@@ -94,7 +102,7 @@ bool ServiceControl::isAutostartEnabled() const
 
 QDir ServiceControl::runtimeDir() const
 {
-	return ServicePrivate::runtimeDir(serviceName());
+	return ServicePrivate::runtimeDir(realServiceName());
 }
 
 bool ServiceControl::start()
@@ -168,6 +176,11 @@ void ServiceControl::clearError()
 QString ServiceControl::serviceName() const
 {
 	return serviceId();
+}
+
+QString ServiceControl::realServiceName() const
+{
+	return d->serviceName.isNull() ? serviceName() : d->serviceName;
 }
 
 void ServiceControl::setError(QString error) const

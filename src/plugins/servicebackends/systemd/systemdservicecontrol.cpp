@@ -31,7 +31,7 @@ bool SystemdServiceControl::serviceExists() const
 	_exists = &_existsRefBase;
 	_existsRefBase = false;
 	auto svcName = serviceId().toUtf8();
-	auto svcType = serviceId().mid(serviceName().size() + 1);
+	auto svcType = serviceId().mid(realServiceName().size() + 1);
 	if(svcType.isEmpty()) {
 		svcType = QStringLiteral("service");
 		svcName += '.' + svcType.toUtf8();
@@ -69,7 +69,7 @@ bool SystemdServiceControl::serviceExists() const
 ServiceControl::ServiceStatus SystemdServiceControl::status() const
 {
 	auto svcName = serviceId().toUtf8();
-	auto svcType = serviceId().mid(serviceName().size() + 1);
+	auto svcType = serviceId().mid(realServiceName().size() + 1);
 	if(svcType.isEmpty()) {
 		svcType = QStringLiteral("service");
 		svcName += '.' + svcType.toUtf8();

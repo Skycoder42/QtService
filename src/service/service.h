@@ -57,12 +57,6 @@ public:
 	using CommandMode Q_DECL_ENUMERATOR_DEPRECATED = CommandResult;//MAJOR compat remove
 	Q_ENUM(CommandResult)
 
-#ifdef Q_CC_MSVC
-#pragma deprecated(CommandMode)
-#pragma deprecated(Synchronous)
-#pragma deprecated(Asynchronous)
-#endif
-
 	//! The modes a terminal can be in
 	enum TerminalMode {
 		ReadOnly, //!< The terminal can only receive data from the service. Useful for machine-to-machine communication

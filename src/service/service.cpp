@@ -10,6 +10,8 @@
 #include <unistd.h>
 #endif
 
+#include "servicecontrol.h"
+
 namespace {
 
 class PluginObjectFactory : public QPluginFactory<QtService::ServicePlugin>
@@ -289,7 +291,10 @@ ServiceControl *ServicePrivate::createControl(const QString &provider, QString &
 
 ServiceControl *ServicePrivate::createLocalControl(const QString &provider, QObject *parent)
 {
-	return factory->createServiceControl(provider, factory->currentServiceId(provider), parent);
+	return ServiceControl::create(provider,
+								  factory->currentServiceId(provider),
+								  QCoreApplication::applicationName(), // make shure we get the same serviceName, even if the serviceId suggests otherwise
+								  parent);
 }
 
 QDir ServicePrivate::runtimeDir(const QString &serviceName)

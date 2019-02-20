@@ -14,11 +14,8 @@ using namespace QtService;
 
 StandardServiceControl::StandardServiceControl(bool debugMode, QString &&serviceId, QObject *parent) :
 	ServiceControl{std::move(serviceId), parent},
-	_debugMode{debugMode},
-	_statusLock{runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock"))}
-{
-	_statusLock.setStaleLockTime(std::numeric_limits<int>::max()); //disable stale locks
-}
+	_debugMode{debugMode}
+{}
 
 QString StandardServiceControl::backend() const
 {
@@ -41,13 +38,14 @@ bool StandardServiceControl::serviceExists() const
 
 ServiceControl::ServiceStatus StandardServiceControl::status() const
 {
-	if(_statusLock.tryLock()) {
-		_statusLock.unlock();
+	const auto lock = statusLock();
+	if(lock->tryLock()) {
+		lock->unlock();
 		return ServiceStopped;
-	} else if(_statusLock.error() == QLockFile::LockFailedError)
+	} else if(lock->error() == QLockFile::LockFailedError)
 		return ServiceRunning;
 	else {
-		setError(tr("Failed to access lockfile with error: %1").arg(_statusLock.error()));
+		setError(tr("Failed to access lockfile with error: %1").arg(lock->error()));
 		return ServiceStatusUnknown;
 	}
 }
@@ -171,11 +169,18 @@ QString StandardServiceControl::serviceName() const
 		return serviceId().split(QLatin1Char('/'), QString::SkipEmptyParts).last();
 }
 
+QSharedPointer<QLockFile> StandardServiceControl::statusLock() const
+{
+	const auto lock = QSharedPointer<QLockFile>::create(runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock")));
+	lock->setStaleLockTime(std::numeric_limits<int>::max()); //disable stale locks
+	return lock;
+}
+
 qint64 StandardServiceControl::getPid()
 {
 	qint64 pid = 0;
 	QString hostname, appname;
-	if(_statusLock.getLockInfo(&pid, &hostname, &appname))
+	if(statusLock()->getLockInfo(&pid, &hostname, &appname))
 		return pid;
 	else
 		return -1;

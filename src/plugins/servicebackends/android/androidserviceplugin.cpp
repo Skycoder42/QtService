@@ -1,6 +1,7 @@
 #include "androidserviceplugin.h"
 #include "androidservicebackend.h"
 #include "androidservicecontrol.h"
+#include <QtCore/QCoreApplication>
 
 Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.android", QtInfoMsg);
 
@@ -10,12 +11,7 @@ AndroidServicePlugin::AndroidServicePlugin(QObject *parent) :
 
 QString AndroidServicePlugin::currentServiceId() const
 {
-	auto service = QtAndroid::androidService();
-	if(service.isValid()) {
-		auto clazz = service.callObjectMethod("getClass", "()Ljava/lang/Class;");
-		return clazz.callObjectMethod("getName", "()Ljava/lang/String;").toString();
-	} else
-		return {};
+	return QCoreApplication::organizationDomain() + QLatin1Char('.') + QCoreApplication::applicationName();
 }
 
 QtService::ServiceBackend *AndroidServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)

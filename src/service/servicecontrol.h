@@ -75,13 +75,14 @@ public:
 	static QString likelyBackend();
 	//! Creates a new ServiceControl for the given service on the service manager defined by backend
 	static ServiceControl *create(const QString &backend, QString serviceId, QObject *parent = nullptr);
+	static ServiceControl *create(const QString &backend, QString serviceId, QString serviceNameOverride, QObject *parent = nullptr);
 	//! Creates a new ServiceControl by guessing the service id from the given name and this applications domain
 	static ServiceControl *createFromName(const QString &backend, const QString &serviceName, QObject *parent = nullptr);
 	//! Creates a new ServiceControl by guessing the service id from the given name and domain
 	static ServiceControl *createFromName(const QString &backend, const QString &serviceName, const QString &domain, QObject *parent = nullptr);
 
 	//! @private
-	explicit ServiceControl(QString &&serviceId, QObject *parent = nullptr);
+	explicit ServiceControl(QString &&serviceId, QObject *parent = nullptr); // MAJOR make protected
 	~ServiceControl() override;
 
 	//! @readAcFn{ServiceControl::backend}
@@ -164,11 +165,14 @@ Q_SIGNALS:
 protected:
 	//! Returns the common name of the controls service
 	virtual QString serviceName() const;
+	//! Returns the common name of the controls service, with a possible override on creation
+	QString realServiceName() const;
 
 	//! @writeAcFn{ServiceControl::error}
 	void setError(QString error) const;
 
 private:
+	friend class QtService::ServiceControlPrivate;
 	QScopedPointer<ServiceControlPrivate> d;
 };
 

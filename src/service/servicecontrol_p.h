@@ -9,10 +9,12 @@ namespace QtService {
 class ServiceControlPrivate
 {
 	Q_DISABLE_COPY(ServiceControlPrivate)
+
 public:
 	ServiceControlPrivate(QString &&serviceId);
 
 	QString serviceId;
+	QString serviceName;
 	bool blocking = true;
 	QString error;
 };

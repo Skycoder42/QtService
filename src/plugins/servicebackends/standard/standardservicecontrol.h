@@ -27,8 +27,8 @@ protected:
 
 private:
 	const bool _debugMode;
-	mutable QLockFile _statusLock;
 
+	QSharedPointer<QLockFile> statusLock() const;
 	qint64 getPid();
 };
 
