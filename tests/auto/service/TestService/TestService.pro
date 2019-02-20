@@ -15,6 +15,8 @@ SOURCES += \
 	testservice.cpp
 
 runtarget.target = run-tests
-win32: runtarget.depends += $(DESTDIR_TARGET)
-else: runtarget.depends += $(TARGET)
+!compat_test {
+	win32: runtarget.depends += $(DESTDIR_TARGET)
+	else: runtarget.depends += $(TARGET)
+}
 QMAKE_EXTRA_TARGETS += runtarget
