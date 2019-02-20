@@ -35,6 +35,9 @@ void QtServiceDeclarativeModule::registerTypes(const char *uri)
 	//Version 1.1
 	qmlRegisterModule(uri, 1, 1);
 
+	//Version 1.2
+	qmlRegisterModule(uri, 1, 2);
+
 	// Check to make shure no module update is forgotten
-	static_assert(VERSION_MAJOR == 1 && VERSION_MINOR == 1, "QML module version needs to be updated");
+	static_assert(VERSION_MAJOR == 1 && VERSION_MINOR == 2, "QML module version needs to be updated");
 }
