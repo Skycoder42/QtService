@@ -160,8 +160,9 @@ protected:
 	//! Is called by the backend if a platform specific callback was triggered
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
 
-	//! Is called from the terminal process to perform early CLI validation
+	//! @deprecated Use Service::verifyCommand2 instead
 	Q_DECL_DEPRECATED virtual bool verifyCommand(const QStringList &arguments);
+	//! Is called from the terminal process to perform early CLI validation
 	virtual bool verifyCommand2(const QStringList &arguments);
 
 	//! Adds a callback to be called by onCallback for the given kind

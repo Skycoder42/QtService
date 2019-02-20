@@ -49,7 +49,7 @@ Terminal::requestLine, Terminal::awaitChar, Terminal::awaitChars, Terminal::awai
 */
 
 /*!
-@property QtService::Terminal::command
+@property QtService::Terminal::command2
 
 @default{<i>Arguments passed to the terminal</i>}
 
@@ -64,7 +64,7 @@ Service::verifyCommand to verify the passed arguments on the clients side before
 the service. After receiving, verify them again and then use them.
 
 @accessors{
-	@readAc{command()}
+	@readAc{command2()}
 	@constantAc
 }
 

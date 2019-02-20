@@ -472,7 +472,7 @@ int MyService::doStuff(int p1, double p2) {
 */
 
 /*!
-@fn QtService::Service::verifyCommand
+@fn QtService::Service::verifyCommand2
 
 @param arguments The terminal client arguments
 @returns `true` if the arguments are valid, `false` if not
@@ -481,10 +481,10 @@ This method is called on a Terminal client (i.e. *not* the service process, but 
 process) before it tries to connect to the service. You can implement to provide an early validation
 of command line arguments which leads to a better experience when using terminals.
 
-The arguments are pre-filtered, which means the application name as well as QtService-specific
-arguments do not appear here. So for example, the command
-`service.exe --terminal --backend windows hello world` can be retrieved from this property as
-`["hello", "world"]`
+The arguments are pre-filtered, which means that QtService-specific arguments do not appear here.
+So for example, the command `service.exe --terminal --backend windows hello world` can be retrieved
+from this property as
+`["service.exe", "hello", "world"]`
 
 @sa Terminal, Service::terminalConnected, Terminal::command
 */
