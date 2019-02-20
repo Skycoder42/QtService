@@ -8,6 +8,13 @@ defineReplace(pyside2_config) {
 	return($$result)
 }
 
+defineReplace(python_config) {
+	win32: command = python.exe
+	command += $$system_quote($$PWD/config.py) $$1
+	result = $$system($$command)
+	return($$result)
+}
+
 isEmpty(PYSIDE2_PREFIX) {
 	QT_TOOL.shiboken2.binary = $$system_path($$pyside2_config(--shiboken2-generator-path)/shiboken2)
 	qtPrepareTool(SHIBOKEN2, shiboken2)
@@ -111,10 +118,25 @@ isEmpty(SHIBOKEN2_CORE_FLAGS) {
 	HEADERS += $$shadowed($$SHIBOKEN2_SRC_DIR/pyside2_$$lower($$SHIBOKEN_MODULE_TARGET)_python.h)
 }
 
+load(qt_common)
+
+QT =
 for(qt_mod, $$list($$SHIBOKEN_MODULE_TARGET $$SHIBOKEN_MODULE_DEPENDS)): \
 	QT += $$lower($$str_member($$qt_mod, 2, -1))
 
+CONFIG += unversioned_soname unversioned_libname plugin no_plugin_name_prefix
+qtConfig(debug_and_release): CONFIG += debug_and_release
+qtConfig(build_all): CONFIG += build_all
+
 darwin: QMAKE_CXXFLAGS += -undefined dynamic_lookup
 
+DESTDIR = $$MODULE_BASE_OUTDIR/lib/PySide2
+DLLDESTDIR = $$MODULE_BASE_OUTDIR/bin/PySide2
+
+TARGET = "$${SHIBOKEN_MODULE_TARGET}"
+QMAKE_EXTENSION_SHLIB = $$str_member($$python_config(suffix), 1, -1)
+
 DISTFILES += \
-	$$PWD/pyside2_config.py
+	$$PWD/pyside2_config.py \
+	$$PWD/setup.py \
+	$$PWD/config.py

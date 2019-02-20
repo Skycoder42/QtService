@@ -1,7 +1,5 @@
 TEMPLATE = lib
 
-TARGET = service
-
 load(qt_build_paths)
 
 SHIBOKEN_MODULE_TARGET = QtService
@@ -24,16 +22,7 @@ PYSIDE2_PREFIX = /usr
 
 include(shiboken.pri)
 
-load(qt_common)
-
-qtConfig(debug_and_release): CONFIG += debug_and_release
-qtConfig(build_all): CONFIG += build_all
-
-DESTDIR = $$MODULE_BASE_OUTDIR/lib
-DLLDESTDIR = $$MODULE_BASE_OUTDIR/bin
-
-TARGET = $$qt5LibraryTarget($$TARGET)
-
-load(qt_installs)
-
-message($$HEADERS)
+message(HEADERS $$HEADERS)
+message(INCLUDEPATH $$INCLUDEPATH)
+message(DEFINES $$DEFINES)
+message(LIBS $$LIBS)
