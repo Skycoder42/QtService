@@ -64,3 +64,5 @@ macos {
 OTHER_FILES += \\
 	AndroidManifest-service.part.xml
 @endif
+
+DISTFILES += $$QMAKE_SUBSTITUTES
