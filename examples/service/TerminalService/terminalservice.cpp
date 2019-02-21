@@ -24,7 +24,7 @@ Service::CommandResult TerminalService::onStop(int &exitCode)
 	return OperationCompleted;
 }
 
-bool TerminalService::verifyCommand2(const QStringList &arguments)
+bool TerminalService::verifyCommand(const QStringList &arguments)
 {
 	QCommandLineParser parser;
 	if(parseArguments(parser, arguments)) {
@@ -43,14 +43,14 @@ bool TerminalService::verifyCommand2(const QStringList &arguments)
 
 void TerminalService::terminalConnected(Terminal *terminal)
 {
-	qDebug() << "new terminal connected with args:" << terminal->command2();
+	qDebug() << "new terminal connected with args:" << terminal->command();
 	connect(terminal, &Terminal::terminalDisconnected,
 			this, [](){
 		qDebug() << "A terminal just disconnected";
 	});
 
 	QCommandLineParser parser;
-	if(!parseArguments(parser, terminal->command2())) {
+	if(!parseArguments(parser, terminal->command())) {
 		terminal->disconnectTerminal();
 		return;
 	}

@@ -252,14 +252,6 @@ bool Service::verifyCommand(const QStringList &arguments)
 	return true;
 }
 
-bool Service::verifyCommand2(const QStringList &arguments)
-{
-	QT_WARNING_PUSH
-	QT_WARNING_DISABLE_DEPRECATED
-	return verifyCommand(arguments.mid(1));
-	QT_WARNING_POP
-}
-
 void Service::addCallback(const QByteArray &kind, const std::function<QVariant (QVariantList)> &fn)
 {
 	Q_ASSERT_X(fn, Q_FUNC_INFO, "fn must be a valid function");

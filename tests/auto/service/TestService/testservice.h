@@ -24,7 +24,7 @@ protected:
 
 	QVariant onCallback(const QByteArray &kind, const QVariantList &args) override;
 
-	bool verifyCommand2(const QStringList &arguments) override;
+	bool verifyCommand(const QStringList &arguments) override;
 
 protected Q_SLOTS:
 	void terminalConnected(QtService::Terminal *terminal) override;

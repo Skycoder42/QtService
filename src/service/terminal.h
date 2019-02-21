@@ -18,10 +18,8 @@ class Q_SERVICE_EXPORT Terminal : public QIODevice
 
 	//! The I/O-mode the terminal operates in
 	Q_PROPERTY(QtService::Service::TerminalMode terminalMode READ terminalMode CONSTANT)
-	//! @deprecated Use QtService::Terminal::command2 instead
-	Q_PROPERTY(QStringList command READ command CONSTANT)
 	//! The command line arguments that have been used to create this terminal
-	Q_PROPERTY(QStringList command2 READ command2 CONSTANT REVISION 2)
+	Q_PROPERTY(QStringList command READ command CONSTANT)
 	//! If true, the terminal will delete itself as soon as the connection has been closed
 	Q_PROPERTY(bool autoDelete READ isAutoDelete WRITE setAutoDelete NOTIFY autoDeleteChanged)
 
@@ -79,9 +77,7 @@ public:
 	//! @readAcFn{Terminal::terminalMode}
 	Service::TerminalMode terminalMode() const;
 	//! @readAcFn{Terminal::command}
-	Q_DECL_DEPRECATED QStringList command() const;
-	//! @readAcFn{Terminal::command2}
-	QStringList command2() const;
+	QStringList command() const;
 	//! @readAcFn{Terminal::autoDelete}
 	bool isAutoDelete() const;
 

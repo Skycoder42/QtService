@@ -91,11 +91,6 @@ Service::TerminalMode Terminal::terminalMode() const
 
 QStringList Terminal::command() const
 {
-	return d->command.mid(1);
-}
-
-QStringList Terminal::command2() const
-{
 	return d->command;
 }
 

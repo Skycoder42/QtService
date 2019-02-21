@@ -24,17 +24,6 @@ ServiceBackend::ServiceBackend(Service *service) :
 			this, &ServiceBackend::onSvcResumed);
 	connect(d->service, QOverload<bool>::of(&Service::paused),
 			this, &ServiceBackend::onSvcPaused);
-
-	//MAJOR compat remove (and remove overload on previous definitions)
-	QT_WARNING_PUSH
-	QT_WARNING_DISABLE_DEPRECATED
-	connect(d->service, QOverload<>::of(&Service::started),
-			this, std::bind(QOverload<bool>::of(&ServiceBackend::onSvcStarted), this, true));
-	connect(d->service, QOverload<>::of(&Service::resumed),
-			this, std::bind(QOverload<bool>::of(&ServiceBackend::onSvcResumed), this, true));
-	connect(d->service, QOverload<>::of(&Service::paused),
-			this, std::bind(QOverload<bool>::of(&ServiceBackend::onSvcPaused), this, true));
-	QT_WARNING_POP
 }
 
 QList<int> ServiceBackend::getActivatedSockets(const QByteArray &name)

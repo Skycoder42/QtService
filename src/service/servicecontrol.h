@@ -82,8 +82,6 @@ public:
 	//! Creates a new ServiceControl by guessing the service id from the given name and domain
 	static ServiceControl *createFromName(const QString &backend, const QString &serviceName, const QString &domain, QObject *parent = nullptr);
 
-	//! @private
-	explicit ServiceControl(QString &&serviceId, QObject *parent = nullptr); // MAJOR make protected
 	~ServiceControl() override;
 
 	//! @readAcFn{ServiceControl::backend}
@@ -164,6 +162,9 @@ Q_SIGNALS:
 	void errorChanged(QString error, QPrivateSignal);
 
 protected:
+	//! @private
+	explicit ServiceControl(QString &&serviceId, QObject *parent = nullptr);
+
 	//! Returns the common name of the controls service
 	virtual QString serviceName() const;
 	//! Returns the common name of the controls service, with a possible override on creation

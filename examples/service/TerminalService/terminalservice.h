@@ -15,7 +15,7 @@ public:
 protected:
 	CommandResult onStart() override;
 	CommandResult onStop(int &exitCode) override;
-	bool verifyCommand2(const QStringList &arguments) override;
+	bool verifyCommand(const QStringList &arguments) override;
 
 	// Service interface
 protected Q_SLOTS:

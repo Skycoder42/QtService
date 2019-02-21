@@ -48,13 +48,7 @@ public:
 		OperationFailed, //!< The command failed synchronously. The system may exit the service afterwards
 
 		OperationExit, //!< The command executed successfully, but the service should still exit. Only usable from onStart()
-
-		//MAJOR compat remove
-		Synchronous Q_DECL_ENUMERATOR_DEPRECATED = OperationCompleted, //!< @deprecated Deprecated. Use OperationCompleted instead
-		Asynchronous Q_DECL_ENUMERATOR_DEPRECATED = OperationPending //!< @deprecated Deprecated. Use OperationPending instead
 	};
-	//! @deprecated Deprecated. Use CommandResult instead
-	using CommandMode Q_DECL_ENUMERATOR_DEPRECATED = CommandResult;//MAJOR compat remove
 	Q_ENUM(CommandResult)
 
 	//! The modes a terminal can be in
@@ -112,22 +106,14 @@ public Q_SLOTS:
 Q_SIGNALS:
 	//! Must be emitted when starting was completed if onStart returned OperationPending
 	void started(bool success); //TODO doc should be direct connected
-	//! @deprecated Use started(bool) instead
-	Q_DECL_DEPRECATED void started();
 	//! Must be emitted when stopping was completed if onStop returned OperationPending
 	void stopped(int exitCode = EXIT_SUCCESS);
 	//! Must be emitted when reloading was completed if onReload returned OperationPending
 	void reloaded(bool success);
-	//! @deprecated Use reloaded(bool) instead
-	Q_DECL_DEPRECATED void reloaded();
 	//! Must be emitted when pausing was completed if onPause returned OperationPending
 	void paused(bool success);
-	//! @deprecated Use paused(bool) instead
-	Q_DECL_DEPRECATED void paused();
 	//! Must be emitted when resuming was completed if onResume returned OperationPending
 	void resumed(bool success);
-	//! @deprecated Use resumed(bool) instead
-	Q_DECL_DEPRECATED void resumed();
 
 	//! @notifyAcFn{Service::terminalActive}
 	void terminalActiveChanged(bool terminalActive, QPrivateSignal);
@@ -160,10 +146,8 @@ protected:
 	//! Is called by the backend if a platform specific callback was triggered
 	virtual QVariant onCallback(const QByteArray &kind, const QVariantList &args);
 
-	//! @deprecated Use Service::verifyCommand2 instead
-	Q_DECL_DEPRECATED virtual bool verifyCommand(const QStringList &arguments);
 	//! Is called from the terminal process to perform early CLI validation
-	virtual bool verifyCommand2(const QStringList &arguments);
+	virtual bool verifyCommand(const QStringList &arguments);
 
 	//! Adds a callback to be called by onCallback for the given kind
 	void addCallback(const QByteArray &kind, const std::function<QVariant(QVariantList)> &fn);

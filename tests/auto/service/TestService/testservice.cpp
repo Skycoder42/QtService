@@ -117,9 +117,9 @@ QVariant TestService::onCallback(const QByteArray &kind, const QVariantList &arg
 	return true;
 }
 
-bool TestService::verifyCommand2(const QStringList &arguments)
+bool TestService::verifyCommand(const QStringList &arguments)
 {
-	qDebug() << Q_FUNC_INFO << arguments.mid(1);
+	qDebug() << Q_FUNC_INFO << arguments;
 	if(arguments.contains(QStringLiteral("--passive")))
 		setTerminalMode(Service::ReadWritePassive);
 	else
@@ -129,8 +129,8 @@ bool TestService::verifyCommand2(const QStringList &arguments)
 
 void TestService::terminalConnected(Terminal *terminal)
 {
-	qDebug() << Q_FUNC_INFO << terminal->command2();
-	if(terminal->command2().mid(1).startsWith(QStringLiteral("stop")))
+	qDebug() << Q_FUNC_INFO << terminal->command();
+	if(terminal->command().mid(1).startsWith(QStringLiteral("stop")))
 		quit();
 	else if(terminal->terminalMode() == Service::ReadWriteActive) {
 		connect(terminal, &Terminal::readyRead,

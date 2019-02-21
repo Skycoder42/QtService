@@ -191,7 +191,7 @@ bool TerminalClient::verifyArgs()
 		_cmdArgs.removeAt(backendIndex);
 	}
 	_cmdArgs.removeOne(QStringLiteral("--terminal"));
-	auto ok = _service->verifyCommand2(_cmdArgs);
+	auto ok = _service->verifyCommand(_cmdArgs);
 	_cmdArgs.removeFirst();
 	// set mode after verify, as verify can change the mode
 	_mode = _service->terminalMode();
