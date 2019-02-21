@@ -120,10 +120,11 @@ void BasicServiceTest::testRestart()
 	if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
 		QThread::sleep(3);
 
-#ifndef Q_OS_WIN
 	QByteArray msg;
+#ifndef Q_OS_WIN
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("stopping"));
+	msg = {};
 #endif
 	QVERIFY(socket->waitForDisconnected(5000));
 	socket->deleteLater();
@@ -133,7 +134,6 @@ void BasicServiceTest::testRestart()
 	QVERIFY(socket->waitForConnected(30000));
 	stream.setDevice(socket);
 
-	msg = {};
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("started"));
 
