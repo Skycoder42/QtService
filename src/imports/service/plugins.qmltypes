@@ -230,6 +230,7 @@ Module {
         }
         Method { name: "start"; type: "bool" }
         Method { name: "stop"; type: "bool" }
+        Method { name: "restart"; type: "bool" }
         Method { name: "pause"; type: "bool" }
         Method { name: "resume"; type: "bool" }
         Method { name: "reload"; type: "bool" }

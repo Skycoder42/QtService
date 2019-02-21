@@ -136,6 +136,7 @@ public Q_SLOTS:
 	virtual bool start();
 	//! Send a stop command for the controls service to the service manager
 	virtual bool stop();
+	virtual bool restart();
 
 	//! Send a pause command for the controls service to the service manager
 	virtual bool pause();

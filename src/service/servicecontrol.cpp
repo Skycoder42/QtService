@@ -119,6 +119,19 @@ bool ServiceControl::stop()
 	return false;
 }
 
+bool ServiceControl::restart()
+{
+	if(supportFlags().testFlag(SupportsBlocking) && d->blocking) {
+		auto ok = stop();
+		if(ok)
+			ok = start();
+		return ok;
+	} else {
+		setError(tr("Operation restart is supported for non-blocking service controls"));
+		return false;
+	}
+}
+
 bool ServiceControl::pause()
 {
 	setError(tr("Operation pause is not implemented for backend %1")

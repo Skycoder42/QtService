@@ -21,6 +21,7 @@ public:
 public slots:
 	bool start() override;
 	bool stop() override;
+	bool restart() override;
 	bool reload() override;
 	bool enableAutostart() override;
 	bool disableAutostart() override;

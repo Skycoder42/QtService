@@ -106,10 +106,45 @@ void BasicServiceTest::testResume()
 	TEST_STATUS(ServiceControl::ServiceRunning);
 }
 
+void BasicServiceTest::testRestart()
+{
+	TEST_STATUS(ServiceControl::ServiceRunning);
+	resetSettings();
+	testFeature(static_cast<ServiceControl::SupportFlag>(static_cast<int>(ServiceControl::SupportsStart |
+																		  ServiceControl::SupportsStop |
+																		  ServiceControl::SupportsBlocking)));
+
+	QVERIFY2(control->restart(), qUtf8Printable(control->error()));
+	QThread::sleep(10);
+	// blocking should only return after the server started, but for non blocking this may not be the case...
+	if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+		QThread::sleep(3);
+
+#ifndef Q_OS_WIN
+	QByteArray msg;
+	READ_LOOP(msg);
+	QCOMPARE(msg, QByteArray("stopping"));
+#endif
+	QVERIFY(socket->waitForDisconnected(5000));
+	socket->deleteLater();
+
+	socket = new QLocalSocket(this);
+	socket->connectToServer(QStringLiteral("__qtservice_testservice"));
+	QVERIFY(socket->waitForConnected(30000));
+	stream.setDevice(socket);
+
+	msg = {};
+	READ_LOOP(msg);
+	QCOMPARE(msg, QByteArray("started"));
+
+	TEST_STATUS(ServiceControl::ServiceRunning);
+}
+
 void BasicServiceTest::testCustom()
 {
 	testFeature(ServiceControl::SupportsCustomCommands);
 	testCustomImpl();
+	resetFailed();
 }
 
 void BasicServiceTest::testStop()
@@ -208,7 +243,6 @@ void BasicServiceTest::resetSettings(const QVariantHash &args)
 	QSettings config{control->runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
 	QVERIFY(config.isWritable());
 	config.clear();
-	config.setValue(QStringLiteral("testval"), true);
 	for(auto it = args.constBegin(); it != args.constEnd(); ++it)
 		config.setValue(it.key(), it.value());
 	config.sync();

@@ -24,6 +24,7 @@ private Q_SLOTS:
 	void testReload();
 	void testPause();
 	void testResume();
+	void testRestart();
 	void testCustom();
 	void testStop();
 

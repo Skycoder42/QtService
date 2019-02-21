@@ -154,6 +154,11 @@ bool SystemdServiceControl::stop()
 	return runSystemctl("stop") == EXIT_SUCCESS;
 }
 
+bool SystemdServiceControl::restart()
+{
+	return runSystemctl("restart") == EXIT_SUCCESS;
+}
+
 bool SystemdServiceControl::reload()
 {
 	return runSystemctl("reload") == EXIT_SUCCESS;

@@ -26,12 +26,13 @@ Service::CommandResult TestService::onStart()
 	//first: read mode of operation:
 #ifndef Q_OS_WIN
 	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
-	if(!config.contains(QStringLiteral("testval")))
-		return OperationFailed;
-	if(config.value(QStringLiteral("exit")).toBool())
+	if(config.value(QStringLiteral("exit")).toBool()) {
+		qDebug() << "Exiting in onStart operation";
 		return OperationExit;
-	if(config.value(QStringLiteral("fail")).toBool())
+	} if(config.value(QStringLiteral("fail")).toBool()) {
+		qDebug() << "Failing onStart operation";
 		return OperationFailed;
+	}
 #endif
 
 	_server = new QLocalServer(this);
