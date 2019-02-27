@@ -9,16 +9,39 @@ StandardServicePlugin::StandardServicePlugin(QObject *parent) :
 	QObject{parent}
 {}
 
-QString StandardServicePlugin::currentServiceId() const
+QString StandardServicePlugin::currentServiceId(const QString &backend) const
 {
-	return QCoreApplication::applicationFilePath();
+	if (backend == QStringLiteral("standard") ||
+		backend == QStringLiteral("debug"))
+		return QCoreApplication::applicationFilePath();
+	else
+		return {};
 }
 
-QtService::ServiceBackend *StandardServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
+QString StandardServicePlugin::findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const
 {
-	if(provider == QStringLiteral("standard"))
+	Q_UNUSED(domain)
+
+	if (backend == QStringLiteral("standard") ||
+		backend == QStringLiteral("debug")) {
+		// first: search wherever this executable is
+		auto serviceId = QStandardPaths::findExecutable(serviceName, {QCoreApplication::applicationDirPath()});
+		// second: search in system paths
+		if (serviceId.isEmpty())
+			serviceId = QStandardPaths::findExecutable(serviceName);
+		// if found, return the result
+		if (!serviceId.isEmpty())
+			return serviceId;
+	}
+
+	return {};
+}
+
+QtService::ServiceBackend *StandardServicePlugin::createServiceBackend(const QString &backend, QtService::Service *service)
+{
+	if (backend == QStringLiteral("standard"))
 		return new StandardServiceBackend{false, service};
-	else if(provider == QStringLiteral("debug"))
+	else if (backend == QStringLiteral("debug"))
 		return new StandardServiceBackend{true, service};
 	else
 		return nullptr;
@@ -26,21 +49,9 @@ QtService::ServiceBackend *StandardServicePlugin::createServiceBackend(const QSt
 
 QtService::ServiceControl *StandardServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-	auto parts = detectNamedService(serviceId);
-	if(!parts.first.isEmpty()) {
-		// first: search wherever this executable is
-		serviceId = QStandardPaths::findExecutable(parts.first, {QCoreApplication::applicationDirPath()});
-		// second: search in system paths
-		if(serviceId.isEmpty())
-			serviceId = QStandardPaths::findExecutable(parts.first);
-		// third: just use the name. Will still fail, but at least give the correct error message
-		if(serviceId.isEmpty())
-			serviceId = parts.first;
-	}
-
-	if(backend == QStringLiteral("standard"))
+	if (backend == QStringLiteral("standard"))
 		return new StandardServiceControl{false, std::move(serviceId), parent};
-	else if(backend == QStringLiteral("debug"))
+	else if (backend == QStringLiteral("debug"))
 		return new StandardServiceControl{true, std::move(serviceId), parent};
 	else
 		return nullptr;

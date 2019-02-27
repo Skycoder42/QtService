@@ -20,16 +20,13 @@ public:
 	virtual ~ServicePlugin();
 
 	//! Return the ID of the currently setup service
-	virtual QString currentServiceId() const = 0;
+	virtual QString currentServiceId(const QString &backend) const;
+	virtual QString findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const = 0;
 
 	//! Create a new service backend for the given backend and service
 	virtual ServiceBackend *createServiceBackend(const QString &backend, Service *service) = 0;
 	//! Create a new service backend for the given backend, name and parent
 	virtual ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) = 0;
-
-protected:
-	//! Check if the given service id is an encoded name and domain, and if yes decode them
-	QPair<QString, QString> detectNamedService(const QString &serviceId) const;
 };
 
 }

@@ -8,14 +8,17 @@ LaunchdServicePlugin::LaunchdServicePlugin(QObject *parent) :
 	QObject{parent}
 {}
 
-QString LaunchdServicePlugin::currentServiceId() const
+QString LaunchdServicePlugin::findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const
 {
-	return QCoreApplication::organizationDomain() + QLatin1Char('.') + QCoreApplication::applicationName();
+	if (backend == QStringLiteral("launchd"))
+		return domain.isEmpty() ? serviceName : domain + QLatin1Char('.') + serviceName;
+	else
+		return {};
 }
 
-QtService::ServiceBackend *LaunchdServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
+QtService::ServiceBackend *LaunchdServicePlugin::createServiceBackend(const QString &backend, QtService::Service *service)
 {
-	if(provider == QStringLiteral("launchd"))
+	if (backend == QStringLiteral("launchd"))
 		return new LaunchdServiceBackend{service};
 	else
 		return nullptr;
@@ -23,11 +26,7 @@ QtService::ServiceBackend *LaunchdServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *LaunchdServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-	auto parts = detectNamedService(serviceId);
-	if(!parts.first.isEmpty())
-		serviceId = parts.second + QLatin1Char('.') + parts.first;
-
-	if(backend == QStringLiteral("launchd"))
+	if (backend == QStringLiteral("launchd"))
 		return new LaunchdServiceControl{std::move(serviceId), parent};
 	else
 		return nullptr;

@@ -28,6 +28,16 @@ QString ServiceControl::likelyBackend()
 		return QStringLiteral("standard");
 }
 
+QString ServiceControl::serviceIdFromName(const QString &backend, const QString &name)
+{
+	return serviceIdFromName(backend, name, QCoreApplication::organizationDomain());
+}
+
+QString ServiceControl::serviceIdFromName(const QString &backend, const QString &name, const QString &domain)
+{
+	return ServicePrivate::idFromName(backend, name, domain);
+}
+
 ServiceControl *ServiceControl::create(const QString &backend, QString serviceId, QObject *parent)
 {
 	auto control = ServicePrivate::createControl(backend, std::move(serviceId), parent);
@@ -47,13 +57,12 @@ ServiceControl *ServiceControl::create(const QString &backend, QString serviceId
 
 ServiceControl *ServiceControl::createFromName(const QString &backend, const QString &serviceName, QObject *parent)
 {
-	return createFromName(backend, serviceName, QCoreApplication::organizationDomain(), parent);
+	return create(backend, serviceIdFromName(backend, serviceName), parent);
 }
 
 ServiceControl *ServiceControl::createFromName(const QString &backend, const QString &serviceName, const QString &domain, QObject *parent)
 {
-	//MAJOR change plugin interface to have 2 seperate methods. for now, string detection is used...
-	return create(backend, QStringLiteral("<<%1*%2>>").arg(serviceName, domain), parent);
+	return create(backend, serviceIdFromName(backend, serviceName, domain), parent);
 }
 
 ServiceControl::ServiceControl(QString &&serviceId, QObject *parent) :

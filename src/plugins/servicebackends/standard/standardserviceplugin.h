@@ -13,8 +13,9 @@ class StandardServicePlugin : public QObject, public QtService::ServicePlugin
 public:
 	StandardServicePlugin(QObject *parent = nullptr);
 
-	QString currentServiceId() const override;
-	QtService::ServiceBackend *createServiceBackend(const QString &provider, QtService::Service *service) override;
+	QString currentServiceId(const QString &backend) const override;
+	QString findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const override;
+	QtService::ServiceBackend *createServiceBackend(const QString &backend, QtService::Service *service) override;
 	QtService::ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) override;
 };
 

@@ -73,6 +73,8 @@ public:
 	static QStringList listBackends();
 	//! Returns the backend that is most likely to be used on the current platform
 	static QString likelyBackend();
+	static QString serviceIdFromName(const QString &backend, const QString &name);
+	static QString serviceIdFromName(const QString &backend, const QString &name, const QString &domain);
 	//! Creates a new ServiceControl for the given service on the service manager defined by backend
 	static ServiceControl *create(const QString &backend, QString serviceId, QObject *parent = nullptr);
 	//! @copybrief ServiceControl::create(const QString &, QString, QObject *)

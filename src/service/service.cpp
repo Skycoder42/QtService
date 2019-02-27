@@ -12,6 +12,16 @@
 
 #include "servicecontrol.h"
 
+#define METHOD_EXPAND(method, retType) \
+	template <typename... TArgs> \
+	retType method(const QString &provider, TArgs&&... args) { \
+		auto plg = plugin(provider); \
+		if(plg) \
+			return plg->method(provider, std::forward<TArgs>(args)...); \
+		else \
+			return {}; \
+	}
+
 namespace {
 
 class PluginObjectFactory : public QPluginFactory<QtService::ServicePlugin>
@@ -21,29 +31,10 @@ public:
 		QPluginFactory{pluginType, parent}
 	{}
 
-	QString currentServiceId(const QString &provider) const {
-		auto plg = plugin(provider);
-		if(plg)
-			return plg->currentServiceId();
-		else
-			return {};
-	}
-
-	QtService::ServiceBackend *createServiceBackend(const QString &provider, QtService::Service *service) {
-		auto plg = plugin(provider);
-		if(plg)
-			return plg->createServiceBackend(provider, service);
-		else
-			return nullptr;
-	}
-
-	QtService::ServiceControl *createServiceControl(const QString &provider, QString &&serviceId, QObject *parent) {
-		auto plg = plugin(provider);
-		if(plg)
-			return plg->createServiceControl(provider, std::move(serviceId), parent);
-		else
-			return nullptr;
-	}
+	METHOD_EXPAND(currentServiceId, QString)
+	METHOD_EXPAND(findServiceId, QString)
+	METHOD_EXPAND(createServiceBackend, QtService::ServiceBackend*)
+	METHOD_EXPAND(createServiceControl, QtService::ServiceControl*)
 };
 Q_GLOBAL_STATIC_WITH_ARGS(PluginObjectFactory, factory, (QString::fromUtf8("servicebackends")))
 
@@ -274,6 +265,11 @@ ServicePrivate::ServicePrivate(Service *q_ptr, int &argc, char **argv, int flags
 QStringList ServicePrivate::listBackends()
 {
 	return factory->allKeys();
+}
+
+QString ServicePrivate::idFromName(const QString &provider, const QString &serviceName, const QString &domain)
+{
+	return factory->findServiceId(provider, serviceName, domain);
 }
 
 ServiceControl *ServicePrivate::createControl(const QString &provider, QString &&serviceId, QObject *parent)

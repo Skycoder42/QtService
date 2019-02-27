@@ -9,14 +9,18 @@ SystemdServicePlugin::SystemdServicePlugin(QObject *parent) :
 	QObject(parent)
 {}
 
-QString SystemdServicePlugin::currentServiceId() const
+QString SystemdServicePlugin::findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const
 {
-	return QCoreApplication::applicationName() + QStringLiteral(".service");
+	Q_UNUSED(domain)
+	if (backend == QStringLiteral("systemd"))
+		return serviceName + QStringLiteral(".service");
+	else
+		return {};
 }
 
-ServiceBackend *SystemdServicePlugin::createServiceBackend(const QString &provider, Service *service)
+ServiceBackend *SystemdServicePlugin::createServiceBackend(const QString &backend, Service *service)
 {
-	if(provider == QStringLiteral("systemd"))
+	if (backend == QStringLiteral("systemd"))
 		return new SystemdServiceBackend{service};
 	else
 		return nullptr;
@@ -24,24 +28,7 @@ ServiceBackend *SystemdServicePlugin::createServiceBackend(const QString &provid
 
 ServiceControl *SystemdServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-	auto parts = detectNamedService(serviceId);
-	if(!parts.first.isEmpty()) {
-		// first: get the service control for the long version and create a control instance via recursion
-		serviceId = parts.second + QLatin1Char('.') + parts.first + QStringLiteral(".service");
-		auto longCtrl = createServiceControl(backend, std::move(serviceId), parent);
-		// test if that instance actually exists
-		if(longCtrl) {
-			if(longCtrl->serviceExists())
-				return longCtrl;
-			else
-				delete longCtrl;
-		}
-
-		// second: use the short name and continue as usual
-		serviceId = parts.first + QStringLiteral(".service");
-	}
-
-	if(backend == QStringLiteral("systemd"))
+	if (backend == QStringLiteral("systemd"))
 		return new SystemdServiceControl{std::move(serviceId), parent};
 	else
 		return nullptr;

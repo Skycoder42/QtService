@@ -8,14 +8,18 @@ WindowsServicePlugin::WindowsServicePlugin(QObject *parent) :
 	QObject(parent)
 {}
 
-QString WindowsServicePlugin::currentServiceId() const
+QString WindowsServicePlugin::findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const
 {
-	return QCoreApplication::applicationName();
+	Q_UNUSED(domain)
+	if (backend == QStringLiteral("windows"))
+		return serviceName;
+	else
+		return {};
 }
 
-QtService::ServiceBackend *WindowsServicePlugin::createServiceBackend(const QString &provider, QtService::Service *service)
+QtService::ServiceBackend *WindowsServicePlugin::createServiceBackend(const QString &backend, QtService::Service *service)
 {
-	if(provider == QStringLiteral("windows"))
+	if (backend == QStringLiteral("windows"))
 		return new WindowsServiceBackend{service};
 	else
 		return nullptr;
@@ -23,11 +27,7 @@ QtService::ServiceBackend *WindowsServicePlugin::createServiceBackend(const QStr
 
 QtService::ServiceControl *WindowsServicePlugin::createServiceControl(const QString &backend, QString &&serviceId, QObject *parent)
 {
-	auto parts = detectNamedService(serviceId);
-	if(!parts.first.isEmpty())
-		serviceId = parts.first;
-
-	if(backend == QStringLiteral("windows"))
+	if (backend == QStringLiteral("windows"))
 		return new WindowsServiceControl{std::move(serviceId), parent};
 	else
 		return nullptr;

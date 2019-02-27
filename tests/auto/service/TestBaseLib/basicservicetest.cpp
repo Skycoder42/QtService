@@ -8,10 +8,6 @@ BasicServiceTest::BasicServiceTest(QObject *parent) :
 
 void BasicServiceTest::initTestCase()
 {
-#ifdef Q_OS_LINUX
-	if(!qgetenv("LD_PRELOAD").contains("Qt5Service"))
-		qWarning() << "No LD_PRELOAD set - this may fail on systems with multiple version of the modules";
-#endif
 	init();
 	control = ServiceControl::create(backend(), name(), this);
 	QVERIFY(control);
