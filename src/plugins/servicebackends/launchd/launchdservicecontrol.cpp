@@ -2,6 +2,11 @@
 #include "launchdserviceplugin.h"
 #include <QtCore/QStandardPaths>
 #include <QtCore/QProcess>
+#include <QtCore/QRegularExpression>
+
+#include <unistd.h>
+#include <sys/types.h>
+
 using namespace QtService;
 
 LaunchdServiceControl::LaunchdServiceControl(QString &&serviceId, QObject *parent) :
@@ -15,12 +20,31 @@ QString LaunchdServiceControl::backend() const
 
 ServiceControl::SupportFlags LaunchdServiceControl::supportFlags() const
 {
-	return SupportsStartStop | SupportsCustomCommands | SupportsNonBlocking;
+	return SupportsStartStop |
+			SupportsCustomCommands |
+			SupportsNonBlocking |
+			SupportsDisable;
 }
 
 bool LaunchdServiceControl::serviceExists() const
 {
 	return runLaunchctl("list") == EXIT_SUCCESS;
+}
+
+bool LaunchdServiceControl::isEnabled() const
+{
+	const auto target = QStringLiteral("/user/%1/")
+						.arg(::getuid());
+	QByteArray outData;
+	if (runLaunchctl("print-disabled", {target}, false, &outData) == EXIT_SUCCESS) {
+		const QRegularExpression lineRegex{
+			QStringLiteral(R"__(\"%1\"\s*=>\s*true)__").arg(serviceId()),
+			QRegularExpression::DontCaptureOption
+		};
+		// if not explicitly disabled, assume enabled
+		return !lineRegex.match(QString::fromUtf8(outData)).hasMatch();
+	} else
+		return true; // assume enabled by default
 }
 
 QVariant LaunchdServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
@@ -42,12 +66,23 @@ bool LaunchdServiceControl::stop()
 	return runLaunchctl("stop") == EXIT_SUCCESS;
 }
 
+bool LaunchdServiceControl::setEnabled(bool enabled)
+{
+	if(enabled == isEnabled())
+		return true;
+
+	const auto target = QStringLiteral("/user/%1/%2")
+						.arg(::getuid())
+						.arg(serviceId());
+	return runLaunchctl(enabled ? "enable" : "disable", {target}, false) == EXIT_SUCCESS;
+}
+
 QString LaunchdServiceControl::serviceName() const
 {
 	return serviceId().split(QLatin1Char('.')).last();
 }
 
-int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QStringList &extraArgs) const
+int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QStringList &extraArgs, bool withServiceId, QByteArray *outData) const
 {
 	const auto launchctl = QStandardPaths::findExecutable(QStringLiteral("launchctl"));
 	if(launchctl.isEmpty()) {
@@ -62,15 +97,19 @@ int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QString
 	args.reserve(extraArgs.size() + 2);
 	args.append(QString::fromUtf8(command));
 	args.append(extraArgs);
-	args.append(serviceId());
+	if(withServiceId)
+		args.append(serviceId());
 	process.setArguments(args);
 
 	process.setStandardInputFile(QProcess::nullDevice());
-	process.setStandardOutputFile(QProcess::nullDevice());
+	if(!outData)
+		process.setStandardOutputFile(QProcess::nullDevice());
 	process.setProcessChannelMode(QProcess::ForwardedErrorChannel);
 
 	process.start(QProcess::ReadOnly);
 	if(process.waitForFinished(isBlocking() ? -1 : 2500)) {//non-blocking calls should finish within two seconds
+		if(outData)
+			*outData = process.readAllStandardOutput();
 		if(process.exitStatus() == QProcess::NormalExit)
 			return process.exitCode();
 		else {
