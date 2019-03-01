@@ -210,6 +210,20 @@ void BasicServiceTest::testAutostart()
 	QVERIFY2(!control->isAutostartEnabled(), qUtf8Printable(control->error()));
 }
 
+void BasicServiceTest::testDisable()
+{
+	QVERIFY2(control->isEnabled(), qUtf8Printable(control->error()));
+
+	testFeature(ServiceControl::SupportsDisable);
+	QVERIFY2(control->setEnabled(false), qUtf8Printable(control->error()));
+	QVERIFY2(!control->isEnabled(), qUtf8Printable(control->error()));
+
+	QVERIFY(!control->start());
+
+	QVERIFY2(control->setEnabled(true), qUtf8Printable(control->error()));
+	QVERIFY2(control->isEnabled(), qUtf8Printable(control->error()));
+}
+
 QString BasicServiceTest::name()
 {
 	return QStringLiteral("testservice");

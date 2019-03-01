@@ -87,6 +87,11 @@ QString ServiceControl::error() const
 	return d->error;
 }
 
+bool ServiceControl::isEnabled() const
+{
+	return true;
+}
+
 QVariant ServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
 {
 	Q_UNUSED(args)
@@ -193,6 +198,12 @@ void ServiceControl::setBlocking(bool blocking)
 void ServiceControl::clearError()
 {
 	setError(QString{});
+}
+
+bool ServiceControl::setEnabled(bool enabled)
+{
+	Q_UNUSED(enabled);
+	return false;
 }
 
 QString ServiceControl::serviceName() const

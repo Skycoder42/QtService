@@ -29,6 +29,8 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 	//! A string describing the last error that occured
 	Q_PROPERTY(QString error READ error RESET clearError NOTIFY errorChanged)
 
+	Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled) // clazy:exclude=qproperty-without-notify
+
 public:
 	//! Flags that indicate what kind of queries and commands the specific control implementation provides
 	enum SupportFlag {
@@ -44,6 +46,8 @@ public:
 
 		SupportsStatus = 0x0200, //!< Can read the current status of a service
 		SupportsCustomCommands = 0x0400, //!< Supports the execution of specific custom commands
+
+		SupportsDisable = 0x0800, //!< Can enable/disable the servia via ServiceControl::enabled
 
 		SupportsStartStop = (SupportsStart | SupportsStop), //!< SupportsStart | SupportsStop
 		SupportsPauseResume = (SupportsPause | SupportsResume), //!< SupportsPause | SupportsResume
@@ -96,6 +100,8 @@ public:
 	bool isBlocking() const;
 	//! @readAcFn{ServiceControl::error}
 	QString error() const;
+	//! @readAcFn{ServiceControl::enabled}
+	virtual bool isEnabled() const;
 
 	//! Calls the command of kind with the given arguments and returns it's result
 	Q_INVOKABLE virtual QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args = {});
@@ -157,6 +163,8 @@ public Q_SLOTS:
 	void setBlocking(bool blocking);
 	//! @resetAcFn{ServiceControl::error}
 	void clearError();
+	//! @writeAcFn{ServiceControl::enabled}
+	virtual bool setEnabled(bool enabled);
 
 Q_SIGNALS:
 	//! @notifyAcFn{ServiceControl::blocking}

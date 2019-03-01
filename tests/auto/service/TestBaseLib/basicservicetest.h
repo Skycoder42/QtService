@@ -34,6 +34,7 @@ private Q_SLOTS:
 #endif
 
 	void testAutostart();
+	void testDisable();
 
 protected:
 	QtService::ServiceControl *control = nullptr;

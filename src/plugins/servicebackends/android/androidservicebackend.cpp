@@ -1,10 +1,10 @@
 #include "androidservicebackend.h"
 #include "androidserviceplugin.h"
-#include <QtCore/QEventLoop>
+#include <QtCore/QPointer>
+#include <QtCore/QDebug>
 #include <QtAndroidExtras/QAndroidService>
 #include <QtAndroidExtras/QtAndroid>
 #include <QtAndroidExtras/QAndroidJniExceptionCleaner>
-#include <QPointer>
 using namespace QtService;
 
 QPointer<AndroidServiceBackend> AndroidServiceBackend::_backendInstance = nullptr;
@@ -103,7 +103,7 @@ void AndroidServiceBackend::onExit()
 
 void AndroidServiceBackend::onStopped(int exitCode)
 {
-	Q_UNUSED(exitCode)  //TODO print result or so
+	qCInfo(logQtService) << "QAndroidService exited with code:" << exitCode;
 	_javaService.callMethod<void>("nativeExited");
 }
 
