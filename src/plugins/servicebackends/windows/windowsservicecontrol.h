@@ -16,15 +16,17 @@ public:
 	bool serviceExists() const override;
 	ServiceStatus status() const override;
 	bool isAutostartEnabled() const override;
+	bool isEnabled() const override;
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
 
-public slots:
+public Q_SLOTS:
 	bool start() override;
 	bool stop() override;
 	bool pause() override;
 	bool resume() override;
 	bool enableAutostart() override;
 	bool disableAutostart() override;
+	bool setEnabled(bool enabled) override;
 
 private:
 	class HandleHolder {

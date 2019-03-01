@@ -23,7 +23,8 @@ ServiceControl::SupportFlags WindowsServiceControl::supportFlags() const
 			SupportsAutostart |
 			SupportsNonBlocking |
 			SupportsStatus |
-			SupportsCustomCommands;
+			SupportsCustomCommands |
+			SupportsDisable;
 }
 
 bool WindowsServiceControl::serviceExists() const
@@ -89,6 +90,29 @@ bool WindowsServiceControl::isAutostartEnabled() const
 		return true;
 	default:
 		return false;
+	}
+}
+
+bool WindowsServiceControl::isEnabled() const
+{
+	HandleHolder handle {svcHandle(SERVICE_QUERY_CONFIG)};
+	if(!handle)
+		return true;  // assume enabled by default
+
+	DWORD sizeNeeded = 0;
+	QueryServiceConfigW(handle, nullptr, 0, &sizeNeeded);
+	QByteArray cData{static_cast<int>(sizeNeeded), '\0'};
+	auto config = reinterpret_cast<LPQUERY_SERVICE_CONFIGW>(cData.data());
+	if(!QueryServiceConfigW(handle, config, cData.size(), &sizeNeeded)) {
+		setWinError(tr("Failed to query service status with error: %1"));
+		return true;  // assume enabled by default
+	}
+
+	switch(config->dwStartType) {
+	case SERVICE_DISABLED:
+		return false;
+	default:
+		return true;
 	}
 }
 
@@ -187,6 +211,14 @@ bool WindowsServiceControl::resume()
 
 bool WindowsServiceControl::enableAutostart()
 {
+	// do not change anything on a disabled service
+	if(!isEnabled())
+		return false;
+
+	// If autostart is already enabled, keep it as is, i.e. do not change the autostart type
+	if(isAutostartEnabled())
+		return true;
+
 	HandleHolder handle {svcHandle(SERVICE_CHANGE_CONFIG)};
 	if(!handle)
 		return false;
@@ -205,11 +237,15 @@ bool WindowsServiceControl::enableAutostart()
 
 bool WindowsServiceControl::disableAutostart()
 {
+	// do not change anything on a disabled service
+	if(!isEnabled())
+		return true;
+
 	HandleHolder handle {svcHandle(SERVICE_CHANGE_CONFIG)};
-	if(!handle)
+	if (!handle)
 		return false;
 
-	if(ChangeServiceConfigW(handle,
+	if (ChangeServiceConfigW(handle,
 							 SERVICE_NO_CHANGE,
 							 SERVICE_DEMAND_START, // only line that actually changes stuff
 							 SERVICE_NO_CHANGE,
@@ -217,6 +253,27 @@ bool WindowsServiceControl::disableAutostart()
 		return true;
 	} else {
 		setWinError(tr("Failed to enable autostart with error: %1"));
+		return false;
+	}
+}
+
+bool WindowsServiceControl::setEnabled(bool enabled)
+{
+	if(enabled == isEnabled())
+		return true;
+
+	HandleHolder handle {svcHandle(SERVICE_CHANGE_CONFIG)};
+	if (!handle)
+		return false;
+
+	if (ChangeServiceConfigW(handle,
+							 SERVICE_NO_CHANGE,
+							 enabled ? SERVICE_DEMAND_START : SERVICE_DISABLED, // only line that actually changes stuff
+							 SERVICE_NO_CHANGE,
+							 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)) {
+		return true;
+	} else {
+		setWinError(tr("Failed to enable/disable service with error: %1"));
 		return false;
 	}
 }
