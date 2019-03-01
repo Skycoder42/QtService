@@ -33,7 +33,7 @@ bool LaunchdServiceControl::serviceExists() const
 
 bool LaunchdServiceControl::isEnabled() const
 {
-	const auto target = QStringLiteral("/user/%1/")
+	const auto target = QStringLiteral("user/%1/")
 						.arg(::getuid());
 	QByteArray outData;
 	if (runLaunchctl("print-disabled", {target}, false, &outData) == EXIT_SUCCESS) {
@@ -71,7 +71,7 @@ bool LaunchdServiceControl::setEnabled(bool enabled)
 	if(enabled == isEnabled())
 		return true;
 
-	const auto target = QStringLiteral("/user/%1/%2")
+	const auto target = QStringLiteral("user/%1/%2")
 						.arg(::getuid())
 						.arg(serviceId());
 	return runLaunchctl(enabled ? "enable" : "disable", {target}, false) == EXIT_SUCCESS;
