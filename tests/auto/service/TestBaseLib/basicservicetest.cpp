@@ -218,7 +218,13 @@ void BasicServiceTest::testDisable()
 	QVERIFY2(control->setEnabled(false), qUtf8Printable(control->error()));
 	QVERIFY2(!control->isEnabled(), qUtf8Printable(control->error()));
 
-	QVERIFY(!control->start());
+	if (control->start()) {
+		// start command succeded - wait for the service to not reach running status
+		for(auto i = 0; i < 5; ++i) {
+			QThread::msleep(1000);
+			TEST_STATUS(ServiceControl::ServiceStopped);
+		}
+	}
 
 	QVERIFY2(control->setEnabled(true), qUtf8Printable(control->error()));
 	QVERIFY2(control->isEnabled(), qUtf8Printable(control->error()));
