@@ -18,17 +18,21 @@ public:
 	QString backend() const override;
 	SupportFlags supportFlags() const override;
 	bool serviceExists() const override;
+	bool isEnabled() const override;
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
 
 public Q_SLOTS:
 	bool start() override;
 	bool stop() override;
+	bool setEnabled(bool enabled) override;
 
 protected:
 	QString serviceName() const override;
 
 private:
 	QByteArray jniServiceId() const;
+	QAndroidJniObject serviceComponent() const;
+	QAndroidJniObject serviceInfo() const;
 
 	bool bind(QAndroidServiceConnection *serviceConnection, QtAndroid::BindFlags flags);
 	void unbind(QAndroidServiceConnection *serviceConnection);

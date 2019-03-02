@@ -190,6 +190,7 @@ Module {
                 "SupportsNonBlocking": 256,
                 "SupportsStatus": 512,
                 "SupportsCustomCommands": 1024,
+                "SupportsDisable": 2048,
                 "SupportsStartStop": 3,
                 "SupportsPauseResume": 12,
                 "SupportsAutostart": 96,
@@ -220,6 +221,7 @@ Module {
         }
         Property { name: "blocking"; type: "bool" }
         Property { name: "error"; type: "string"; isReadonly: true }
+        Property { name: "enabled"; type: "bool" }
         Signal {
             name: "blockingChanged"
             Parameter { name: "blocking"; type: "bool" }
@@ -241,6 +243,11 @@ Module {
             Parameter { name: "blocking"; type: "bool" }
         }
         Method { name: "clearError" }
+        Method {
+            name: "setEnabled"
+            type: "bool"
+            Parameter { name: "enabled"; type: "bool" }
+        }
         Method {
             name: "callGenericCommand"
             type: "QVariant"
