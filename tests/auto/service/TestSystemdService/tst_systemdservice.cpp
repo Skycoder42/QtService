@@ -82,7 +82,7 @@ void TestSystemdService::cleanup()
 
 void TestSystemdService::testCustomImpl()
 {
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	QCOMPARE(control->status(), ServiceControl::Status::Running);
 
 	QCOMPARE(control->callCommand<int>("kill", QStringLiteral("--signal=SIGTSTP")), EXIT_SUCCESS);
 	QByteArray msg;

@@ -36,7 +36,7 @@ private:
 	Service *_service;
 	QStringList _cmdArgs;
 
-	Service::TerminalMode _mode = Service::ReadWriteActive;
+	Service::TerminalMode _mode = Service::TerminalMode::ReadWriteActive;
 	QLocalSocket *_socket = nullptr;
 	QDataStream _stream;
 	QFile *_outFile = nullptr;

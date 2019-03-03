@@ -11,14 +11,14 @@ Terminal::Terminal(TerminalPrivate *d_ptr, QObject *parent) :
 
 	QIODevice::OpenMode mode;
 	switch(d->terminalMode) {
-	case QtService::Service::ReadOnly:
+	case QtService::Service::TerminalMode::ReadOnly:
 		mode = QIODevice::WriteOnly; // a read only terminal means the service can only write
 		break;
-	case QtService::Service::WriteOnly:
+	case QtService::Service::TerminalMode::WriteOnly:
 		mode = QIODevice::ReadOnly; // a write only terminal means the service can only read
 		break;
-	case QtService::Service::ReadWritePassive:
-	case QtService::Service::ReadWriteActive:
+	case QtService::Service::TerminalMode::ReadWritePassive:
+	case QtService::Service::TerminalMode::ReadWriteActive:
 		mode = QIODevice::ReadWrite;
 		break;
 	}
@@ -121,7 +121,7 @@ void Terminal::disconnectTerminal()
 
 void Terminal::requestChar()
 {
-	if(d->terminalMode != Service::ReadWriteActive) {
+	if(d->terminalMode != Service::TerminalMode::ReadWriteActive) {
 		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
 		return;
 	}
@@ -133,7 +133,7 @@ void Terminal::requestChar()
 void Terminal::requestChars(qint64 num)
 {
 	Q_ASSERT_X(num > 0, Q_FUNC_INFO, "Cannot read negative amounts of data");
-	if(d->terminalMode != Service::ReadWriteActive) {
+	if(d->terminalMode != Service::TerminalMode::ReadWriteActive) {
 		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
 		return;
 	}
@@ -145,7 +145,7 @@ void Terminal::requestChars(qint64 num)
 
 void Terminal::requestLine()
 {
-	if(d->terminalMode != Service::ReadWriteActive) {
+	if(d->terminalMode != Service::TerminalMode::ReadWriteActive) {
 		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
 		return;
 	}
@@ -187,7 +187,7 @@ qint64 Terminal::readLineData(char *data, qint64 maxlen)
 
 qint64 Terminal::writeData(const char *data, qint64 len)
 {
-	if(d->terminalMode == Service::ReadWriteActive) {
+	if(d->terminalMode == Service::TerminalMode::ReadWriteActive) {
 		if(len > std::numeric_limits<int>::max()) {
 			for(qint64 lIndex = 0; lIndex < len; lIndex += std::numeric_limits<int>::max()) {
 				auto writeData = data + lIndex;

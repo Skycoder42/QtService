@@ -113,7 +113,7 @@ void TerminalClient::error(QLocalSocket::LocalSocketError socketError)
 
 void TerminalClient::socketReady()
 {
-	if(_mode == Service::ReadWriteActive) {
+	if(_mode == Service::TerminalMode::ReadWriteActive) {
 		// in this mode, data is stream to "channel" it
 		while(!_stream.atEnd()) {
 			_stream.startTransaction();
@@ -203,13 +203,13 @@ bool TerminalClient::ensureServiceStarted()
 	auto control = ServicePrivate::createLocalControl(_service->backend(), this);
 	if(!control)
 		qCWarning(logQtService) << "Unable to create control to ensure service is running";
-	else if(!control->supportFlags().testFlag(ServiceControl::SupportsStart))
+	else if(!control->supportFlags().testFlag(ServiceControl::SupportFlag::Start))
 		qCWarning(logQtService) << "Service control does not support starting - cannot start service";
 	else {
 		control->setBlocking(true);
-		auto canStatus = control->supportFlags().testFlag(ServiceControl::SupportsStatus);
+		auto canStatus = control->supportFlags().testFlag(ServiceControl::SupportFlag::Status);
 		// start the service, depending on its status (if possible)
-		if(!canStatus || control->status() == ServiceControl::ServiceStopped) {
+		if(!canStatus || control->status() == ServiceControl::Status::Stopped) {
 			if(!control->start()) {
 				qCCritical(logQtService).noquote() << control->error();
 				return false;
@@ -217,12 +217,12 @@ bool TerminalClient::ensureServiceStarted()
 		}
 		// ensure the service is running for controls that can check it
 		if(canStatus) {
-			auto waitCnt = control->blocking() == ServiceControl::Blocking ? 0 : 15;
-			while(control->status() != ServiceControl::ServiceRunning && waitCnt > 0) {
+			auto waitCnt = control->blocking() == ServiceControl::BlockMode::Blocking ? 0 : 15;
+			while(control->status() != ServiceControl::Status::Running && waitCnt > 0) {
 				QThread::sleep(1);
 				--waitCnt;
 			}
-			if(control->status() != ServiceControl::ServiceRunning) {
+			if(control->status() != ServiceControl::Status::Running) {
 				if(!control->error().isNull())
 					qCCritical(logQtService).noquote() << control->error();
 				else
@@ -239,7 +239,7 @@ void TerminalClient::setupChannels()
 {
 	_socket = new QLocalSocket{this};
 	_outFile = QConsole::qStdOut(this);
-	if(_mode == Service::ReadWriteActive)
+	if(_mode == Service::TerminalMode::ReadWriteActive)
 		_inFile = QConsole::qStdIn(this);
 	else {
 		_inConsole = new QConsole{this};

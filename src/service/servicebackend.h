@@ -4,6 +4,7 @@
 #include <QtCore/qobject.h>
 #include <QtCore/qbytearraylist.h>
 #include <QtCore/qscopedpointer.h>
+#include <QtCore/qhash.h>
 
 #include "QtService/qtservice_global.h"
 #include "QtService/service.h"
@@ -18,12 +19,12 @@ class Q_SERVICE_EXPORT ServiceBackend : public QObject
 
 public:
 	//! The standard service commands that the library can handle
-	enum ServiceCommand {
-		StartCommand, //!< Service was started. Will lead to Service::onStart beeing called
-		StopCommand, //!< Service should stop. Will lead to Service::onStop beeing called
-		ReloadCommand, //!< Service should reload. Will lead to Service::onReload beeing called
-		PauseCommand, //!< Service should pause. Will lead to Service::onPause beeing called
-		ResumeCommand //!< Service was resumed. Will lead to Service::onResume beeing called
+	enum class ServiceCommand {
+		Start, //!< Service was started. Will lead to Service::onStart beeing called
+		Stop, //!< Service should stop. Will lead to Service::onStop beeing called
+		Reload, //!< Service should reload. Will lead to Service::onReload beeing called
+		Pause, //!< Service should pause. Will lead to Service::onPause beeing called
+		Resume //!< Service was resumed. Will lead to Service::onResume beeing called
 	};
 	Q_ENUM(ServiceCommand)
 
@@ -86,6 +87,10 @@ private Q_SLOTS:
 private:
 	QScopedPointer<ServiceBackendPrivate> d;
 };
+
+Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceBackend::ServiceCommand key, uint seed = 0) Q_DECL_NOTHROW {
+	return ::qHash(static_cast<int>(key), seed);
+}
 
 template<typename TRet, typename... TArgs>
 TRet ServiceBackend::processServiceCallback(const QByteArray &kind, TArgs... args)

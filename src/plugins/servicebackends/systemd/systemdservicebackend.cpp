@@ -37,13 +37,13 @@ void SystemdServiceBackend::quitService()
 			this, &SystemdServiceBackend::onStopped,
 			Qt::UniqueConnection);
 	sd_notify(false, "STOPPING=1");
-	processServiceCommand(StopCommand);
+	processServiceCommand(ServiceCommand::Stop);
 }
 
 void SystemdServiceBackend::reloadService()
 {
 	sd_notify(false, "RELOADING=1");
-	processServiceCommand(ReloadCommand);
+	processServiceCommand(ServiceCommand::Reload);
 }
 
 QList<int> SystemdServiceBackend::getActivatedSockets(const QByteArray &name)
@@ -82,10 +82,10 @@ void SystemdServiceBackend::signalTriggered(int signal)
 		reloadService();
 		break;
 	case SIGTSTP:
-		processServiceCommand(PauseCommand);
+		processServiceCommand(ServiceCommand::Pause);
 		break;
 	case SIGCONT:
-		processServiceCommand(ResumeCommand);
+		processServiceCommand(ServiceCommand::Resume);
 		break;
 	case SIGUSR1:
 		processServiceCallback("SIGUSR1");
@@ -152,7 +152,7 @@ int SystemdServiceBackend::run(int &argc, char **argv, int flags)
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
 	return QCoreApplication::exec();
 }
 

@@ -14,7 +14,7 @@ public:
 	QString backend() const override;
 	SupportFlags supportFlags() const override;
 	bool serviceExists() const override;
-	ServiceStatus status() const override;
+	Status status() const override;
 	BlockMode blocking() const override;
 
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;

@@ -27,7 +27,7 @@ int LaunchdServiceBackend::runService(int &argc, char **argv, int flags)
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
 	return app.exec();
 }
 
@@ -36,12 +36,12 @@ void LaunchdServiceBackend::quitService()
 	connect(service(), &Service::stopped,
 			qApp, &QCoreApplication::exit,
 			Qt::UniqueConnection);
-	processServiceCommand(StopCommand);
+	processServiceCommand(ServiceCommand::Stop);
 }
 
 void LaunchdServiceBackend::reloadService()
 {
-	processServiceCommand(ReloadCommand);
+	processServiceCommand(ServiceCommand::Reload);
 }
 
 QList<int> LaunchdServiceBackend::getActivatedSockets(const QByteArray &name)
@@ -77,10 +77,10 @@ void LaunchdServiceBackend::signalTriggered(int signal)
 		reloadService();
 		break;
 	case SIGTSTP:
-		processServiceCommand(PauseCommand);
+		processServiceCommand(ServiceCommand::Pause);
 		break;
 	case SIGCONT:
-		processServiceCommand(ResumeCommand);
+		processServiceCommand(ServiceCommand::Resume);
 		break;
 	case SIGUSR1:
 		processServiceCallback("SIGUSR1");

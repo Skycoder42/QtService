@@ -38,7 +38,7 @@ private Q_SLOTS:
 private:
 	QLocalSocket *socket;
 
-	Service::TerminalMode terminalMode = Service::ReadWriteActive;
+	Service::TerminalMode terminalMode = Service::TerminalMode::ReadWriteActive;
 	QStringList command;
 	bool autoDelete = true;
 

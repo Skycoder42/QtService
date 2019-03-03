@@ -75,7 +75,7 @@ QString ServiceControl::serviceId() const
 
 ServiceControl::BlockMode ServiceControl::blocking() const
 {
-	return Undetermined;
+	return BlockMode::Undetermined;
 }
 
 QString ServiceControl::error() const
@@ -96,11 +96,11 @@ QVariant ServiceControl::callGenericCommand(const QByteArray &kind, const QVaria
 	return {};
 }
 
-ServiceControl::ServiceStatus ServiceControl::status() const
+ServiceControl::Status ServiceControl::status() const
 {
 	setError(tr("Reading the service status is not implemented for backend %1")
 			 .arg(backend()));
-	return ServiceStatusUnknown;
+	return Status::Unknown;
 }
 
 bool ServiceControl::isAutostartEnabled() const
@@ -131,7 +131,7 @@ bool ServiceControl::stop()
 
 bool ServiceControl::restart()
 {
-	if(blocking() == Blocking) {
+	if(blocking() == BlockMode::Blocking) {
 		auto ok = stop();
 		if(ok)
 			ok = start();

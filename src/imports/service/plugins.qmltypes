@@ -87,10 +87,10 @@ Module {
         Enum {
             name: "CommandResult"
             values: {
-                "OperationCompleted": 0,
-                "OperationPending": 1,
-                "OperationFailed": 2,
-                "OperationExit": 3
+                "Completed": 0,
+                "Pending": 1,
+                "Failed": 2,
+                "Exit": 3
             }
         }
         Enum {
@@ -179,35 +179,35 @@ Module {
         Enum {
             name: "SupportFlags"
             values: {
-                "SupportsStart": 1,
-                "SupportsStop": 2,
-                "SupportsPause": 4,
-                "SupportsResume": 8,
-                "SupportsReload": 16,
-                "SupportsGetAutostart": 32,
-                "SupportsSetAutostart": 64,
-                "SupportsSetBlocking": 128,
-                "SupportsSetEnabled": 256,
-                "SupportsStatus": 512,
-                "SupportsCustomCommands": 1024,
-                "SupportsStartStop": 3,
-                "SupportsPauseResume": 12,
-                "SupportsAutostart": 96
+                "Start": 1,
+                "Stop": 2,
+                "Pause": 4,
+                "Resume": 8,
+                "Reload": 16,
+                "GetAutostart": 32,
+                "SetAutostart": 64,
+                "SetBlocking": 128,
+                "SetEnabled": 256,
+                "Status": 512,
+                "CustomCommands": 1024,
+                "StartStop": 3,
+                "PauseResume": 12,
+                "Autostart": 96
             }
         }
         Enum {
-            name: "ServiceStatus"
+            name: "Status"
             values: {
-                "ServiceStatusUnknown": 0,
-                "ServiceStopped": 1,
-                "ServiceStarting": 2,
-                "ServiceRunning": 3,
-                "ServicePausing": 4,
-                "ServicePaused": 5,
-                "ServiceResuming": 6,
-                "ServiceReloading": 7,
-                "ServiceStopping": 8,
-                "ServiceErrored": 9
+                "Unknown": 0,
+                "Stopped": 1,
+                "Starting": 2,
+                "Running": 3,
+                "Pausing": 4,
+                "Paused": 5,
+                "Resuming": 6,
+                "Reloading": 7,
+                "Stopping": 8,
+                "Errored": 9
             }
         }
         Enum {
@@ -267,7 +267,7 @@ Module {
             Parameter { name: "kind"; type: "QByteArray" }
         }
         Method { name: "serviceExists"; type: "bool" }
-        Method { name: "status"; type: "QtService::ServiceControl::ServiceStatus" }
+        Method { name: "status"; type: "QtService::ServiceControl::Status" }
         Method { name: "isAutostartEnabled"; type: "bool" }
         Method { name: "runtimeDir"; type: "QDir" }
     }

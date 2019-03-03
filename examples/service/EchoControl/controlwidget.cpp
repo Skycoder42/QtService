@@ -53,35 +53,35 @@ void ControlWidget::on_loadButton_clicked()
 	ui->backendComboBox->setEnabled(false);
 	ui->nameLineEdit->setEnabled(false);
 
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsSetBlocking)) {
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::SetBlocking)) {
 		ui->bLockingCheckBox->setEnabled(true);
-		ui->bLockingCheckBox->setChecked(_control->blocking() == ServiceControl::Blocking);
-	} else if(_control->blocking() == ServiceControl::Blocking)
+		ui->bLockingCheckBox->setChecked(_control->blocking() == ServiceControl::BlockMode::Blocking);
+	} else if(_control->blocking() == ServiceControl::BlockMode::Blocking)
 		ui->bLockingCheckBox->setChecked(true);
-	else if(_control->blocking() == ServiceControl::NonBlocking)
+	else if(_control->blocking() == ServiceControl::BlockMode::NonBlocking)
 		ui->bLockingCheckBox->setChecked(false);
 	else
 		ui->bLockingCheckBox->setCheckState(Qt::PartiallyChecked);
 
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsGetAutostart))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::GetAutostart))
 		ui->enabledCheckBox->setChecked(_control->isAutostartEnabled());
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsSetAutostart))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::SetAutostart))
 		ui->enabledCheckBox->setEnabled(true);
 
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsStatus)) {
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::Status)) {
 		ui->actionReload->setEnabled(true);
 		setStatus();
 	}
 
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsStart))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::Start))
 		ui->startButton->setEnabled(true);
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsStop))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::Stop))
 		ui->stopButton->setEnabled(true);
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsPause))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::Pause))
 		ui->pauseButton->setEnabled(true);
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsResume))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::Resume))
 		ui->resumeButton->setEnabled(true);
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsReload))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::Reload))
 		ui->reloadButton->setEnabled(true);
 }
 
@@ -117,9 +117,9 @@ void ControlWidget::setStatus()
 {
 	if(!_control)
 		return;
-	auto metaEnum = QMetaEnum::fromType<ServiceControl::ServiceStatus>();
+	auto metaEnum = QMetaEnum::fromType<ServiceControl::Status>();
 	ui->statusLineEdit->setText(QString::fromUtf8(metaEnum.valueToKey(static_cast<int>(_control->status()))));
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsGetAutostart))
+	if(_control->supportFlags().testFlag(ServiceControl::SupportFlag::GetAutostart))
 		ui->enabledCheckBox->setChecked(_control->isAutostartEnabled());
 }
 

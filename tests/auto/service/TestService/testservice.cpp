@@ -28,10 +28,10 @@ Service::CommandResult TestService::onStart()
 	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
 	if(config.value(QStringLiteral("exit")).toBool()) {
 		qDebug() << "Exiting in onStart operation";
-		return OperationExit;
+		return CommandResult::Exit;
 	} if(config.value(QStringLiteral("fail")).toBool()) {
 		qDebug() << "Failing onStart operation";
-		return OperationFailed;
+		return CommandResult::Failed;
 	}
 #endif
 
@@ -70,7 +70,7 @@ Service::CommandResult TestService::onStart()
 	}
 
 	qDebug() << "start ready";
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult TestService::onStop(int &exitCode)
@@ -82,7 +82,7 @@ Service::CommandResult TestService::onStop(int &exitCode)
 		_socket->flush();
 		_socket->waitForBytesWritten(2500);
 	}
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult TestService::onReload()
@@ -90,7 +90,7 @@ Service::CommandResult TestService::onReload()
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("reloading");
 	_socket->flush();
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult TestService::onPause()
@@ -99,7 +99,7 @@ Service::CommandResult TestService::onPause()
 	_stream << QByteArray("pausing");
 	_socket->flush();
 	_socket->waitForBytesWritten(2500);
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult TestService::onResume()
@@ -107,7 +107,7 @@ Service::CommandResult TestService::onResume()
 	qDebug() << Q_FUNC_INFO;
 	_stream << QByteArray("resuming");
 	_socket->flush();
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 QVariant TestService::onCallback(const QByteArray &kind, const QVariantList &args)
@@ -122,9 +122,9 @@ bool TestService::verifyCommand(const QStringList &arguments)
 {
 	qDebug() << Q_FUNC_INFO << arguments;
 	if(arguments.contains(QStringLiteral("--passive")))
-		setTerminalMode(Service::ReadWritePassive);
+		setTerminalMode(Service::TerminalMode::ReadWritePassive);
 	else
-		setTerminalMode(Service::ReadWriteActive);
+		setTerminalMode(Service::TerminalMode::ReadWriteActive);
 	return true;
 }
 
@@ -133,7 +133,7 @@ void TestService::terminalConnected(Terminal *terminal)
 	qDebug() << Q_FUNC_INFO << terminal->command();
 	if(terminal->command().mid(1).startsWith(QStringLiteral("stop")))
 		quit();
-	else if(terminal->terminalMode() == Service::ReadWriteActive) {
+	else if(terminal->terminalMode() == Service::TerminalMode::ReadWriteActive) {
 		connect(terminal, &Terminal::readyRead,
 				terminal, [terminal](){
 			qDebug() << Q_FUNC_INFO << terminal->readAll();

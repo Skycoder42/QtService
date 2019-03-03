@@ -120,10 +120,10 @@ void TestWindowsService::cleanup()
 
 void TestWindowsService::testCustomImpl()
 {
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	testFeature(ServiceControl::SupportFlag::Status);
+	QCOMPARE(control->status(), ServiceControl::Status::Running);
 
-	testFeature(ServiceControl::SupportsCustomCommands);
+	testFeature(ServiceControl::SupportFlag::CustomCommands);
 	QVERIFY2(control->callCommand<bool>("command", 142), qUtf8Printable(control->error()));
 
 	QByteArray msg;
@@ -132,8 +132,8 @@ void TestWindowsService::testCustomImpl()
 	QCOMPARE(msg, QByteArray{"command"});
 	QCOMPARE(args, QVariantList{142});
 
-	testFeature(ServiceControl::SupportsStatus);
-	QCOMPARE(control->status(), ServiceControl::ServiceRunning);
+	testFeature(ServiceControl::SupportFlag::Status);
+	QCOMPARE(control->status(), ServiceControl::Status::Running);
 }
 
 QTEST_MAIN(TestWindowsService)

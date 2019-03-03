@@ -41,7 +41,7 @@ int AndroidServiceBackend::runService(int &argc, char **argv, int flags)
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
 	return app.exec();
 }
 
@@ -53,7 +53,7 @@ void AndroidServiceBackend::quitService()
 
 void AndroidServiceBackend::reloadService()
 {
-	processServiceCommand(ReloadCommand);
+	processServiceCommand(ServiceCommand::Reload);
 }
 
 jint AndroidServiceBackend::callStartCommand(JNIEnv *, jobject, jobject intent, jint flags, jint startId, jint oldId)
@@ -97,7 +97,7 @@ void AndroidServiceBackend::onExit()
 		connect(service(), &Service::stopped,
 				this, &AndroidServiceBackend::onStopped,
 				Qt::UniqueConnection);
-		processServiceCommand(StopCommand);
+		processServiceCommand(ServiceCommand::Stop);
 	}
 }
 

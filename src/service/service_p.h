@@ -35,7 +35,7 @@ public:
 	bool isRunning = false;
 	bool wasPaused = false;
 	bool terminalActive = false;
-	Service::TerminalMode terminalMode = Service::ReadWriteActive;
+	Service::TerminalMode terminalMode = Service::TerminalMode::ReadWriteActive;
 	bool terminalGlobal = false;
 	bool startWithTerminal = false;
 

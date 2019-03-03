@@ -42,17 +42,17 @@ class Q_SERVICE_EXPORT Service : public QObject
 
 public:
 	//! Indicates whether a service command has finished or needs to run asynchronously
-	enum CommandResult {
-		OperationCompleted, //!< The command was successfully completed synchronously
-		OperationPending, //!< The command is beeing proccessed asynchronously and the service will emit the corresponding signal once it's done
-		OperationFailed, //!< The command failed synchronously. The system may exit the service afterwards
+	enum class CommandResult {
+		Completed, //!< The command was successfully completed synchronously
+		Pending, //!< The command is beeing proccessed asynchronously and the service will emit the corresponding signal once it's done
+		Failed, //!< The command failed synchronously. The system may exit the service afterwards
 
-		OperationExit, //!< The command executed successfully, but the service should still exit. Only usable from onStart()
+		Exit, //!< The command executed successfully, but the service should still exit. Only usable from onStart()
 	};
 	Q_ENUM(CommandResult)
 
 	//! The modes a terminal can be in
-	enum TerminalMode {
+	enum class TerminalMode {
 		ReadOnly, //!< The terminal can only receive data from the service. Useful for machine-to-machine communication
 		WriteOnly, //!< The terminal can only send data to the service. Useful for machine-to-machine communication
 		ReadWritePassive, //!< The terminal can read and write as much as it wants. Useful for machine-to-machine communication
@@ -165,6 +165,13 @@ private:
 
 	QScopedPointer<ServicePrivate> d;
 };
+
+Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::Service::CommandResult key, uint seed = 0) Q_DECL_NOTHROW {
+	return ::qHash(static_cast<int>(key), seed);
+}
+Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::Service::TerminalMode key, uint seed = 0) Q_DECL_NOTHROW {
+	return ::qHash(static_cast<int>(key), seed);
+}
 
 template<typename TFunction>
 void Service::addCallback(const QByteArray &kind, const TFunction &fn)

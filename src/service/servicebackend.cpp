@@ -41,24 +41,24 @@ void ServiceBackend::signalTriggered(int signal)
 
 void ServiceBackend::processServiceCommand(ServiceCommand code)
 {
-	if(d->operating && code != StopCommand) { //always allow stopping
+	if(d->operating && code != ServiceCommand::Stop) { //always allow stopping
 		qCWarning(logQtService) << "Ignoring command of type" << code << "as another command is currently beeing processed";
 		return;
 	}
 
 	d->operating = true;
 	switch(code) {
-	case StartCommand:
+	case ServiceCommand::Start:
 		switch(d->service->onStart()) {
-		case Service::OperationCompleted:
+		case Service::CommandResult::Completed:
 			emit d->service->started(true);
 			break;
-		case Service::OperationFailed:
+		case Service::CommandResult::Failed:
 			emit d->service->started(false);
 			break;
-		case Service::OperationPending:
+		case Service::CommandResult::Pending:
 			break;
-		case Service::OperationExit:
+		case Service::CommandResult::Exit:
 			emit d->service->started(true);
 			quitService();
 			break;
@@ -67,18 +67,18 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			break;
 		}
 		break;
-	case StopCommand:
+	case ServiceCommand::Stop:
 	{
 		auto exitCode = EXIT_SUCCESS;
 		switch(d->service->onStop(exitCode)) {
-		case Service::OperationCompleted:
+		case Service::CommandResult::Completed:
 			emit d->service->stopped(exitCode);
 			break;
-		case Service::OperationFailed:
+		case Service::CommandResult::Failed:
 			qCWarning(logQtService) << "The stop-operation should never fail. The result is ignored and the service will stop anyways";
 			emit d->service->stopped(exitCode == EXIT_SUCCESS ? EXIT_FAILURE : exitCode);
 			break;
-		case Service::OperationPending:
+		case Service::CommandResult::Pending:
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();
@@ -86,31 +86,31 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 		}
 		break;
 	}
-	case ReloadCommand:
+	case ServiceCommand::Reload:
 		switch(d->service->onReload()) {
-		case Service::OperationCompleted:
+		case Service::CommandResult::Completed:
 			emit d->service->reloaded(true);
 			break;
-		case Service::OperationFailed:
+		case Service::CommandResult::Failed:
 			emit d->service->reloaded(false);
 			break;
-		case Service::OperationPending:
+		case Service::CommandResult::Pending:
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();
 			break;
 		}
 		break;
-	case PauseCommand:
+	case ServiceCommand::Pause:
 		if(!d->service->d->wasPaused) {
 			switch(d->service->onPause()) {
-			case Service::OperationCompleted:
+			case Service::CommandResult::Completed:
 				emit d->service->paused(true);
 				break;
-			case Service::OperationFailed:
+			case Service::CommandResult::Failed:
 				emit d->service->paused(false);
 				break;
-			case Service::OperationPending:
+			case Service::CommandResult::Pending:
 				break;
 			default: //all other cases should never happen
 				Q_UNREACHABLE();
@@ -118,16 +118,16 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			}
 		}
 		break;
-	case ResumeCommand:
+	case ServiceCommand::Resume:
 		if(d->service->d->wasPaused) {
 			switch(d->service->onResume()) {
-			case Service::OperationCompleted:
+			case Service::CommandResult::Completed:
 				emit d->service->resumed(true);
 				break;
-			case Service::OperationFailed:
+			case Service::CommandResult::Failed:
 				emit d->service->resumed(false);
 				break;
-			case Service::OperationPending:
+			case Service::CommandResult::Pending:
 				break;
 			default: //all other cases should never happen
 				Q_UNREACHABLE();

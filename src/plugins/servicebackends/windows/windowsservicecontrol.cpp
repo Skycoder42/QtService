@@ -18,52 +18,52 @@ QString WindowsServiceControl::backend() const
 
 ServiceControl::SupportFlags WindowsServiceControl::supportFlags() const
 {
-	return SupportsStartStop |
-			SupportsPauseResume |
-			SupportsAutostart |
-			SupportsStatus |
-			SupportsCustomCommands |
-			SupportsSetEnabled;
+	return SupportFlag::StartStop |
+			SupportFlag::PauseResume |
+			SupportFlag::Autostart |
+			SupportFlag::Status |
+			SupportFlag::CustomCommands |
+			SupportFlag::SetEnabled;
 }
 
 bool WindowsServiceControl::serviceExists() const
 {
-	return status() != ServiceStatusUnknown;
+	return status() != Status::Unknown;
 }
 
-ServiceControl::ServiceStatus WindowsServiceControl::status() const
+ServiceControl::Status WindowsServiceControl::status() const
 {
 	HandleHolder handle {svcHandle(SERVICE_QUERY_STATUS)};
 	if(!handle)
-		return ServiceStatusUnknown;
+		return Status::Unknown;
 
 	SERVICE_STATUS status;
 	ZeroMemory(&status, sizeof(status));
 	if(!QueryServiceStatus(handle, &status)) {
 		setWinError(tr("Failed to query service status with error: %1"));
-		return ServiceStatusUnknown;
+		return Status::Unknown;
 	}
 
 	switch(status.dwCurrentState) {
 	case SERVICE_START_PENDING:
-		return ServiceStarting;
+		return Status::Starting;
 	case SERVICE_RUNNING:
-		return ServiceRunning;
+		return Status::Running;
 	case SERVICE_STOP_PENDING:
-		return ServiceStopping;
+		return Status::Stopping;
 	case SERVICE_STOPPED:
 		if(status.dwWin32ExitCode == NO_ERROR)
-			return ServiceStopped;
+			return Status::Stopped;
 		else
-			return ServiceErrored;
+			return Status::Errored;
 	case SERVICE_PAUSE_PENDING:
-		return ServicePausing;
+		return Status::Pausing;
 	case SERVICE_PAUSED:
-		return ServicePaused;
+		return Status::Paused;
 	case SERVICE_CONTINUE_PENDING:
-		return ServiceResuming;
+		return Status::Resuming;
 	default:
-		return ServiceStatusUnknown;
+		return Status::Unknown;
 	}
 }
 
@@ -117,7 +117,7 @@ bool WindowsServiceControl::isEnabled() const
 
 ServiceControl::BlockMode WindowsServiceControl::blocking() const
 {
-	return NonBlocking;
+	return BlockMode::NonBlocking;
 }
 
 QVariant WindowsServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)

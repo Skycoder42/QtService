@@ -46,7 +46,7 @@ QtService::Service::CommandResult EchoService::onStart()
 		qApp->exit(EXIT_FAILURE);
 	}
 
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 QtService::Service::CommandResult EchoService::onStop(int &exitCode)
@@ -54,7 +54,7 @@ QtService::Service::CommandResult EchoService::onStop(int &exitCode)
 	Q_UNUSED(exitCode)
 	qDebug() << Q_FUNC_INFO;
 	_server->close();
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 QtService::Service::CommandResult EchoService::onReload()
@@ -68,21 +68,21 @@ QtService::Service::CommandResult EchoService::onReload()
 		qApp->exit(EXIT_FAILURE);
 	}
 
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 QtService::Service::CommandResult EchoService::onPause()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->pauseAccepting();
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 QtService::Service::CommandResult EchoService::onResume()
 {
 	qDebug() << Q_FUNC_INFO;
 	_server->resumeAccepting();
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 void EchoService::newConnection()

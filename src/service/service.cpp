@@ -209,22 +209,22 @@ bool Service::preStart()
 Service::CommandResult Service::onStop(int &exitCode)
 {
 	Q_UNUSED(exitCode);
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult Service::onReload()
 {
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult Service::onPause()
 {
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult Service::onResume()
 {
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 QVariant Service::onCallback(const QByteArray &kind, const QVariantList &args)

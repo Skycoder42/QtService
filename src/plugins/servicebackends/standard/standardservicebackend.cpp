@@ -82,7 +82,7 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
 	return app.exec();
 }
 
@@ -91,12 +91,12 @@ void StandardServiceBackend::quitService()
 	connect(service(), &Service::stopped,
 			qApp, &QCoreApplication::exit,
 			Qt::UniqueConnection);
-	processServiceCommand(StopCommand);
+	processServiceCommand(ServiceCommand::Stop);
 }
 
 void StandardServiceBackend::reloadService()
 {
-	processServiceCommand(ReloadCommand);
+	processServiceCommand(ServiceCommand::Reload);
 }
 
 void StandardServiceBackend::signalTriggered(int signal)
@@ -117,10 +117,10 @@ void StandardServiceBackend::signalTriggered(int signal)
 		reloadService();
 		break;
 	case SIGTSTP:
-		processServiceCommand(PauseCommand);
+		processServiceCommand(ServiceCommand::Pause);
 		break;
 	case SIGCONT:
-		processServiceCommand(ResumeCommand);
+		processServiceCommand(ServiceCommand::Resume);
 		break;
 	case SIGUSR1:
 		processServiceCallback("SIGUSR1");

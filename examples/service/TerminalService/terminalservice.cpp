@@ -14,14 +14,14 @@ TerminalService::TerminalService(int &argc, char **argv) :
 Service::CommandResult TerminalService::onStart()
 {
 	qDebug() << "Service started with terminal mode:" << terminalMode();
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 Service::CommandResult TerminalService::onStop(int &exitCode)
 {
 	qDebug() << "Closing down service...";
 	Q_UNUSED(exitCode)
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 bool TerminalService::verifyCommand(const QStringList &arguments)
@@ -35,7 +35,7 @@ bool TerminalService::verifyCommand(const QStringList &arguments)
 			parser.showVersion();
 
 		if(parser.isSet(QStringLiteral("passive")))
-			setTerminalMode(Service::ReadWritePassive);
+			setTerminalMode(Service::TerminalMode::ReadWritePassive);
 		return true;
 	} else
 		return false;
@@ -57,7 +57,7 @@ void TerminalService::terminalConnected(Terminal *terminal)
 
 	if(parser.positionalArguments().startsWith(QStringLiteral("stop")))
 		quit();
-	else if(terminal->terminalMode() == Service::ReadWriteActive) {
+	else if(terminal->terminalMode() == Service::TerminalMode::ReadWriteActive) {
 		connect(terminal, &Terminal::readyRead,
 				terminal, [terminal](){
 			qDebug() << "terminals name is:" << terminal->readAll();

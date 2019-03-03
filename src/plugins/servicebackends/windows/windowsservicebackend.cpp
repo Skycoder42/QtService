@@ -142,12 +142,12 @@ void WindowsServiceBackend::quitService()
 {
 	setStatus(SERVICE_STOP_PENDING);
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StopCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Stop));
 }
 
 void WindowsServiceBackend::reloadService()
 {
-	processServiceCommand(ReloadCommand);
+	processServiceCommand(ServiceCommand::Reload);
 }
 
 void WindowsServiceBackend::onStarted(bool success)
@@ -220,7 +220,7 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 	// handle the start event
 	_backendInstance->setStatus(SERVICE_START_PENDING);
 	QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
-							  Q_ARG(QtService::ServiceBackend::ServiceCommand, StartCommand));
+							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
 }
 
 void WindowsServiceBackend::handler(DWORD dwOpcode)
@@ -237,12 +237,12 @@ void WindowsServiceBackend::handler(DWORD dwOpcode)
 	case SERVICE_CONTROL_PAUSE:
 		_backendInstance->setStatus(SERVICE_PAUSE_PENDING);
 		QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
-								  Q_ARG(QtService::ServiceBackend::ServiceCommand, PauseCommand));
+								  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Pause));
 		break;
 	case SERVICE_CONTROL_CONTINUE:
 		_backendInstance->setStatus(SERVICE_CONTINUE_PENDING);
 		QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
-								  Q_ARG(QtService::ServiceBackend::ServiceCommand, ResumeCommand));
+								  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Resume));
 		break;
 	default:
 		if (dwOpcode >= 128 && dwOpcode <= 255) {

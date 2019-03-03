@@ -18,12 +18,12 @@ QString SystemdServiceControl::backend() const
 
 ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 {
-	return SupportsStartStop |
-			SupportsReload |
-			SupportsAutostart |
-			SupportsStatus |
-			SupportsCustomCommands |
-			SupportsSetBlocking;
+	return SupportFlag::StartStop |
+			SupportFlag::Reload |
+			SupportFlag::Autostart |
+			SupportFlag::Status |
+			SupportFlag::CustomCommands |
+			SupportFlag::SetBlocking;
 }
 
 bool SystemdServiceControl::serviceExists() const
@@ -66,7 +66,7 @@ bool SystemdServiceControl::serviceExists() const
 	return false;
 }
 
-ServiceControl::ServiceStatus SystemdServiceControl::status() const
+ServiceControl::Status SystemdServiceControl::status() const
 {
 	auto svcName = serviceId().toUtf8();
 	auto svcType = serviceId().mid(realServiceName().size() + 1);
@@ -85,7 +85,7 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 						QStringLiteral("--no-legend"),
 						QStringLiteral("--type=") + svcType
 					}, &data, true) != EXIT_SUCCESS)
-		return ServiceStatusUnknown;
+		return Status::Unknown;
 
 	QBuffer buffer{&data};
 	buffer.open(QIODevice::ReadOnly);
@@ -101,32 +101,32 @@ ServiceControl::ServiceStatus SystemdServiceControl::status() const
 		// found correct service! now read the status
 		const auto &svcState = lineData[2];
 		if(svcState == "active")
-			return ServiceRunning;
+			return Status::Running;
 		else if(svcState == "reloading")
-			return ServiceReloading;
+			return Status::Reloading;
 		else if(svcState == "inactive")
-			return ServiceStopped;
+			return Status::Stopped;
 		else if(svcState == "failed")
-			return ServiceErrored;
+			return Status::Errored;
 		else if(svcState == "activating")
-			return ServiceStarting;
+			return Status::Starting;
 		else if(svcState == "deactivating")
-			return ServiceStopping;
+			return Status::Stopping;
 		else {
 			setError(tr("Unknown service state %1 for service %2")
 					 .arg(QString::fromUtf8(svcState), QString::fromUtf8(svcName)));
-			return ServiceStatusUnknown;
+			return Status::Unknown;
 		}
 	}
 
 	if(!_exists)
 		serviceExists();
 	if(_exists)
-		return ServiceStopped;
+		return Status::Stopped;
 	else {
 		setError(tr("Service %1 was not found as systemd service")
 				 .arg(QString::fromUtf8(svcName)));
-		return ServiceStatusUnknown;
+		return Status::Unknown;
 	}
 }
 
@@ -137,7 +137,7 @@ bool SystemdServiceControl::isAutostartEnabled() const
 
 ServiceControl::BlockMode SystemdServiceControl::blocking() const
 {
-	return _blocking ? Blocking : NonBlocking;
+	return _blocking ? BlockMode::Blocking : BlockMode::NonBlocking;
 }
 
 QVariant SystemdServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)

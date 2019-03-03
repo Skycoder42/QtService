@@ -24,9 +24,9 @@ QString StandardServiceControl::backend() const
 
 ServiceControl::SupportFlags StandardServiceControl::supportFlags() const
 {
-	SupportFlags flags = SupportsStatus | SupportsStop;
+	auto flags = SupportFlag::Status | SupportFlag::Stop;
 #if QT_CONFIG(process)
-	flags |= SupportsStart;
+	flags |= SupportFlag::Start;
 #endif
 	return flags;
 }
@@ -36,23 +36,23 @@ bool StandardServiceControl::serviceExists() const
 	return !QStandardPaths::findExecutable(serviceId()).isEmpty();
 }
 
-ServiceControl::ServiceStatus StandardServiceControl::status() const
+ServiceControl::Status StandardServiceControl::status() const
 {
 	const auto lock = statusLock();
 	if(lock->tryLock()) {
 		lock->unlock();
-		return ServiceStopped;
+		return Status::Stopped;
 	} else if(lock->error() == QLockFile::LockFailedError)
-		return ServiceRunning;
+		return Status::Running;
 	else {
 		setError(tr("Failed to access lockfile with error: %1").arg(lock->error()));
-		return ServiceStatusUnknown;
+		return Status::Unknown;
 	}
 }
 
 ServiceControl::BlockMode StandardServiceControl::blocking() const
 {
-	return NonBlocking;
+	return BlockMode::NonBlocking;
 }
 
 QVariant StandardServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
@@ -67,7 +67,7 @@ QVariant StandardServiceControl::callGenericCommand(const QByteArray &kind, cons
 bool StandardServiceControl::start()
 {
 #if QT_CONFIG(process)
-	if(status() == ServiceRunning) {
+	if(status() == Status::Running) {
 		qCDebug(logQtService) << "Service already running with PID" << getPid();
 		return true;
 	}
@@ -123,7 +123,7 @@ bool StandardServiceControl::start()
 
 bool StandardServiceControl::stop()
 {
-	if(status() == ServiceStopped) {
+	if(status() == Status::Stopped) {
 		qCDebug(logQtService) << "Service already stopped ";
 		return true;
 	}

@@ -20,9 +20,9 @@ QString LaunchdServiceControl::backend() const
 
 ServiceControl::SupportFlags LaunchdServiceControl::supportFlags() const
 {
-	return SupportsStartStop |
-			SupportsCustomCommands |
-			SupportsSetEnabled;
+	return SupportFlag::StartStop |
+			SupportFlag::CustomCommands |
+			SupportFlag::SetEnabled;
 }
 
 bool LaunchdServiceControl::serviceExists() const
@@ -106,7 +106,7 @@ int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QString
 	process.setProcessChannelMode(QProcess::ForwardedErrorChannel);
 
 	process.start(QProcess::ReadOnly);
-	if(process.waitForFinished(isBlocking() ? -1 : 2500)) {//non-blocking calls should finish within two seconds
+	if(process.waitForFinished(2500)) {  // non-blocking calls should finish within two seconds
 		if(outData)
 			*outData = process.readAllStandardOutput();
 		if(process.exitStatus() == QProcess::NormalExit)

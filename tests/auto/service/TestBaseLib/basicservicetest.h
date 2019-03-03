@@ -53,7 +53,7 @@ protected:
 	void resetSettings(const QVariantHash &args = {});
 	void performSocketTest();
 	void testFeature(QtService::ServiceControl::SupportFlag flag);
-	void waitAsLongAs(QtService::ServiceControl::ServiceStatus status);
+	void waitAsLongAs(QtService::ServiceControl::Status status);
 };
 
 #define READ_LOOP(...) do { \
@@ -63,7 +63,7 @@ protected:
 } while(!stream.commitTransaction())
 
 #define TEST_STATUS(state) do {\
-	if(control->supportFlags().testFlag(ServiceControl::SupportsStatus)) { \
+	if(control->supportFlags().testFlag(ServiceControl::SupportFlag::Status)) { \
 		waitAsLongAs(state); \
 		QCOMPARE(control->status(), state); \
 	} \

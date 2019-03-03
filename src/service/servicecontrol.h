@@ -5,6 +5,7 @@
 #include <QtCore/qscopedpointer.h>
 #include <QtCore/qdir.h>
 #include <QtCore/qvariant.h>
+#include <QtCore/qhash.h>
 
 #include "QtService/qtservice_global.h"
 
@@ -33,44 +34,44 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 
 public:
 	//! Flags that indicate what kind of queries and commands the specific control implementation provides
-	enum SupportFlag {
-		SupportsStart = 0x0001, //!< Can start services via ServiceControl::start
-		SupportsStop = 0x0002, //!< Can stop services via ServiceControl::stop
-		SupportsPause = 0x0004, //!< Can pause services via ServiceControl::pause
-		SupportsResume = 0x0008, //!< Can resume services via ServiceControl::resume
-		SupportsReload = 0x0010, //!< Can reload services via ServiceControl::reload
-		SupportsGetAutostart = 0x0020, //!< Can read the autostart state of a service
-		SupportsSetAutostart = 0x0040, //!< Can write the autostart state of a service
-		SupportsSetBlocking = 0x0080,
-		SupportsSetEnabled = 0x0100,
+	enum class SupportFlag {
+		Start = 0x0001, //!< Can start services via ServiceControl::start
+		Stop = 0x0002, //!< Can stop services via ServiceControl::stop
+		Pause = 0x0004, //!< Can pause services via ServiceControl::pause
+		Resume = 0x0008, //!< Can resume services via ServiceControl::resume
+		Reload = 0x0010, //!< Can reload services via ServiceControl::reload
+		GetAutostart = 0x0020, //!< Can read the autostart state of a service
+		SetAutostart = 0x0040, //!< Can write the autostart state of a service
+		SetBlocking = 0x0080,
+		SetEnabled = 0x0100,
 
-		SupportsStatus = 0x0200, //!< Can read the current status of a service
-		SupportsCustomCommands = 0x0400, //!< Supports the execution of specific custom commands
+		Status = 0x0200, //!< Can read the current status of a service
+		CustomCommands = 0x0400, //!< Supports the execution of specific custom commands
 
-		SupportsStartStop = (SupportsStart | SupportsStop), //!< SupportsStart | SupportsStop
-		SupportsPauseResume = (SupportsPause | SupportsResume), //!< SupportsPause | SupportsResume
-		SupportsAutostart = (SupportsGetAutostart | SupportsSetAutostart), //!< SupportsGetAutostart | SupportsSetAutostart
+		StartStop = (Start | Stop), //!< SupportFlag::Start | SupportFlag::Stop
+		PauseResume = (Pause | Resume), //!< SupportFlag::Pause | SupportFlag::Resume
+		Autostart = (GetAutostart | SetAutostart), //!< SupportFlag::GetAutostart | SupportFlag::SetAutostart
 	};
 	Q_DECLARE_FLAGS(SupportFlags, SupportFlag)
 	Q_FLAG(SupportFlags)
 
 	//! The different states a service can be in
-	enum ServiceStatus {
-		ServiceStatusUnknown = 0, //!< The control is unable to determine the services state
+	enum class Status {
+		Unknown = 0, //!< The control is unable to determine the services state
 
-		ServiceStopped, //!< The service is not running
-		ServiceStarting, //!< The service is currently trying to start
-		ServiceRunning, //!< The service is running
-		ServicePausing, //!< The service is currently trying to pause
-		ServicePaused, //!< The service is paused
-		ServiceResuming, //!< The service is currently trying to resume
-		ServiceReloading, //!< The service is currently reloading it's configuration
-		ServiceStopping, //!< The service is currently trying to stop
-		ServiceErrored //!< The service is not running and exited in an error state
+		Stopped, //!< The service is not running
+		Starting, //!< The service is currently trying to start
+		Running, //!< The service is running
+		Pausing, //!< The service is currently trying to pause
+		Paused, //!< The service is paused
+		Resuming, //!< The service is currently trying to resume
+		Reloading, //!< The service is currently reloading it's configuration
+		Stopping, //!< The service is currently trying to stop
+		Errored //!< The service is not running and exited in an error state
 	};
-	Q_ENUM(ServiceStatus)
+	Q_ENUM(Status)
 
-	enum BlockMode {
+	enum class BlockMode {
 		Undetermined,
 		Blocking,
 		NonBlocking
@@ -137,7 +138,7 @@ public:
 	//! Checks if the service this control was created for actually exists
 	Q_INVOKABLE virtual bool serviceExists() const = 0;
 	//! Returns the current status of the service
-	Q_INVOKABLE virtual QtService::ServiceControl::ServiceStatus status() const;
+	Q_INVOKABLE virtual QtService::ServiceControl::Status status() const;
 	//! Returns the current autostart state of the service
 	Q_INVOKABLE virtual bool isAutostartEnabled() const;
 	//! Returns the runtime directory of this controls service
@@ -192,6 +193,16 @@ private:
 	friend class QtService::ServiceControlPrivate;
 	QScopedPointer<ServiceControlPrivate> d;
 };
+
+Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceControl::SupportFlags key, uint seed = 0) Q_DECL_NOTHROW {
+	return ::qHash(static_cast<int>(key), seed);
+}
+Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceControl::Status key, uint seed = 0) Q_DECL_NOTHROW {
+	return ::qHash(static_cast<int>(key), seed);
+}
+Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceControl::BlockMode key, uint seed = 0) Q_DECL_NOTHROW {
+	return ::qHash(static_cast<int>(key), seed);
+}
 
 // ------------- Generic Implementations -------------
 
