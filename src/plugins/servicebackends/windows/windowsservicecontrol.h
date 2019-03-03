@@ -17,6 +17,7 @@ public:
 	ServiceStatus status() const override;
 	bool isAutostartEnabled() const override;
 	bool isEnabled() const override;
+	BlockMode blocking() const override;
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
 
 public Q_SLOTS:

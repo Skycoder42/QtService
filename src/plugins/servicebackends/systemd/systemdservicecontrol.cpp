@@ -23,7 +23,7 @@ ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 			SupportsAutostart |
 			SupportsStatus |
 			SupportsCustomCommands |
-			SupportsBlockingNonBlocking;
+			SupportsSetBlocking;
 }
 
 bool SystemdServiceControl::serviceExists() const
@@ -135,6 +135,11 @@ bool SystemdServiceControl::isAutostartEnabled() const
 	return runSystemctl("is-enabled") == EXIT_SUCCESS;
 }
 
+ServiceControl::BlockMode SystemdServiceControl::blocking() const
+{
+	return _blocking ? Blocking : NonBlocking;
+}
+
 QVariant SystemdServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
 {
 	QStringList sArgs;
@@ -174,6 +179,16 @@ bool SystemdServiceControl::disableAutostart()
 	return runSystemctl("disable") == EXIT_SUCCESS;
 }
 
+bool SystemdServiceControl::setBlocking(bool blocking)
+{
+	if(_blocking == blocking)
+		return true;
+
+	_blocking = blocking;
+	emit blockingChanged(this->blocking());
+	return true;
+}
+
 QString SystemdServiceControl::serviceName() const
 {
 	const static QRegularExpression regex(QStringLiteral(R"__((.+)\.(?:service|socket|device|mount|automount|swap|target|path|timer|slice|scope))__"));
@@ -205,7 +220,7 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 	args.append(QString::fromUtf8(command));
 	if(!noPrepare) {
 		args.append(serviceId());
-		if(!isBlocking())
+		if(!_blocking)
 			args.append(QStringLiteral("--no-block"));
 	}
 	args.append(extraArgs);
@@ -217,9 +232,10 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 	process.setProcessChannelMode(QProcess::ForwardedErrorChannel);
 
 	process.start(QProcess::ReadOnly);
-	if(process.waitForFinished(isBlocking() ? -1 : 2500)) {//non-blocking calls should finish within two seconds
+	if(process.waitForFinished(_blocking ? -1 : 2500)) {//non-blocking calls should finish within two seconds
 		if(outData)
 			*outData = process.readAllStandardOutput();
+
 		if(process.exitStatus() == QProcess::NormalExit)
 			return process.exitCode();
 		else {

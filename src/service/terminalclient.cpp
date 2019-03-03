@@ -217,7 +217,7 @@ bool TerminalClient::ensureServiceStarted()
 		}
 		// ensure the service is running for controls that can check it
 		if(canStatus) {
-			auto waitCnt = control->supportFlags().testFlag(ServiceControl::SupportsBlocking) ? 0 : 15;
+			auto waitCnt = control->blocking() == ServiceControl::Blocking ? 0 : 15;
 			while(control->status() != ServiceControl::ServiceRunning && waitCnt > 0) {
 				QThread::sleep(1);
 				--waitCnt;

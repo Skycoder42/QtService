@@ -50,6 +50,11 @@ ServiceControl::ServiceStatus StandardServiceControl::status() const
 	}
 }
 
+ServiceControl::BlockMode StandardServiceControl::blocking() const
+{
+	return NonBlocking;
+}
+
 QVariant StandardServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
 {
 	Q_UNUSED(args)
@@ -133,18 +138,7 @@ bool StandardServiceControl::stop()
 	auto hadConsole = FreeConsole();
 	if(AttachConsole(static_cast<DWORD>(pid))) {
 		if(SetConsoleCtrlHandler(nullptr, true)) {
-			if(GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) {
-				for(auto i = 0; i < 10; i++) {
-					if(status() == ServiceRunning)
-						QThread::msleep(500);
-					else {
-						ok = true;
-						break;
-					}
-				}
-				if(!ok)
-					setError(tr("Service did not stop yet"));
-			} else
+			if(!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0))
 				setError(tr("Failed to send stop signal with error: %1").arg(qt_error_string(GetLastError())));
 			SetConsoleCtrlHandler(nullptr, false);
 		} else

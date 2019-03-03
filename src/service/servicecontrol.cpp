@@ -40,16 +40,12 @@ QString ServiceControl::serviceIdFromName(const QString &backend, const QString 
 
 ServiceControl *ServiceControl::create(const QString &backend, QString serviceId, QObject *parent)
 {
-	auto control = ServicePrivate::createControl(backend, std::move(serviceId), parent);
-	// set the correct default value
-	if(control)
-		control->d->blocking = control->supportFlags().testFlag(SupportsBlocking);
-	return control;
+	return ServicePrivate::createControl(backend, std::move(serviceId), parent);
 }
 
 ServiceControl *ServiceControl::create(const QString &backend, QString serviceId, QString serviceNameOverride, QObject *parent)
 {
-	auto control = create(backend, std::move(serviceId), parent);
+	auto control = ServicePrivate::createControl(backend, std::move(serviceId), parent);
 	if(control)
 		control->d->serviceName = std::move(serviceNameOverride);
 	return control;
@@ -57,12 +53,12 @@ ServiceControl *ServiceControl::create(const QString &backend, QString serviceId
 
 ServiceControl *ServiceControl::createFromName(const QString &backend, const QString &serviceName, QObject *parent)
 {
-	return create(backend, serviceIdFromName(backend, serviceName), parent);
+	return ServicePrivate::createControl(backend, serviceIdFromName(backend, serviceName), parent);
 }
 
 ServiceControl *ServiceControl::createFromName(const QString &backend, const QString &serviceName, const QString &domain, QObject *parent)
 {
-	return create(backend, serviceIdFromName(backend, serviceName, domain), parent);
+	return ServicePrivate::createControl(backend, serviceIdFromName(backend, serviceName, domain), parent);
 }
 
 ServiceControl::ServiceControl(QString &&serviceId, QObject *parent) :
@@ -77,9 +73,9 @@ QString ServiceControl::serviceId() const
 	return d->serviceId;
 }
 
-bool ServiceControl::isBlocking() const
+ServiceControl::BlockMode ServiceControl::blocking() const
 {
-	return d->blocking;
+	return Undetermined;
 }
 
 QString ServiceControl::error() const
@@ -135,7 +131,7 @@ bool ServiceControl::stop()
 
 bool ServiceControl::restart()
 {
-	if(supportFlags().testFlag(SupportsBlocking) && d->blocking) {
+	if(blocking() == Blocking) {
 		auto ok = stop();
 		if(ok)
 			ok = start();
@@ -181,18 +177,10 @@ bool ServiceControl::disableAutostart()
 	return false;
 }
 
-void ServiceControl::setBlocking(bool blocking)
+bool ServiceControl::setBlocking(bool blocking)
 {
-	if (d->blocking == blocking)
-		return;
-
-	if(blocking && !supportFlags().testFlag(SupportsBlocking))
-		return;
-	if(!blocking && !supportFlags().testFlag(SupportsNonBlocking))
-		return;
-
-	d->blocking = blocking;
-	emit blockingChanged(d->blocking, {});
+	Q_UNUSED(blocking)
+	return false;
 }
 
 void ServiceControl::clearError()

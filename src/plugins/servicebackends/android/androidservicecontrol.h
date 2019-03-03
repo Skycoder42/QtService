@@ -20,6 +20,7 @@ public:
 	bool serviceExists() const override;
 	bool isEnabled() const override;
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
+	BlockMode blocking() const override;
 
 public Q_SLOTS:
 	bool start() override;

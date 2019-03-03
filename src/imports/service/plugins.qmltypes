@@ -186,15 +186,13 @@ Module {
                 "SupportsReload": 16,
                 "SupportsGetAutostart": 32,
                 "SupportsSetAutostart": 64,
-                "SupportsBlocking": 128,
-                "SupportsNonBlocking": 256,
+                "SupportsSetBlocking": 128,
+                "SupportsSetEnabled": 256,
                 "SupportsStatus": 512,
                 "SupportsCustomCommands": 1024,
-                "SupportsDisable": 2048,
                 "SupportsStartStop": 3,
                 "SupportsPauseResume": 12,
-                "SupportsAutostart": 96,
-                "SupportsBlockingNonBlocking": 384
+                "SupportsAutostart": 96
             }
         }
         Enum {
@@ -212,6 +210,14 @@ Module {
                 "ServiceErrored": 9
             }
         }
+        Enum {
+            name: "BlockMode"
+            values: {
+                "Undetermined": 0,
+                "Blocking": 1,
+                "NonBlocking": 2
+            }
+        }
         Property { name: "backend"; type: "string"; isReadonly: true }
         Property { name: "serviceId"; type: "string"; isReadonly: true }
         Property {
@@ -219,12 +225,12 @@ Module {
             type: "QtService::ServiceControl::SupportFlags"
             isReadonly: true
         }
-        Property { name: "blocking"; type: "bool" }
+        Property { name: "blocking"; type: "BlockMode"; isReadonly: true }
         Property { name: "error"; type: "string"; isReadonly: true }
         Property { name: "enabled"; type: "bool" }
         Signal {
             name: "blockingChanged"
-            Parameter { name: "blocking"; type: "bool" }
+            Parameter { name: "blocking"; type: "BlockMode" }
         }
         Signal {
             name: "errorChanged"
@@ -240,6 +246,7 @@ Module {
         Method { name: "disableAutostart"; type: "bool" }
         Method {
             name: "setBlocking"
+            type: "bool"
             Parameter { name: "blocking"; type: "bool" }
         }
         Method { name: "clearError" }

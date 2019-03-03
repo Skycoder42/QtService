@@ -21,10 +21,9 @@ ServiceControl::SupportFlags WindowsServiceControl::supportFlags() const
 	return SupportsStartStop |
 			SupportsPauseResume |
 			SupportsAutostart |
-			SupportsNonBlocking |
 			SupportsStatus |
 			SupportsCustomCommands |
-			SupportsDisable;
+			SupportsSetEnabled;
 }
 
 bool WindowsServiceControl::serviceExists() const
@@ -114,6 +113,11 @@ bool WindowsServiceControl::isEnabled() const
 	default:
 		return true;
 	}
+}
+
+ServiceControl::BlockMode WindowsServiceControl::blocking() const
+{
+	return NonBlocking;
 }
 
 QVariant WindowsServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)

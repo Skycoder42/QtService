@@ -53,15 +53,16 @@ void ControlWidget::on_loadButton_clicked()
 	ui->backendComboBox->setEnabled(false);
 	ui->nameLineEdit->setEnabled(false);
 
-	if(_control->supportFlags().testFlag(ServiceControl::SupportsBlockingNonBlocking)) {
+	if(_control->supportFlags().testFlag(ServiceControl::SupportsSetBlocking)) {
 		ui->bLockingCheckBox->setEnabled(true);
-		ui->bLockingCheckBox->setChecked(_control->isBlocking());
-	} else if(_control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+		ui->bLockingCheckBox->setChecked(_control->blocking() == ServiceControl::Blocking);
+	} else if(_control->blocking() == ServiceControl::Blocking)
 		ui->bLockingCheckBox->setChecked(true);
-	else if(_control->supportFlags().testFlag(ServiceControl::SupportsNonBlocking))
+	else if(_control->blocking() == ServiceControl::NonBlocking)
 		ui->bLockingCheckBox->setChecked(false);
 	else
 		ui->bLockingCheckBox->setCheckState(Qt::PartiallyChecked);
+
 	if(_control->supportFlags().testFlag(ServiceControl::SupportsGetAutostart))
 		ui->enabledCheckBox->setChecked(_control->isAutostartEnabled());
 	if(_control->supportFlags().testFlag(ServiceControl::SupportsSetAutostart))

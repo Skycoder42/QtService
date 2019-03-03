@@ -45,7 +45,7 @@ void BasicServiceTest::testStart()
 	testFeature(ServiceControl::SupportsStart);
 	QVERIFY2(control->start(), qUtf8Printable(control->error()));
 	// blocking should only return after the server started, but for non blocking this may not be the case...
-	if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+	if(control->blocking() != ServiceControl::Blocking)
 		QThread::sleep(3);
 
 	socket = new QLocalSocket(this);
@@ -106,14 +106,15 @@ void BasicServiceTest::testRestart()
 {
 	TEST_STATUS(ServiceControl::ServiceRunning);
 	resetSettings();
+	if(control->blocking() != ServiceControl::Blocking)
+		return;
 	testFeature(static_cast<ServiceControl::SupportFlag>(static_cast<int>(ServiceControl::SupportsStart |
-																		  ServiceControl::SupportsStop |
-																		  ServiceControl::SupportsBlocking)));
+																		  ServiceControl::SupportsStop)));
 
 	QVERIFY2(control->restart(), qUtf8Printable(control->error()));
 	QThread::sleep(10);
 	// blocking should only return after the server started, but for non blocking this may not be the case...
-	if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+	if(control->blocking() != ServiceControl::Blocking)
 		QThread::sleep(3);
 
 	QByteArray msg;
@@ -169,7 +170,7 @@ void BasicServiceTest::testStartExit()
 
 	testFeature(ServiceControl::SupportsStart);
 	if(control->start()) {
-		if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+		if(control->blocking() != ServiceControl::Blocking)
 			QThread::sleep(3);
 	}
 
@@ -185,7 +186,7 @@ void BasicServiceTest::testStartFail()
 
 	testFeature(ServiceControl::SupportsStart);
 	if(control->start()) {
-		if(!control->supportFlags().testFlag(ServiceControl::SupportsBlocking))
+		if(control->blocking() != ServiceControl::Blocking)
 			QThread::sleep(3);
 	}
 
@@ -214,7 +215,7 @@ void BasicServiceTest::testDisable()
 {
 	QVERIFY2(control->isEnabled(), qUtf8Printable(control->error()));
 
-	testFeature(ServiceControl::SupportsDisable);
+	testFeature(ServiceControl::SupportsSetEnabled);
 	QVERIFY2(control->setEnabled(false), qUtf8Printable(control->error()));
 	QVERIFY2(!control->isEnabled(), qUtf8Printable(control->error()));
 

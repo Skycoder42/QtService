@@ -17,8 +17,7 @@ ServiceControl::SupportFlags AndroidServiceControl::supportFlags() const
 {
 	return SupportsStartStop |
 			SupportsCustomCommands |
-			SupportsNonBlocking |
-			SupportsDisable;
+			SupportsSetEnabled;
 }
 
 bool AndroidServiceControl::serviceExists() const
@@ -103,6 +102,11 @@ QVariant AndroidServiceControl::callGenericCommand(const QByteArray &kind, const
 		return {};
 	} else
 		return ServiceControl::callGenericCommand(kind, args);
+}
+
+ServiceControl::BlockMode AndroidServiceControl::blocking() const
+{
+	return NonBlocking;
 }
 
 bool AndroidServiceControl::start()

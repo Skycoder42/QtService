@@ -24,7 +24,7 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 	//! The features that this implementation supports
 	Q_PROPERTY(QtService::ServiceControl::SupportFlags supportFlags READ supportFlags CONSTANT)
 	//! Specifies if service control commands are blocking
-	Q_PROPERTY(bool blocking READ isBlocking WRITE setBlocking NOTIFY blockingChanged)
+	Q_PROPERTY(BlockMode blocking READ blocking NOTIFY blockingChanged)
 
 	//! A string describing the last error that occured
 	Q_PROPERTY(QString error READ error RESET clearError NOTIFY errorChanged)
@@ -41,18 +41,15 @@ public:
 		SupportsReload = 0x0010, //!< Can reload services via ServiceControl::reload
 		SupportsGetAutostart = 0x0020, //!< Can read the autostart state of a service
 		SupportsSetAutostart = 0x0040, //!< Can write the autostart state of a service
-		SupportsBlocking = 0x0080, //!< Supports service commands that block for the execution
-		SupportsNonBlocking = 0x0100, //!< Supports service commands the only trigger execution without blocking
+		SupportsSetBlocking = 0x0080,
+		SupportsSetEnabled = 0x0100,
 
 		SupportsStatus = 0x0200, //!< Can read the current status of a service
 		SupportsCustomCommands = 0x0400, //!< Supports the execution of specific custom commands
 
-		SupportsDisable = 0x0800, //!< Can enable/disable the servia via ServiceControl::enabled
-
 		SupportsStartStop = (SupportsStart | SupportsStop), //!< SupportsStart | SupportsStop
 		SupportsPauseResume = (SupportsPause | SupportsResume), //!< SupportsPause | SupportsResume
 		SupportsAutostart = (SupportsGetAutostart | SupportsSetAutostart), //!< SupportsGetAutostart | SupportsSetAutostart
-		SupportsBlockingNonBlocking = (SupportsBlocking | SupportsNonBlocking) //!< SupportsBlocking | SupportsNonBlocking
 	};
 	Q_DECLARE_FLAGS(SupportFlags, SupportFlag)
 	Q_FLAG(SupportFlags)
@@ -72,6 +69,13 @@ public:
 		ServiceErrored //!< The service is not running and exited in an error state
 	};
 	Q_ENUM(ServiceStatus)
+
+	enum BlockMode {
+		Undetermined,
+		Blocking,
+		NonBlocking
+	};
+	Q_ENUM(BlockMode)
 
 	//! Returns a list of all available backends
 	static QStringList listBackends();
@@ -97,7 +101,7 @@ public:
 	//! @readAcFn{ServiceControl::supportFlags}
 	virtual SupportFlags supportFlags() const = 0;
 	//! @readAcFn{ServiceControl::blocking}
-	bool isBlocking() const;
+	virtual BlockMode blocking() const;
 	//! @readAcFn{ServiceControl::error}
 	QString error() const;
 	//! @readAcFn{ServiceControl::enabled}
@@ -160,7 +164,7 @@ public Q_SLOTS:
 	virtual bool disableAutostart();
 
 	//! @writeAcFn{ServiceControl::blocking}
-	void setBlocking(bool blocking);
+	virtual bool setBlocking(bool blocking);
 	//! @resetAcFn{ServiceControl::error}
 	void clearError();
 	//! @writeAcFn{ServiceControl::enabled}
@@ -168,7 +172,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	//! @notifyAcFn{ServiceControl::blocking}
-	void blockingChanged(bool blocking, QPrivateSignal);
+	void blockingChanged(BlockMode blocking);
 	//! @notifyAcFn{ServiceControl::error}
 	void errorChanged(QString error, QPrivateSignal);
 

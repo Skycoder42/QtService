@@ -22,8 +22,7 @@ ServiceControl::SupportFlags LaunchdServiceControl::supportFlags() const
 {
 	return SupportsStartStop |
 			SupportsCustomCommands |
-			SupportsNonBlocking |
-			SupportsDisable;
+			SupportsSetEnabled;
 }
 
 bool LaunchdServiceControl::serviceExists() const

@@ -15,16 +15,18 @@ public:
 	bool serviceExists() const override;
 	ServiceStatus status() const override;
 	bool isAutostartEnabled() const override;
+	BlockMode blocking() const override;
 
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
 
-public slots:
+public Q_SLOTS:
 	bool start() override;
 	bool stop() override;
 	bool restart() override;
 	bool reload() override;
 	bool enableAutostart() override;
 	bool disableAutostart() override;
+	bool setBlocking(bool blocking) override;
 
 protected:
 	QString serviceName() const override;
@@ -32,6 +34,7 @@ protected:
 private:
 	mutable bool _existsRefBase = false;
 	mutable bool *_exists = nullptr;
+	bool _blocking = true;
 
 	int runSystemctl(const QByteArray &command,
 					 const QStringList &extraArgs = {},
