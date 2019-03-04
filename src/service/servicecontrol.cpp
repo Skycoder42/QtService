@@ -2,6 +2,9 @@
 #include "servicecontrol_p.h"
 #include "logging_p.h"
 #include "service_p.h"
+
+#include <QtCore/QTimer>
+
 using namespace QtService;
 
 QStringList ServiceControl::listBackends()
@@ -131,13 +134,38 @@ bool ServiceControl::stop()
 
 bool ServiceControl::restart()
 {
+	// blocking services can simply call stop and start
 	if(blocking() == BlockMode::Blocking) {
 		auto ok = stop();
 		if(ok)
 			ok = start();
 		return ok;
+	// other types can still simulate a (non)-blocking start/stop, if the have status reports
+	} else if(supportFlags().testFlag(SupportFlag::Status)) {
+		if(!stop())
+			return false;
+
+		// check every second, until the service stopped or errored, then start again if successfully
+		auto timer = new QTimer{this};
+		connect(timer, &QTimer::timeout,
+				this, [this, timer]() {
+			switch(status()) {
+			case Status::Stopped:
+				timer->deleteLater();
+				start(); //ignore result as error messages are set by start itself
+				break;
+			case Status::Errored:
+				timer->deleteLater();
+				break;
+			// ignore all other cases
+			default:
+				break;
+			}
+		});
+		timer->start(std::chrono::seconds{1});
+		return true;
 	} else {
-		setError(tr("Operation restart is supported for non-blocking service controls"));
+		setError(tr("Operation restart is not supported for non-blocking service controls without status information"));
 		return false;
 	}
 }

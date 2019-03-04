@@ -50,7 +50,7 @@ void BasicServiceTest::testStart()
 
 	socket = new QLocalSocket(this);
 	socket->connectToServer(QStringLiteral("__qtservice_testservice"));
-	QVERIFY(socket->waitForConnected(30000));
+	QVERIFY2(socket->waitForConnected(30000), qUtf8Printable(socket->errorString()));
 	stream.setDevice(socket);
 
 	QByteArray msg;
@@ -106,16 +106,17 @@ void BasicServiceTest::testRestart()
 {
 	TEST_STATUS(ServiceControl::Status::Running);
 	resetSettings();
-	if(control->blocking() != ServiceControl::BlockMode::Blocking)
-		return;
-	testFeature(static_cast<ServiceControl::SupportFlag>(static_cast<int>(ServiceControl::SupportFlag::Start |
-																		  ServiceControl::SupportFlag::Stop)));
+
+	// run test for blocking backends or backends that report status - but those must support start/stop
+	if(control->blocking() != ServiceControl::BlockMode::Blocking &&
+	   !control->supportFlags().testFlag(ServiceControl::SupportFlag::Status)) {
+		QEXPECT_FAIL("", "feature restart not supported by backend", Abort);
+	} else {
+		QVERIFY(control->supportFlags().testFlag(ServiceControl::SupportFlag::Start));
+		QVERIFY(control->supportFlags().testFlag(ServiceControl::SupportFlag::Stop));
+	}
 
 	QVERIFY2(control->restart(), qUtf8Printable(control->error()));
-	QThread::sleep(10);
-	// blocking should only return after the server started, but for non blocking this may not be the case...
-	if(control->blocking() != ServiceControl::BlockMode::Blocking)
-		QThread::sleep(3);
 
 	QByteArray msg;
 #ifndef Q_OS_WIN
@@ -123,18 +124,25 @@ void BasicServiceTest::testRestart()
 	QCOMPARE(msg, QByteArray("stopping"));
 	msg = {};
 #endif
-	QVERIFY(socket->waitForDisconnected(5000));
+	QVERIFY2(socket->waitForDisconnected(5000), qUtf8Printable(socket->errorString()));
 	socket->deleteLater();
+
+	// blocking should only return after the server started, but for non blocking this may not be the case...
+	if(control->blocking() != ServiceControl::BlockMode::Blocking) {
+		for(auto i = 0; i < 10; ++i) {
+			QThread::msleep(500);
+			QCoreApplication::processEvents();
+		}
+	}
+	TEST_STATUS(ServiceControl::Status::Running);
 
 	socket = new QLocalSocket(this);
 	socket->connectToServer(QStringLiteral("__qtservice_testservice"));
-	QVERIFY(socket->waitForConnected(30000));
+	QVERIFY2(socket->waitForConnected(30000), qUtf8Printable(socket->errorString()));
 	stream.setDevice(socket);
 
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("started"));
-
-	TEST_STATUS(ServiceControl::Status::Running);
 }
 
 void BasicServiceTest::testCustom()
@@ -156,7 +164,7 @@ void BasicServiceTest::testStop()
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("stopping"));
 #endif
-	QVERIFY(socket->waitForDisconnected(5000));
+	QVERIFY2(socket->waitForDisconnected(5000), qUtf8Printable(socket->errorString()));
 
 	TEST_STATUS(ServiceControl::Status::Stopped);
 }
@@ -273,10 +281,7 @@ void BasicServiceTest::performSocketTest()
 
 	auto tcpSocket = new QTcpSocket(this);
 	tcpSocket->connectToHost(QStringLiteral("127.0.0.1"), 15843);
-	while(control->status() == ServiceControl::Status::Starting)
-		QThread::msleep(500);
-	QVERIFY(tcpSocket->waitForConnected(5000));
-
+	QVERIFY2(tcpSocket->waitForConnected(5000), qUtf8Printable(socket->errorString()));
 	TEST_STATUS(ServiceControl::Status::Running);
 
 	QByteArray msg = "hello world";
