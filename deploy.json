@@ -3,7 +3,7 @@
 	"description": "A platform independent library to easily create system services and use some of their features.",
 	"modules": [ "QtService" ],
 	"dependencies": [],
-	"excludes": [],
+	"excludes": [ "msvc2015" ],
 	"license": {
 		"name": "BSD-3-Clause",
 		"path": "LICENSE"
