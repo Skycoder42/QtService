@@ -30,6 +30,7 @@ class Q_SERVICE_EXPORT ServiceControl : public QObject
 	//! A string describing the last error that occured
 	Q_PROPERTY(QString error READ error RESET clearError NOTIFY errorChanged)
 
+	//! Specifies whether the service is currently enabled
 	Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled) // clazy:exclude=qproperty-without-notify
 
 public:
@@ -42,8 +43,8 @@ public:
 		Reload = 0x0010, //!< Can reload services via ServiceControl::reload
 		GetAutostart = 0x0020, //!< Can read the autostart state of a service
 		SetAutostart = 0x0040, //!< Can write the autostart state of a service
-		SetBlocking = 0x0080,
-		SetEnabled = 0x0100,
+		SetBlocking = 0x0080, //!< Can switch between blocking and nonblocking via ServiceControl::setBlocking
+		SetEnabled = 0x0100, //!< Can be enabled and disabled via ServiceControl::setEnabled
 
 		Status = 0x0200, //!< Can read the current status of a service
 		CustomCommands = 0x0400, //!< Supports the execution of specific custom commands
@@ -71,10 +72,11 @@ public:
 	};
 	Q_ENUM(Status)
 
+	//! A mode that specifies the blocking behaviour of service commands
 	enum class BlockMode {
-		Undetermined,
-		Blocking,
-		NonBlocking
+		Undetermined, //!< Some commands block, while others don't. There is no guarantee given for either variant
+		Blocking, //!< All commands are blocking and only return when the service they are run on completed the corresponding operation
+		NonBlocking //!< All commands only schedule the operation to be performed and return after the system has receive the command
 	};
 	Q_ENUM(BlockMode)
 
@@ -82,7 +84,9 @@ public:
 	static QStringList listBackends();
 	//! Returns the backend that is most likely to be used on the current platform
 	static QString likelyBackend();
+	//! Generates a serviceId by using the given name and domain
 	static QString serviceIdFromName(const QString &backend, const QString &name);
+	//! @copybrief ServiceControl::serviceIdFromName(const QString &, const QString &)
 	static QString serviceIdFromName(const QString &backend, const QString &name, const QString &domain);
 	//! Creates a new ServiceControl for the given service on the service manager defined by backend
 	static ServiceControl *create(const QString &backend, QString serviceId, QObject *parent = nullptr);
@@ -149,6 +153,7 @@ public Q_SLOTS:
 	virtual bool start();
 	//! Send a stop command for the controls service to the service manager
 	virtual bool stop();
+	//! Send a restart command for the controls service to the service manager
 	virtual bool restart();
 
 	//! Send a pause command for the controls service to the service manager
@@ -194,12 +199,15 @@ private:
 	QScopedPointer<ServiceControlPrivate> d;
 };
 
+//! Overload for qHash
 Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceControl::SupportFlags key, uint seed = 0) Q_DECL_NOTHROW {
 	return ::qHash(static_cast<int>(key), seed);
 }
+//! Overload for qHash
 Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceControl::Status key, uint seed = 0) Q_DECL_NOTHROW {
 	return ::qHash(static_cast<int>(key), seed);
 }
+//! Overload for qHash
 Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceControl::BlockMode key, uint seed = 0) Q_DECL_NOTHROW {
 	return ::qHash(static_cast<int>(key), seed);
 }

@@ -166,9 +166,11 @@ private:
 	QScopedPointer<ServicePrivate> d;
 };
 
+//! Overload for qHash
 Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::Service::CommandResult key, uint seed = 0) Q_DECL_NOTHROW {
 	return ::qHash(static_cast<int>(key), seed);
 }
+//! Overload for qHash
 Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::Service::TerminalMode key, uint seed = 0) Q_DECL_NOTHROW {
 	return ::qHash(static_cast<int>(key), seed);
 }

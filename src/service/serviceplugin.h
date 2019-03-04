@@ -21,6 +21,7 @@ public:
 
 	//! Return the ID of the currently setup service
 	virtual QString currentServiceId(const QString &backend) const;
+	//! Guess the ID of a service that has the given name within the given domain
 	virtual QString findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const = 0;
 
 	//! Create a new service backend for the given backend and service

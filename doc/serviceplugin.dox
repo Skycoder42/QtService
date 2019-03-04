@@ -22,6 +22,20 @@ For more details on how to implement such a plugin, have a look at:
 */
 
 /*!
+@fn QtService::ServicePlugin::findServiceId
+
+@param backend The service manager backend to create a service for
+@param serviceName The name of the service
+@param domain The domain of the service
+@returns A serviceId derived from the given name and possibly domain
+
+This method is internally used to resolve serviceIDs when only names are given. You implementation
+should basically do the opposite of the ServiceControl::serviceName method.
+
+@sa ServiceControl::createFromName
+*/
+
+/*!
 @fn QtService::ServicePlugin::createServiceBackend
 
 @param backend The service manager backend to create a service for
@@ -55,19 +69,4 @@ that are created via ServiceControl::createFromName instead of a service id.
 
 @sa ServiceControl::create, ServiceControl::createFromName, ServiceControl,
 ServicePlugin::detectNamedService
-*/
-
-/*!
-@fn QtService::ServicePlugin::detectNamedService
-
-This method was only introduced to keep binary compability. For now, it is used to differentiate
-between a service control created from the service id and one created from a name.
-
-You should call this method at the beginning of createServiceControl(). If the pair is empty, you
-can assume an actual service id was passed and treat it like that. If the pair however does hold
-something and thus is not empty, first will be the services name and second the domain. You
-should then use these two to generate a valid service id and try to create a service control from
-it.
-
-@sa ServicePlugin::createServiceControl, ServiceControl::createFromName
 */

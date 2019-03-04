@@ -88,6 +88,7 @@ private:
 	QScopedPointer<ServiceBackendPrivate> d;
 };
 
+//! Overload for qHash
 Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qHash(QtService::ServiceBackend::ServiceCommand key, uint seed = 0) Q_DECL_NOTHROW {
 	return ::qHash(static_cast<int>(key), seed);
 }

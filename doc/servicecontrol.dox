@@ -71,34 +71,35 @@ performing an unsupported operation will cause an error.
 /*!
 @property QtService::ServiceControl::blocking
 
-@default{`supportFlags().testFlag(SupportsBlocking)`}
+@default{`ServiceControl::BlockMode::Undetermined`}
 
-Whether a backend supports either of those modes depends on the support flags. The following
-combinations are possible:
+Whether a backend supports either of those modes depends on the support flags.
 
- SupportsBlocking	| SupportsNonBlocking	| Behaviour
---------------------|-----------------------|-----------
- yes				| yes					| The behaviour of all commands is determined by this property
- yes				| no					| This property is ignored - services will always behave blocking
- no					| yes					| This property is ignored - services will always behave non blocking
- no					| no					| This property is ignored - the services behaviour is undefined - some methods may be blocking, other unblocking
-
-If commands are blocking, it means that the control won't return from a command until it's
-execution has been completed. So if you for example start a service in blocking mode, the
+If commands are ServiceControl::BlockMode::Blocking, it means that the control won't return from a command until
+it's execution has been completed. So if you for example start a service in blocking mode, the
 method will return only after the service reached the running state or error. In this case
 the method will return the actual result of the operation.
 
-In nonblocking mode the command is only dispatched to the service manager and true is returned
-if the manager accepted the command. You will have to use ServiceControl::status to check the
-services state, if available.
+In ServiceControl::BlockMode::NonBlocking mode the command is only dispatched to the service manager and true is
+returned if the manager accepted the command. You will have to use ServiceControl::status to
+check the services state, if available.
+
+If neither is supported, i.e. ServiceControl::BlockMode::Undetermined is returned, they behaviour differs from
+method to method and might be different on different platforms and even change randomly. In other
+words, you cannot count on it beeing either one or the other behaviour.
+
+@note Some services support both, blocking and nonblocking operation. In those cases,
+ServiceControl::SupportFlag::SetBlocking will be set and you can change the mode by using setBlocking(). For all
+other controls that do not have this flag set, setBlocking will do nothing and always return
+false.
 
 @accessors{
-	@readAc{isBlocking()}
+	@readAc{blocking()}
 	@writeAc{setBlocking()}
 	@notifyAc{blockingChanged()}
 }
 
-@sa ServiceControl::SupportsBlocking, ServiceControl::SupportsNonBlocking
+@sa ServiceControl::SupportFlag::SetBlocking, BlockMode
 */
 
 /*!
@@ -122,6 +123,26 @@ Use setError() to set an error from the implementation
 */
 
 /*!
+@property QtService::ServiceControl::enabled
+
+@default{`true`}
+
+All services are enabled by default. For some backends however, it is possible to disable
+services. A disabled service cannot be started, neither explicitly (i.e. by calling start()) nor
+implicitly (i.e. via autostart or socket activation).
+
+Writing the property is only possible on platforms that have the ServiceControl::SupportFlag::SetEnabled flag
+set.
+
+@accessors{
+	@readAc{isEnabled()}
+	@resetAc{setEnabled()}
+}
+
+@sa ServiceControl::SupportFlag::SetEnabled
+*/
+
+/*!
 @fn QtService::ServiceControl::likelyBackend
 
 @returns The most likely backend for the current platform
@@ -135,6 +156,38 @@ Use setError() to set an error from the implementation
  Others		| standard
 
 @sa ServiceControl::listBackends, ServiceControl::create
+*/
+
+/*!
+@fn QtService::ServiceControl::serviceIdFromName(const QString &, const QString &)
+
+@param backend The backend to create a control from
+@param name The name of the service to control
+@returns The serviceId derived from the given name and default domain
+@throws QException In case loading fails
+
+This method lets the corresponding plugin make a guess on what the serviceId of a serivce with
+the given name could be. As some backends require not only a name, but also domain,
+QCoreApplication::organizationDomain() is used for that if needed. Use the other overload if
+you want to specify your own domain.
+
+@sa ServiceControl::createFromName, ServiceControl::create
+*/
+
+/*!
+@fn QtService::ServiceControl::serviceIdFromName(const QString &, const QString &, const QString &)
+
+@param backend The backend to create a control from
+@param name The name of the service to control
+@param domain The domain of the service to control
+@returns The serviceId derived from the given name and domain
+@throws QException In case loading fails
+
+This method lets the corresponding plugin make a guess on what the serviceId of a serivce with
+the given name could be. As some backends require not only a name, but also domain, the given
+one is used for that if needed.
+
+@sa ServiceControl::createFromName, ServiceControl::create
 */
 
 /*!
@@ -154,7 +207,7 @@ The returned instance is owned by the caller. To check if the control operates o
 service, use ServiceControl::serviceExists
 
 @sa ServiceControl::createFromName, ServiceControl::serviceExists, ServiceControl::supportFlags,
-ServiceControl::likelyBackend
+ServiceControl::likelyBackend, ServiceControl::serviceIdFromName
 */
 
 /*!
@@ -206,7 +259,7 @@ ServiceControl::likelyBackend
 @returns The return of the command
 
 Custom commands can only be used if the control supports the
-ServiceControl::SupportsCustomCommands flag is set. If the operation is not supported,
+ServiceControl::SupportFlag::CustomCommands flag is set. If the operation is not supported,
 an invalid variant will be returned and ServiceControl::error is set.
 
 This method can be used to execute a custom command, i.e. one that is not a standard command.
@@ -237,17 +290,17 @@ fails to find out, ServiceControl::setError can be used to set an error string.
 
 @returns The current status of the service
 
-The status can only be returned if the control supports the ServiceControl::SupportsStatus
+The status can only be returned if the control supports the ServiceControl::SupportFlag::Status
 flag is set. The kinds of status returned differ on the capabilities of each service manager.
-If the operation is not supported, ServiceControl::ServiceStatusUnknown will be returned and
+If the operation is not supported, ServiceControl::Status::UnknownUnknown will be returned and
 ServiceControl::error is set.
 
 A backend should query the manager from this method in a synchronous manner to get and return
 the service status. If the backend fails to find out, ServiceControl::setError can be used to
-set an error string and ServiceControl::ServiceStatusUnknown should be returned to indicate
+set an error string and ServiceControl::Status::UnknownUnknown should be returned to indicate
 the error.
 
-@sa ServiceControl::SupportsStatus, ServiceControl::supportFlags, ServiceControl::error
+@sa ServiceControl::SupportFlag::Status, ServiceControl::supportFlags, ServiceControl::error
 */
 
 /*!
@@ -256,7 +309,7 @@ the error.
 @returns true if the service will start automatically with the system, false if not
 
 The status can only be returned if the control supports the
-ServiceControl::SupportsGetAutostart flag is set.
+ServiceControl::SupportFlag::GetAutostart flag is set.
 
 @note When using socket activation, the autostart is reported as false, as the service itself
 will not start until someone tries to connect to the socket. So activated services should not
@@ -266,7 +319,7 @@ A backend should query the manager from this method in a synchronous manner to g
 the autostart status. If the backend fails to find out, ServiceControl::setError can be used
 to set an error string and false should be returned.
 
-@sa ServiceControl::SupportsGetAutostart, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::GetAutostart, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::enableAutostart, ServiceControl::disableAutostart
 */
 
@@ -288,14 +341,14 @@ service controlled by this instance.
 
 @returns true if successfully started, false if not
 
-The command can only be used if the control supports the ServiceControl::SupportsStart flag
+The command can only be used if the control supports the ServiceControl::SupportFlag::Start flag
 is set. If the operation is not supported, false will be returned and ServiceControl::error
 is set.
 
 The command will follow the standard blocking rules and return true either after successfully
 starting or dispatching the start command.
 
-@sa ServiceControl::SupportsStart, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::Start, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::blocking, ServiceControl::stop
 */
 
@@ -304,15 +357,35 @@ ServiceControl::blocking, ServiceControl::stop
 
 @returns true if successfully stopped, false if not
 
-The command can only be used if the control supports the ServiceControl::SupportsStop flag
+The command can only be used if the control supports the ServiceControl::SupportFlag::Stop flag
 is set. If the operation is not supported, false will be returned and ServiceControl::error
 is set.
 
 The command will follow the standard blocking rules and return true either after successfully
 stopping or dispatching the stop command.
 
-@sa ServiceControl::SupportsStop, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::Stop, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::blocking, ServiceControl::start
+*/
+
+/*!
+@fn QtService::ServiceControl::restart
+
+@returns true if successfully restarted, false if not
+
+The command can only be used if the control supports the ServiceControl::SupportFlag::Start and
+ServiceControl::SupportFlag::Stop flag are set. If the operation is not supported, false will be
+returned and ServiceControl::error is set.
+
+For backends that do not support native restart, the control simulates the behaviour by calling
+stop and start in succession. This is only possible if the serivce either is in blocking mode or
+supports the ServiceControl::SupportFlag::Status feature.
+
+The command will follow the standard blocking rules and return true either after successfully
+restarting or dispatching the restart command.
+
+@sa ServiceControl::start, ServiceControl::stop, ServiceControl::supportFlags,
+ServiceControl::error, ServiceControl::blocking
 */
 
 /*!
@@ -320,14 +393,14 @@ ServiceControl::blocking, ServiceControl::start
 
 @returns true if successfully paused, false if not
 
-The command can only be used if the control supports the ServiceControl::SupportsPause flag
+The command can only be used if the control supports the ServiceControl::SupportFlag::Pause flag
 is set. If the operation is not supported, false will be returned and ServiceControl::error
 is set.
 
 The command will follow the standard blocking rules and return true either after successfully
 pausing or dispatching the pause command.
 
-@sa ServiceControl::SupportsPause, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::Pause, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::blocking, ServiceControl::resume
 */
 
@@ -336,14 +409,14 @@ ServiceControl::blocking, ServiceControl::resume
 
 @returns true if successfully resumed, false if not
 
-The command can only be used if the control supports the ServiceControl::SupportsResume flag
+The command can only be used if the control supports the ServiceControl::SupportFlag::Resume flag
 is set. If the operation is not supported, false will be returned and ServiceControl::error
 is set.
 
 The command will follow the standard blocking rules and return true either after successfully
 resuming or dispatching the resume command.
 
-@sa ServiceControl::SupportsResume, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::Resume, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::blocking, ServiceControl::pause
 */
 
@@ -352,14 +425,14 @@ ServiceControl::blocking, ServiceControl::pause
 
 @returns true if successfully reloaded, false if not
 
-The command can only be used if the control supports the ServiceControl::SupportsReload flag
+The command can only be used if the control supports the ServiceControl::SupportFlag::Reload flag
 is set. If the operation is not supported, false will be returned and ServiceControl::error
 is set.
 
 The command will follow the standard blocking rules and return true either after successfully
 reloading or dispatching the reload command.
 
-@sa ServiceControl::SupportsReload, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::Reload, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::blocking
 */
 
@@ -368,14 +441,14 @@ ServiceControl::blocking
 
 @returns true if autostart was enabled, false if not
 
-The command can only be used if the control supports the ServiceControl::SupportsSetAutostart
+The command can only be used if the control supports the ServiceControl::SupportFlag::SetAutostart
 flag is set. If the operation is not supported, false will be returned and
 ServiceControl::error is set.
 
 The method will only set the autostart state. This will not start a service that is currently
 not running.
 
-@sa ServiceControl::SupportsSetAutostart, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::SetAutostart, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::disableAutostart, ServiceControl::isAutostartEnabled
 */
 
@@ -384,14 +457,14 @@ ServiceControl::disableAutostart, ServiceControl::isAutostartEnabled
 
 @returns true if autostart was disabled, false if not
 
-The command can only be used if the control supports the ServiceControl::SupportsSetAutostart
+The command can only be used if the control supports the ServiceControl::SupportFlag::SetAutostart
 flag is set. If the operation is not supported, false will be returned and
 ServiceControl::error is set.
 
 The method will only set the autostart state. This will not stop a service that is currently
 running.
 
-@sa ServiceControl::SupportsSetAutostart, ServiceControl::supportFlags, ServiceControl::error,
+@sa ServiceControl::SupportFlag::SetAutostart, ServiceControl::supportFlags, ServiceControl::error,
 ServiceControl::enableAutostart, ServiceControl::isAutostartEnabled
 */
 

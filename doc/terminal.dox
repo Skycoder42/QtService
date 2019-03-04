@@ -17,7 +17,7 @@ remote terminal. Read that documentation to make shure you use this class correc
 /*!
 @property QtService::Terminal::terminalMode
 
-@default{`Service::ReadWriteActive`}
+@default{`Service::TerminalMode::ReadWriteActive`}
 
 The terminal mode that this terminal used to connect to the service with. The mode determines
 how I/O is managed between the service and the terminal. This cannot be changed after
@@ -26,12 +26,12 @@ connecting, which means you should simply discard terminals with unallowed modes
 The modes are define in Service::TerminalMode - from the clients perspective. However here is
 a table to explain what they are
 
- Terminal mode				| Open mode				| Explanation
-----------------------------|-----------------------|-------------
- Service::ReadOnly			| QIODevice::WriteOnly	| @copybrief Service::ReadOnly
- Service::WriteOnly			| QIODevice::ReadOnly	| @copybrief Service::WriteOnly
- Service::ReadWritePassive	| QIODevice::ReadWrite	| @copybrief Service::ReadWritePassive
- Service::ReadWriteActive	| QIODevice::ReadWrite	| @copybrief Service::ReadWriteActive
+ Terminal mode								| Open mode				| Explanation
+--------------------------------------------|-----------------------|-------------
+ Service::TerminalMode::ReadOnly			| QIODevice::WriteOnly	| @copybrief Service::TerminalMode::ReadOnly
+ Service::TerminalMode::WriteOnly			| QIODevice::ReadOnly	| @copybrief Service::TerminalMode::WriteOnly
+ Service::TerminalMode::ReadWritePassive	| QIODevice::ReadWrite	| @copybrief Service::TerminalMode::ReadWritePassive
+ Service::TerminalMode::ReadWriteActive		| QIODevice::ReadWrite	| @copybrief Service::TerminalMode::ReadWriteActive
 
 @note For the active mode, the user won't be able to input anything unless the
 Terminal::request* (or Terminal::await*) methods are called. This means whenever your service
@@ -49,7 +49,7 @@ Terminal::requestLine, Terminal::awaitChar, Terminal::awaitChars, Terminal::awai
 */
 
 /*!
-@property QtService::Terminal::command2
+@property QtService::Terminal::command
 
 @default{<i>Arguments passed to the terminal</i>}
 
@@ -64,7 +64,7 @@ Service::verifyCommand to verify the passed arguments on the clients side before
 the service. After receiving, verify them again and then use them.
 
 @accessors{
-	@readAc{command2()}
+	@readAc{command()}
 	@constantAc
 }
 

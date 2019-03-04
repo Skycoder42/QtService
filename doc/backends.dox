@@ -22,6 +22,7 @@
 - Callbacks signatures:
 	- `void SIGUSR1()`: Invoked by handling the unix signal `SIGUSR1`
 	- `void SIGUSR2()`: Invoked by handling the unix signal `SIGUSR2`
+
 @subsection qtservice_backends_standard_control Service Control
 - Support Flags:
 	- QtService::ServiceControl::SupportsStart (only on platforms that provice QProcess)
@@ -29,6 +30,8 @@
 	- QtService::ServiceControl::SupportsStatus
 - Custom commands:
 	- `qint64 getPid()`: Returns the PID auf the currently running instance, or -1 if none is running
+- Is ServiceControl::BlockMode::Undetermined on windows, ServiceControl::BlockMode::NonBlocking
+on all other platforms
 - Starting is done by simply running the service executable as detached process
 - The lockfile is used to determine the service state - which means only services that use the
 backend can be controlled properly
@@ -66,8 +69,7 @@ backend can be controlled properly
 	- QtService::ServiceControl::SupportsSetAutostart
 	- QtService::ServiceControl::SupportsStatus
 	- QtService::ServiceControl::SupportsCustomCommands
-	- QtService::ServiceControl::SupportsBlocking
-	- QtService::ServiceControl::SupportsNonBlocking
+	- QtService::ServiceControl::SetBlocking
 - Custom commands:
 	- Any command that is a valid systemctl command. The general signature is:
 `int command(parameters...)` and will invoke systemctl as
@@ -75,6 +77,8 @@ backend can be controlled properly
 of that command. The first two parameters as well as the service name are automatically determined
 by the backend, depending on the control configuration. For example, to send the `SIGUSR1` signal to
 a running service, you would call `callCommand<int>("kill", QStringLiteral("--signal=SIGUSR1"));`
+- Supports both blocking and nonblocking, the default is ServiceControl::BlockMode::Blocking
+- Has native restart command
 
 @section qtservice_backends_windows Windows Backend
 @subsection qtservice_backends_windows_backend Service Backend
@@ -102,10 +106,12 @@ a running service, you would call `callCommand<int>("kill", QStringLiteral("--si
 	- QtService::ServiceControl::SupportsSetAutostart
 	- QtService::ServiceControl::SupportsStatus
 	- QtService::ServiceControl::SupportsCustomCommands
-	- QtService::ServiceControl::SupportsNonBlocking
+	- QtService::ServiceControl::SetEnabled
 - Custom commands:
 	- `bool command(DWORD cmd)`: Accepts commands in the range of `[128;255]`. The command is sent
 to the service as custom command
+- Supports ServiceControl::BlockMode::NonBlocking
+
 
 @section qtservice_backends_launchd Launchd Backend
 @subsection qtservice_backends_launchd_backend Service Backend
@@ -128,13 +134,14 @@ to the service as custom command
 	- QtService::ServiceControl::SupportsStart
 	- QtService::ServiceControl::SupportsStop
 	- QtService::ServiceControl::SupportsCustomCommands
-	- QtService::ServiceControl::SupportsNonBlocking
+	- QtService::ServiceControl::SetEnabled
 - Custom commands:
 	- Any command that is a valid launchctl command. The general signature is:
 `int command(parameters...)` and will invoke launchctl as
 `launchctl <command> <arguments> <service-name>` and return the result
 of that command. The service name is automatically determined by the backend, depending on the
 control configuration.
+- Supports ServiceControl::BlockMode::Undetermined
 
 @section qtservice_backends_android Android Backend
 @subsection qtservice_backends_android_backend Service Backend
@@ -156,7 +163,7 @@ corresponding command
 	- QtService::ServiceControl::SupportsStart
 	- QtService::ServiceControl::SupportsStop
 	- QtService::ServiceControl::SupportsCustomCommands
-	- QtService::ServiceControl::SupportsNonBlocking
+	- QtService::ServiceControl::SetEnabled
 - Custom commands:
 	- `void startWithIntent(QAndroidIntent)`: Starts the service with a custom intent. If the
 service is already running it is delivered to the running service. The target class is set
@@ -167,4 +174,5 @@ QAndroidServiceConnection.
 	- `void unbind(QAndroidServiceConnection*)`: Unbinds the service connected by the given
 connection. If no other binders are connected and the service was not started explicitly, this will
 stop the service.
+- Supports ServiceControl::BlockMode::NonBlocking
 */
