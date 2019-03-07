@@ -1,6 +1,6 @@
 TARGET  = qsystemd
 
-QT += service
+QT += service dbus
 QT -= gui
 
 CONFIG += link_pkgconfig
@@ -16,7 +16,11 @@ SOURCES += \
 	systemdservicebackend.cpp \
 	systemdservicecontrol.cpp
 
-DISTFILES += systemd.json
+DBUS_INTERFACES += de.skycoder42.QtService.ServicePlugin.systemd.xml
+DBUS_ADAPTORS += $$DBUS_INTERFACES
+
+DISTFILES += \
+	systemd.json
 
 PLUGIN_TYPE = servicebackends
 PLUGIN_EXTENDS = service

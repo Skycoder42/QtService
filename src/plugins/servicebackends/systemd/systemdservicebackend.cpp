@@ -1,5 +1,8 @@
 #include "systemdservicebackend.h"
 #include "systemdserviceplugin.h"
+
+#include <QtDBus/QDBusConnection>
+
 #include <chrono>
 #include <csignal>
 #include <unistd.h>
@@ -8,27 +11,33 @@
 #include <systemd/sd-journal.h>
 #include <systemd/sd-daemon.h>
 
+#include "systemd_interface.h"
+
 using namespace QtService;
 
+const QString SystemdServiceBackend::DBusObjectPath = QStringLiteral("/de/skycoder42/QtService/SystemdServiceBackend");
+
 SystemdServiceBackend::SystemdServiceBackend(Service *service) :
-	ServiceBackend{service}
-{}
+	ServiceBackend{service},
+	_dbusAdapter{new SystemdAdaptor{this}}
+{
+	// manually connect signals from service to adaptor
+	connect(service, &Service::reloaded,
+			_dbusAdapter, &SystemdAdaptor::serviceReloaded);
+	connect(service, &Service::stopped,
+			_dbusAdapter, &SystemdAdaptor::serviceStopped);
+}
 
 int SystemdServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	qInstallMessageHandler(SystemdServiceBackend::systemdMessageHandler);
-	try {
-		auto pid = 0;
-		if(findArg("stop", argc, argv, pid))
-			return stop(pid);
-		else if(findArg("reload", argc, argv, pid))
-			return reload(pid);
-		else
-			return run(argc, argv, flags);
-	} catch(int exitCode) {
-		qCWarning(logQtService) << "Control commands must be used as \"<path/to/service> --backend systemd <command> $MAINPID\"";
-		return exitCode;
-	}
+	QCoreApplication app{argc, argv, flags};
+	if(findArg(QStringLiteral("stop")))
+		return stop();
+	else if(findArg(QStringLiteral("reload")))
+		return reload();
+	else
+		return run();
 }
 
 void SystemdServiceBackend::quitService()
@@ -132,10 +141,9 @@ void SystemdServiceBackend::onPaused(bool success)
 		kill(getpid(), SIGSTOP); //now actually stop
 }
 
-int SystemdServiceBackend::run(int &argc, char **argv, int flags)
+int SystemdServiceBackend::run()
 {
 	//prepare the app
-	QCoreApplication app{argc, argv, flags};
 	prepareWatchdog(); //do as early as possible
 	if(!preStartService())
 		return EXIT_FAILURE;
@@ -150,30 +158,89 @@ int SystemdServiceBackend::run(int &argc, char **argv, int flags)
 	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2})
 		registerForSignal(signal);
 
+	// register the D-Bus service
+	auto connection = QDBusConnection::sessionBus();
+	if(!connection.registerObject(DBusObjectPath, this)) {
+		printDbusError(connection.lastError());
+		return EXIT_FAILURE;
+	}
+	if(!connection.registerService(dbusId())) {
+		printDbusError(connection.lastError());
+		return EXIT_FAILURE;
+	}
+
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
 	return QCoreApplication::exec();
 }
 
-int SystemdServiceBackend::stop(int pid)
+int SystemdServiceBackend::stop()
 {
+	using namespace de::skycoder42::QtService::ServicePlugin;
 	sd_notify(false, "STOPPING=1");
-	qCDebug(logQtService) << "Sending signal SIGTERM to main process with pid" << pid;
-	if(kill(pid, SIGTERM) == 0)
-		return EXIT_SUCCESS;
-	else
-		return errno;
+
+	auto connection = QDBusConnection::sessionBus();
+	auto dbusInterface = new systemd{dbusId(), DBusObjectPath, connection, this};
+	if (!dbusInterface->isValid()) {
+		printDbusError(connection.lastError());
+		return EXIT_FAILURE;
+	}
+
+	qCDebug(logQtService) << "Sending stop signal to main process";
+	// forward service stop result
+	connect(dbusInterface, &systemd::serviceStopped,
+			qApp, &QCoreApplication::exit);
+	// handle service removal, in case stop result is not received
+	connect(connection.interface(), &QDBusConnectionInterface::serviceUnregistered,
+			this, [this](const QString &svcName) {
+		if(svcName == dbusId()) {
+			qCWarning(logQtService) << "D-Bus Service of main process was removed before the stop result was received! Assuming successful exit";
+			qApp->quit();
+		}
+	}, Qt::QueuedConnection);
+	// send the stop request and handle possible direct failures
+	auto watcher = new QDBusPendingCallWatcher{dbusInterface->quitService(), this};
+	connect(watcher, &QDBusPendingCallWatcher::finished,
+			this, [this](QDBusPendingCallWatcher *w){
+		if (w->isError()) {
+			printDbusError(w->error());
+			qApp->exit(EXIT_FAILURE);
+		}
+	});
+	// run eventloop until done
+	return QCoreApplication::exec();
 }
 
-int SystemdServiceBackend::reload(int pid)
+int SystemdServiceBackend::reload()
 {
+	using namespace de::skycoder42::QtService::ServicePlugin;
 	sd_notify(false, "RELOADING=1");
-	qCDebug(logQtService) << "Sending signal SIGHUP to main process with pid" << pid;
-	if(kill(pid, SIGHUP) == 0)
-		return EXIT_SUCCESS;
-	else
-		return errno;
+
+	auto connection = QDBusConnection::sessionBus();
+	auto dbusInterface = new systemd{dbusId(), DBusObjectPath, connection, this};
+	if (!dbusInterface->isValid()) {
+		printDbusError(connection.lastError());
+		return EXIT_FAILURE;
+	}
+
+	qCDebug(logQtService) << "Sending reload signal to main process";
+	// forward service reload result
+	connect(dbusInterface, &systemd::serviceReloaded,
+			qApp, [](bool success) {
+		qApp->exit(success ? EXIT_SUCCESS : EXIT_FAILURE);
+	});
+	// send the reload request and handle possible direct failures
+	auto watcher = new QDBusPendingCallWatcher{dbusInterface->reloadService(), this};
+	connect(watcher, &QDBusPendingCallWatcher::finished,
+			this, [this](QDBusPendingCallWatcher *w){
+		if (w->isError()) {
+			printDbusError(w->error());
+			qApp->exit(EXIT_FAILURE);
+		}
+	});
+	// run eventloop until done
+	return QCoreApplication::exec();
 }
 
 void SystemdServiceBackend::prepareWatchdog()
@@ -198,21 +265,31 @@ void SystemdServiceBackend::prepareWatchdog()
 	}
 }
 
-bool SystemdServiceBackend::findArg(const char *command, int argc, char **argv, int &pid)
+bool SystemdServiceBackend::findArg(const QString &command) const
 {
-	for(auto i = 1; i < argc; i++) {
-		if(qstrcmp(command, argv[i]) == 0) {
-			if((i + 1) >= argc)
-				throw EXIT_FAILURE;
-			auto ok = false;
-			pid = QByteArray(argv[i + 1]).toInt(&ok);
-			if(ok)
-				return true;
-			else
-				throw EXIT_FAILURE;
-		}
+	for(const auto arg : QCoreApplication::arguments()) {
+		if(arg == command)
+			return true;
 	}
 	return false;
+}
+
+QString SystemdServiceBackend::dbusId() const
+{
+	auto dId = QCoreApplication::organizationDomain();
+	if(dId.isEmpty())
+		dId = QCoreApplication::applicationName();
+	else
+		dId = dId + QLatin1Char('.') + QCoreApplication::applicationName();
+	return dId + QStringLiteral(".systemd-service");
+}
+
+void SystemdServiceBackend::printDbusError(const QDBusError &error) const
+{
+	if(error.type() != QDBusError::NoError) {
+		qCCritical(logQtService).noquote().nospace() << error.name() << ": "
+													 << error.message();
+	}
 }
 
 void SystemdServiceBackend::systemdMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
@@ -241,11 +318,11 @@ void SystemdServiceBackend::systemdMessageHandler(QtMsgType type, const QMessage
 		break;
 	}
 
-	sd_journal_send("MESSAGE=%s",     formattedMessage.toUtf8().constData(),
-					"PRIORITY=%i",    priority,
-					"CODE_FUNC=%s",   context.function ? context.function : "unknown",
-					"CODE_LINE=%d",   context.line,
-					"CODE_FILE=%s",   context.file ? context.file : "unknown",
+	sd_journal_send("MESSAGE=%s", formattedMessage.toUtf8().constData(),
+					"PRIORITY=%i", priority,
+					"CODE_FUNC=%s", context.function ? context.function : "unknown",
+					"CODE_LINE=%d", context.line,
+					"CODE_FILE=%s", context.file ? context.file : "unknown",
 					"QT_CATEGORY=%s", context.category ? context.category : "unknown",
 					NULL);
 }

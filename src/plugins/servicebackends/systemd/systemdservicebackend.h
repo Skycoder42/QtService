@@ -4,16 +4,20 @@
 #include <QtCore/QTimer>
 #include <QtService/ServiceBackend>
 
+#include "systemd_adaptor.h"
+
 class SystemdServiceBackend : public QtService::ServiceBackend
 {
 	Q_OBJECT
 
 public:
+	static const QString DBusObjectPath;
+
 	explicit SystemdServiceBackend(QtService::Service *service);
 
 	int runService(int &argc, char **argv, int flags) override;
-	void quitService() override;
-	void reloadService() override;
+	Q_INVOKABLE void quitService() override;
+	Q_INVOKABLE void reloadService() override;
 	QList<int> getActivatedSockets(const QByteArray &name) override;
 
 protected Q_SLOTS:
@@ -31,12 +35,17 @@ private:
 	QTimer *_watchdogTimer = nullptr;
 	QMultiHash<QByteArray, int> _sockets;
 
-	int run(int &argc, char **argv, int flags);
-	int stop(int pid);
-	int reload(int pid);
+	SystemdAdaptor *_dbusAdapter;
+
+	int run();
+	int stop();
+	int reload();
 
 	void prepareWatchdog();
-	bool findArg(const char *command, int argc, char **argv, int &pid);
+	bool findArg(const QString &command) const;
+
+	QString dbusId() const;
+	void printDbusError(const QDBusError &error) const;
 
 	static void systemdMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };

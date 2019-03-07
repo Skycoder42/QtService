@@ -1,0 +1,14 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/de/skycoder42/QtService/SystemdServiceBackend">
+	<interface name="de.skycoder42.QtService.ServicePlugin.systemd">
+		<method name="quitService" />
+
+		<method name="reloadService" />
+		<signal name="serviceReloaded">
+			<arg name="success" type="b" />
+		</signal>
+		<signal name="serviceStopped">
+			<arg name="exitCode" type="i" />
+		</signal>
+	</interface>
+</node>

@@ -3,6 +3,8 @@
 #include "logging_p.h"
 #include "service_p.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 
 using namespace QtService;
@@ -134,6 +136,8 @@ bool ServiceControl::stop()
 
 bool ServiceControl::restart()
 {
+	using namespace std::chrono_literals;
+
 	// blocking services can simply call stop and start
 	if(blocking() == BlockMode::Blocking) {
 		auto ok = stop();
@@ -162,7 +166,7 @@ bool ServiceControl::restart()
 				break;
 			}
 		});
-		timer->start(std::chrono::seconds{1});
+		timer->start(1s);
 		return true;
 	} else {
 		setError(tr("Operation restart is not supported for non-blocking service controls without status information"));

@@ -14,15 +14,15 @@ ServiceBackend::ServiceBackend(Service *service) :
 	QObject{service},
 	d{new ServiceBackendPrivate{service}}
 {
-	connect(d->service, QOverload<bool>::of(&Service::started),
+	connect(d->service, &Service::started,
 			this, &ServiceBackend::onSvcStarted);
 	connect(d->service, &Service::stopped,
 			this, &ServiceBackend::onSvcStopped);
-	connect(d->service, QOverload<bool>::of(&Service::reloaded),
+	connect(d->service, &Service::reloaded,
 			this, &ServiceBackend::onSvcReloaded);
-	connect(d->service, QOverload<bool>::of(&Service::resumed),
+	connect(d->service, &Service::resumed,
 			this, &ServiceBackend::onSvcResumed);
-	connect(d->service, QOverload<bool>::of(&Service::paused),
+	connect(d->service, &Service::paused,
 			this, &ServiceBackend::onSvcPaused);
 }
 
