@@ -53,7 +53,7 @@ QDEP_DEPENDS += \
 # extra cpp files for translations
 never_true_lupdate_only {
 	PLUGINS = $$files(../plugins/servicebackends/*)
-	for(plugin, PLUGINS): SOURCES += $$plugin/*.h
+	for(plugin, PLUGINS): HEADERS += $$plugin/*.h
 	for(plugin, PLUGINS): SOURCES += $$plugin/*.cpp
 }
 

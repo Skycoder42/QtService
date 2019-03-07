@@ -33,7 +33,7 @@ bool LaunchdServiceControl::serviceExists() const
 bool LaunchdServiceControl::isEnabled() const
 {
 	const auto target = QStringLiteral("user/%1/")
-						.arg(::getuid());
+						.arg(::geteuid());
 	QByteArray outData;
 	if (runLaunchctl("print-disabled", {target}, false, &outData) == EXIT_SUCCESS) {
 		const QRegularExpression lineRegex{
@@ -71,7 +71,7 @@ bool LaunchdServiceControl::setEnabled(bool enabled)
 		return true;
 
 	const auto target = QStringLiteral("user/%1/%2")
-						.arg(::getuid())
+						.arg(::geteuid())
 						.arg(serviceId());
 	return runLaunchctl(enabled ? "enable" : "disable", {target}, false) == EXIT_SUCCESS;
 }

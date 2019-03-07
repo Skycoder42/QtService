@@ -2,6 +2,9 @@
 #define SYSTEMDSERVICEBACKEND_H
 
 #include <QtCore/QTimer>
+
+#include <QtDBus/QDBusConnection>
+
 #include <QtService/ServiceBackend>
 
 #include "systemd_adaptor.h"
@@ -32,6 +35,7 @@ private Q_SLOTS:
 	void onPaused(bool success);
 
 private:
+	bool _userService = true;
 	QTimer *_watchdogTimer = nullptr;
 	QMultiHash<QByteArray, int> _sockets;
 
@@ -42,8 +46,8 @@ private:
 	int reload();
 
 	void prepareWatchdog();
-	bool findArg(const QString &command) const;
 
+	QDBusConnection dbusConnection() const;
 	QString dbusId() const;
 	void printDbusError(const QDBusError &error) const;
 

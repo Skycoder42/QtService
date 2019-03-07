@@ -42,7 +42,6 @@ backend can be controlled properly
 - All QDebug is logged into journald
 - Uses QCoreApplication as application
 - Can be used for user and system services
-- should be used with `-platform minimal` to avoid any dependencies to the windowing system
 - supported systemd commands:
 	- start
 	- stop
@@ -77,6 +76,9 @@ backend can be controlled properly
 of that command. The first two parameters as well as the service name are automatically determined
 by the backend, depending on the control configuration. For example, to send the `SIGUSR1` signal to
 a running service, you would call `callCommand<int>("kill", QStringLiteral("--signal=SIGUSR1"));`
+- Custom Properties:
+	- `runAsUser: bool [GSNR]`: Holds whether commands to systemd are issued as `--user` or `--system`.
+The default is determined by checking the current user id, but it can be overwritten.
 - Supports both blocking and nonblocking, the default is ServiceControl::BlockMode::Blocking
 - Has native restart command
 

@@ -8,7 +8,8 @@
 using namespace QtService;
 
 SystemdServiceControl::SystemdServiceControl(QString &&serviceId, QObject *parent) :
-	ServiceControl{std::move(serviceId), parent}
+	ServiceControl{std::move(serviceId), parent},
+	_runAsUser{::geteuid() != 0}
 {}
 
 QString SystemdServiceControl::backend() const
@@ -140,6 +141,11 @@ ServiceControl::BlockMode SystemdServiceControl::blocking() const
 	return _blocking ? BlockMode::Blocking : BlockMode::NonBlocking;
 }
 
+bool SystemdServiceControl::isRunAsUser() const
+{
+	return _runAsUser;
+}
+
 QVariant SystemdServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
 {
 	QStringList sArgs;
@@ -189,6 +195,20 @@ bool SystemdServiceControl::setBlocking(bool blocking)
 	return true;
 }
 
+void SystemdServiceControl::setRunAsUser(bool runAsUser)
+{
+	if (_runAsUser == runAsUser)
+		return;
+
+	_runAsUser = runAsUser;
+	emit runAsUserChanged(_runAsUser);
+}
+
+void SystemdServiceControl::resetRunAsUser()
+{
+	setRunAsUser(::geteuid() != 0);
+}
+
 QString SystemdServiceControl::serviceName() const
 {
 	const static QRegularExpression regex(QStringLiteral(R"__((.+)\.(?:service|socket|device|mount|automount|swap|target|path|timer|slice|scope))__"));
@@ -213,10 +233,10 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 
 	QStringList args;
 	args.reserve(extraArgs.size() + 4);
-	if(::geteuid() == 0)
-		args.append(QStringLiteral("--system"));
-	else
+	if(_runAsUser)
 		args.append(QStringLiteral("--user"));
+	else
+		args.append(QStringLiteral("--system"));
 	args.append(QString::fromUtf8(command));
 	if(!noPrepare) {
 		args.append(serviceId());

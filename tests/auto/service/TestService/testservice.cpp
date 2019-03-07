@@ -88,6 +88,15 @@ Service::CommandResult TestService::onStop(int &exitCode)
 Service::CommandResult TestService::onReload()
 {
 	qDebug() << Q_FUNC_INFO;
+
+#ifndef Q_OS_WIN
+	QSettings config{runtimeDir().absoluteFilePath(QStringLiteral("test.conf")), QSettings::IniFormat};
+	if(config.value(QStringLiteral("fail")).toBool()) {
+		qDebug() << "Failing onReload operation";
+		return CommandResult::Failed;
+	}
+#endif
+
 	_stream << QByteArray("reloading");
 	_socket->flush();
 	return CommandResult::Completed;

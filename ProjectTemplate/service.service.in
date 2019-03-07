@@ -8,9 +8,9 @@ After=network-online.target %{SvcSystemdSocketName}
 [Service]
 Type=notify
 NotifyAccess=exec
-ExecStart=$${target.path}/$$TARGET -platform minimal --backend systemd
-ExecReload=$${target.path}/$$TARGET -platform minimal --backend systemd reload $MAINPID
-ExecStop=$${target.path}/$$TARGET -platform minimal --backend systemd stop $MAINPID
+ExecStart=$${target.path}/$$TARGET --backend systemd
+ExecReload=$${target.path}/$$TARGET --backend systemd reload
+ExecStop=$${target.path}/$$TARGET --backend systemd stop
 #WatchdogSec=10
 Restart=on-abnormal
 RuntimeDirectory=$$TARGET

@@ -105,7 +105,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	//! Must be emitted when starting was completed if onStart returned OperationPending
-	void started(bool success); //TODO doc should be direct connected
+	void started(bool success);
 	//! Must be emitted when stopping was completed if onStop returned OperationPending
 	void stopped(int exitCode = EXIT_SUCCESS);
 	//! Must be emitted when reloading was completed if onReload returned OperationPending

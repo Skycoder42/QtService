@@ -4,7 +4,7 @@
 <context>
     <name>AndroidServiceControl</name>
     <message>
-        <location filename="../../plugins/servicebackends/android/androidservicecontrol.cpp" line="+32"/>
+        <location filename="../../plugins/servicebackends/android/androidservicecontrol.cpp" line="+63"/>
         <location line="+6"/>
         <source>The bind command must be called with a QAndroidServiceConnection* as first parameter and QtAndroid::BindFlags as optional second parameter</source>
         <translation>Das bind Kommando muss mit QAndroidServiceConnection* als ersten und QtAndroid::BindFlags als optionalen zweiten Parameter aufgerufen werden</translation>
@@ -25,12 +25,12 @@
 <context>
     <name>LaunchdServiceControl</name>
     <message>
-        <location filename="../../plugins/servicebackends/launchd/launchdservicecontrol.cpp" line="+54"/>
+        <location filename="../../plugins/servicebackends/launchd/launchdservicecontrol.cpp" line="+88"/>
         <source>Failed to find launchctl executable</source>
         <translation>Konnte launchctl Anwendung nicht finden</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+27"/>
         <source>launchctl crashed with error: %1</source>
         <translation>launchctl ist abgestürtzt mit Fehlermeldung: %1</translation>
     </message>
@@ -43,7 +43,7 @@
 <context>
     <name>QtService::ServiceControl</name>
     <message>
-        <location filename="../servicecontrol.cpp" line="+76"/>
+        <location filename="../servicecontrol.cpp" line="+99"/>
         <source>Operation custom command for kind %1 is not implemented for backend %2</source>
         <translation>Die custom command Operation des Typs %1 ist für Backend %2 nicht implementiert</translation>
     </message>
@@ -66,6 +66,11 @@
         <location line="+7"/>
         <source>Operation stop is not implemented for backend %1</source>
         <translation>Die Stop-Operation ist für Backend %1 nicht implementiert</translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Operation restart is not supported for non-blocking service controls without status information</source>
+        <translation>Die Stop-Operation ist für Backends die weder blockend noch keine Status-Informationen bereitstellen nicht implementiert</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -96,12 +101,12 @@
 <context>
     <name>StandardServiceControl</name>
     <message>
-        <location filename="../../plugins/servicebackends/standard/standardservicecontrol.cpp" line="+50"/>
+        <location filename="../../plugins/servicebackends/standard/standardservicecontrol.cpp" line="+48"/>
         <source>Failed to access lockfile with error: %1</source>
         <translation>Konnte nicht auf Sperrdatei zugreifen mit Fehler: %1</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+33"/>
         <source>Unabled to find executable for service with id &quot;%1&quot;</source>
         <translation>Konnte Anwendung für Service mit id &quot;%1&quot; nicht finden</translation>
     </message>
@@ -137,6 +142,24 @@
     </message>
 </context>
 <context>
+    <name>SystemdServiceBackend</name>
+    <message>
+        <location filename="../../plugins/servicebackends/systemd/systemdservicebackend.cpp" line="+43"/>
+        <source>Run the service as system service, independend of the current user id</source>
+        <translation>Führt den Dienst als Systemdienst aus, unabhängig von der aktuellen Nutzer-ID</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Run the service as user service, independend of the current user id</source>
+        <translation>Führt den Dienst als Benutzerdienst aus, unabhängig von der aktuellen Nutzer-ID</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>A command to execute on the primary service process. Can be either &apos;reload&apos; to let the service reload its configuration or &apos;stop&apos; to halt the service</source>
+        <translation>Ein Kommando, welches der primäre Dienst-Prozess ausführen soll. Kann entweder &apos;reload&apos; sein um den Dienst seine Konfiguration neu laden zu lassen, oder &apos;stop&apos; um den Dienst anzuhalten</translation>
+    </message>
+</context>
+<context>
     <name>SystemdServiceControl</name>
     <message>
         <location filename="../../plugins/servicebackends/systemd/systemdservicecontrol.cpp" line="+116"/>
@@ -149,12 +172,12 @@
         <translation>Dienst %1 konnte nicht als Systemd-Dienst gefunden werden</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+80"/>
         <source>Failed to find systemctl executable</source>
         <translation>Konnte systemctl Anwendung nicht finden</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+35"/>
         <source>systemctl crashed with error: %1</source>
         <translation>systemctl ist abgestürtzt mit Fehlermeldung: %1</translation>
     </message>
@@ -174,11 +197,12 @@
     <message>
         <location line="+32"/>
         <location line="+38"/>
+        <location line="+25"/>
         <source>Failed to query service status with error: %1</source>
         <translation>Konnte Dienst-Status nicht lesen mit Fehler: %1</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+21"/>
         <location line="+6"/>
         <source>The command must be called with a single integer [128,255] as argument</source>
         <translation>Das command Kommando muss mit einem Integer [128,255] als einzigen Parameter aufgerufen werden</translation>
@@ -209,10 +233,15 @@
         <translation>Konnte Dienst-Prozess nicht fortsetzen mit Fehler: %1</translation>
     </message>
     <message>
-        <location line="+18"/>
-        <location line="+18"/>
+        <location line="+26"/>
+        <location line="+22"/>
         <source>Failed to enable autostart with error: %1</source>
         <translation>Konnte Autostart des Dienstes nicht de/aktivieren mit Fehler: %1</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Failed to enable/disable service with error: %1</source>
+        <translation>Konnte den Dienst nicht aktivieren/deaktivieren mit Fehler: %1</translation>
     </message>
     <message>
         <location line="+14"/>

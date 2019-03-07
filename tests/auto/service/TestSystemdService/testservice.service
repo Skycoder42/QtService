@@ -8,9 +8,9 @@ Type=notify
 NotifyAccess=exec
 Environment=LD_LIBRARY_PATH=%{LD_LIBRARY_PATH}
 Environment=QT_PLUGIN_PATH=%{QT_PLUGIN_PATH}
-ExecStart=%{TESTSERVICE_PATH} -platform minimal --backend systemd
-ExecReload=%{TESTSERVICE_PATH} -platform minimal --backend systemd reload $MAINPID
-ExecStop=%{TESTSERVICE_PATH} -platform minimal --backend systemd stop $MAINPID
+ExecStart=%{TESTSERVICE_PATH} --backend systemd
+ExecReload=%{TESTSERVICE_PATH} --backend systemd reload
+ExecStop=%{TESTSERVICE_PATH} --backend systemd stop
 Restart=on-abnormal
 RuntimeDirectory=testservice
 

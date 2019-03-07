@@ -128,7 +128,7 @@ To start a terminal client, simply prepend `--terminal` as well as the backend t
 ```.sh
 #!/bin/sh
 # use as "service-cli <arguments>" (assuming this script is named service-cli)
-exec /path/to/service -platform minimal --backend systemd --terminal "$@"
+exec /path/to/service --backend systemd --terminal "$@"
 ```
 
 (The platform argument is recommended to not depend on any windowing system)

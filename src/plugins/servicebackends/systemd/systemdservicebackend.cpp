@@ -1,7 +1,7 @@
 #include "systemdservicebackend.h"
 #include "systemdserviceplugin.h"
 
-#include <QtDBus/QDBusConnection>
+#include <QtCore/QCommandLineParser>
 
 #include <chrono>
 #include <csignal>
@@ -32,9 +32,37 @@ int SystemdServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	qInstallMessageHandler(SystemdServiceBackend::systemdMessageHandler);
 	QCoreApplication app{argc, argv, flags};
-	if(findArg(QStringLiteral("stop")))
+
+	QCommandLineParser parser;
+	parser.addHelpOption();
+	QCommandLineOption backendOpt{QStringLiteral("backend"), {}, QStringLiteral("backend")};
+	backendOpt.setFlags(QCommandLineOption::HiddenFromHelp);
+	parser.addOption(backendOpt);
+	parser.addOption({
+						 QStringLiteral("system"),
+						 tr("Run the service as system service, independend of the current user id")
+					 });
+	parser.addOption({
+						 QStringLiteral("user"),
+						 tr("Run the service as user service, independend of the current user id")
+					 });
+	parser.addPositionalArgument(QStringLiteral("command"),
+								 tr("A command to execute on the primary service process. "
+									"Can be either 'reload' to let the service reload its configuration "
+									"or 'stop' to halt the service"),
+								 QStringLiteral("[stop|reload]"));
+
+	parser.process(app);
+	if(parser.isSet(QStringLiteral("user")))
+		_userService = true;
+	else if(parser.isSet(QStringLiteral("system")))
+		_userService = false;
+	else
+		_userService = ::geteuid() != 0;
+
+	if(parser.positionalArguments().startsWith(QStringLiteral("stop")))
 		return stop();
-	else if(findArg(QStringLiteral("reload")))
+	else if(parser.positionalArguments().startsWith(QStringLiteral("reload")))
 		return reload();
 	else
 		return run();
@@ -123,8 +151,7 @@ void SystemdServiceBackend::onStarted(bool success)
 
 void SystemdServiceBackend::onReloaded(bool success)
 {
-	if(!success) //TODO does not work! modify commands instead
-		sd_notify(false, "ERRNO=1");
+	Q_UNUSED(success)
 	sd_notify(false, "READY=1");
 }
 
@@ -159,7 +186,7 @@ int SystemdServiceBackend::run()
 		registerForSignal(signal);
 
 	// register the D-Bus service
-	auto connection = QDBusConnection::sessionBus();
+	auto connection = dbusConnection();
 	if(!connection.registerObject(DBusObjectPath, this)) {
 		printDbusError(connection.lastError());
 		return EXIT_FAILURE;
@@ -180,7 +207,7 @@ int SystemdServiceBackend::stop()
 	using namespace de::skycoder42::QtService::ServicePlugin;
 	sd_notify(false, "STOPPING=1");
 
-	auto connection = QDBusConnection::sessionBus();
+	auto connection = dbusConnection();
 	auto dbusInterface = new systemd{dbusId(), DBusObjectPath, connection, this};
 	if (!dbusInterface->isValid()) {
 		printDbusError(connection.lastError());
@@ -217,7 +244,7 @@ int SystemdServiceBackend::reload()
 	using namespace de::skycoder42::QtService::ServicePlugin;
 	sd_notify(false, "RELOADING=1");
 
-	auto connection = QDBusConnection::sessionBus();
+	auto connection = dbusConnection();
 	auto dbusInterface = new systemd{dbusId(), DBusObjectPath, connection, this};
 	if (!dbusInterface->isValid()) {
 		printDbusError(connection.lastError());
@@ -265,13 +292,12 @@ void SystemdServiceBackend::prepareWatchdog()
 	}
 }
 
-bool SystemdServiceBackend::findArg(const QString &command) const
+QDBusConnection SystemdServiceBackend::dbusConnection() const
 {
-	for(const auto arg : QCoreApplication::arguments()) {
-		if(arg == command)
-			return true;
-	}
-	return false;
+	if(_userService)
+		return QDBusConnection::sessionBus();
+	else
+		return QDBusConnection::systemBus();
 }
 
 QString SystemdServiceBackend::dbusId() const

@@ -26,6 +26,7 @@ protected:
 
 private Q_SLOTS:
 	void testSocketActivation();
+	void testReloadFail();
 
 private:
 	bool daemonReload();
@@ -84,11 +85,13 @@ void TestSystemdService::testCustomImpl()
 {
 	QCOMPARE(control->status(), ServiceControl::Status::Running);
 
+	// test pause
 	QCOMPARE(control->callCommand<int>("kill", QStringLiteral("--signal=SIGTSTP")), EXIT_SUCCESS);
 	QByteArray msg;
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("pausing"));
 
+	// test resume
 	QCOMPARE(control->callCommand<int>("kill", QStringLiteral("--signal=SIGCONT")), EXIT_SUCCESS);
 	READ_LOOP(msg);
 	QCOMPARE(msg, QByteArray("resuming"));
@@ -104,6 +107,22 @@ void TestSystemdService::testSocketActivation()
 	performSocketTest();
 
 	QVERIFY(socketControl->stop());
+}
+
+void TestSystemdService::testReloadFail()
+{
+	QVERIFY(control->setBlocking(true));
+	QVERIFY2(control->start(), qUtf8Printable(control->error()));
+
+	TEST_STATUS(ServiceControl::Status::Running);
+	resetSettings({{QStringLiteral("fail"), true}});
+
+	QVERIFY(!control->reload());
+
+	TEST_STATUS(ServiceControl::Status::Errored);
+	resetSettings();
+	resetFailed();
+	TEST_STATUS(ServiceControl::Status::Stopped);
 }
 
 bool TestSystemdService::daemonReload()

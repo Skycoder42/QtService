@@ -7,6 +7,8 @@ class SystemdServiceControl : public QtService::ServiceControl
 {
 	Q_OBJECT
 
+	Q_PROPERTY(bool runAsUser READ isRunAsUser WRITE setRunAsUser RESET resetRunAsUser NOTIFY runAsUserChanged)
+
 public:
 	explicit SystemdServiceControl(QString &&serviceId, QObject *parent = nullptr);
 
@@ -16,6 +18,7 @@ public:
 	Status status() const override;
 	bool isAutostartEnabled() const override;
 	BlockMode blocking() const override;
+	bool isRunAsUser() const;
 
 	QVariant callGenericCommand(const QByteArray &kind, const QVariantList &args) override;
 
@@ -27,6 +30,11 @@ public Q_SLOTS:
 	bool enableAutostart() override;
 	bool disableAutostart() override;
 	bool setBlocking(bool blocking) override;
+	void setRunAsUser(bool runAsUser);
+	void resetRunAsUser();
+
+Q_SIGNALS:
+	void runAsUserChanged(bool runAsUser);
 
 protected:
 	QString serviceName() const override;
@@ -35,6 +43,7 @@ private:
 	mutable bool _existsRefBase = false;
 	mutable bool *_exists = nullptr;
 	bool _blocking = true;
+	bool _runAsUser;
 
 	int runSystemctl(const QByteArray &command,
 					 const QStringList &extraArgs = {},
