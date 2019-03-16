@@ -13,11 +13,11 @@ QtService::Service::CommandResult %{SvcCn}::onStart()
 @if '%{SocketPort}'
 	auto socket = getSocket();
 @endif
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
 
 QtService::Service::CommandResult %{SvcCn}::onStop(int &exitCode)
 {
 	exitCode = EXIT_SUCCESS;
-	return OperationCompleted;
+	return CommandResult::Completed;
 }
