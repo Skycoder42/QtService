@@ -10,7 +10,7 @@ osx_image: xcode10.2
 env:
   global:
     - QDEP_CACHE_DIR=$HOME/.qdep-cache
-    - QT_VER=5.12.4
+    - QT_VER=5.13.0
     - DOCKER_IMAGE=base
     - MAKE_RUN_TESTS=true
     - TARGET_NAME=qtservice
@@ -25,16 +25,19 @@ matrix:
         - EXTRA_PKG="libsystemd-dev" #in order to build the systemd plugin
     - os: linux
       env:
-        - PLATFORM=emscripten
+        - PLATFORM=android_arm64_v8a
     - os: linux
       env:
-        - PLATFORM=android_arm64_v8a
+        - PLATFORM=android_x86_64
     - os: linux
       env:
         - PLATFORM=android_armv7
     - os: linux
       env:
         - PLATFORM=android_x86
+    - os: linux
+      env:
+        - PLATFORM=wasm_32
     - os: osx
       env:
         - PLATFORM=clang_64
