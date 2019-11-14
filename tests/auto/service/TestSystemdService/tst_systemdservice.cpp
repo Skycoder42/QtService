@@ -72,6 +72,9 @@ void TestSystemdService::init()
 
 void TestSystemdService::cleanup()
 {
+	QProcess::execute(QStringLiteral("systemctl --user status testservice.service"));
+	QProcess::execute(QStringLiteral("journalctl --user -xe --no-pager"));
+
 	resetFailed();
 	control->disableAutostart();
 	auto systemdHome = QDir{QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)};

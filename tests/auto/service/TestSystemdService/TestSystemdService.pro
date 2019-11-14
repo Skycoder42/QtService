@@ -3,8 +3,8 @@ include(../testlib.pri)
 TARGET = tst_systemdservice
 
 SOURCES += \
-		tst_systemdservice.cpp
+	tst_systemdservice.cpp
 
 DISTFILES += \
-    testservice.service \
-    testservice.socket
+	testservice.service \
+	testservice.socket

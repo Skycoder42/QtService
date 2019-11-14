@@ -97,7 +97,7 @@ void TestWindowsService::init()
 								 SERVICE_WIN32_OWN_PROCESS,
 								 SERVICE_DEMAND_START,
 								 SERVICE_ERROR_IGNORE,
-								 reinterpret_cast<const wchar_t*>(svcPath.utf16()),
+								 reinterpret_cast<const wchar_t*>(svcArg.utf16()),
 								 nullptr,
 								 nullptr,
 								 nullptr,
