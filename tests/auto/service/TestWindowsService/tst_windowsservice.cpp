@@ -1,4 +1,4 @@
-#include <QString>
+﻿#include <QString>
 #include <QtTest/QtTest>
 #include <QCoreApplication>
 #include <basicservicetest.h>
@@ -47,7 +47,15 @@ void TestWindowsService::init()
 	auto svcPath = QStringLiteral("\"%1\" --backend windows").arg(QDir::toNativeSeparators(svcDir.absoluteFilePath(QStringLiteral("testservice.exe"))));
 
 	// copy Qt libs
-	QDir qtLibDir{QLibraryInfo::location(QLibraryInfo::BinariesPath)};
+	QDir qtLibDir;
+	if (const auto lDir = QLibraryInfo::location(QLibraryInfo::BinariesPath); lDir.isEmpty()) {
+		qDebug() << "Fallback Qt path:" << QT_LIB_DIR;
+		qtLibDir.setPath(QStringLiteral(QT_LIB_DIR));
+	} else {
+		qDebug() << "Primary Qt path:" << lDir;
+		qtLibDir.setPath(lDir);
+	}
+	qDebug() << "qtLibDir" << qtLibDir;
 	for(const auto &baseLib : {LIB("Qt5Core"), LIB("Qt5Network")}) {
 		if(!svcDir.exists(baseLib))
 			QVERIFY(QFile::copy(qtLibDir.absoluteFilePath(baseLib), svcDir.absoluteFilePath(baseLib)));
@@ -62,6 +70,7 @@ void TestWindowsService::init()
 
 	// add plugins to Qt
 	QDir qtPlgDir{QLibraryInfo::location(QLibraryInfo::PluginsPath)};
+	qDebug() << "qtPlgDir" << qtPlgDir;
 	QDir bPlgDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../../../../plugins/servicebackends")};
 	auto plgNew = QStringLiteral("servicebackends");
 	auto plgOld = QStringLiteral("servicebackends.old");

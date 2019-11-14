@@ -6,3 +6,5 @@ SOURCES += \
 		tst_windowsservice.cpp
 
 LIBS += -ladvapi32
+
+DEFINES+=QT_LIB_DIR=\\\"$$[QT_INSTALL_BINS]\\\"
