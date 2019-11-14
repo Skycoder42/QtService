@@ -56,24 +56,33 @@ void TestWindowsService::init()
 	QVERIFY(QFile::copy(svcSrcPath, svcDir.absoluteFilePath(svcName)));
 	const auto svcArg = QStringLiteral("\"%1\" --backend windows").arg(QDir::toNativeSeparators(svcDir.absoluteFilePath(svcName)));
 
-	// run windeployqt
-	const auto procRes = QProcess::execute(QStringLiteral("windeployqt.exe"),  // should be in path
-										   QStringList{
-											   deployType,
-											   QStringLiteral("--pdb"),
-											   QStringLiteral("--no-quick-import"),
-											   QStringLiteral("--no-translations"),
-											   QStringLiteral("--compiler-runtime"),
-											   QStringLiteral("--verbose"), QStringLiteral("2"),
-											   svcDir.absoluteFilePath(svcName)
-										   });
-	QCOMPARE(procRes, EXIT_SUCCESS);
+    // copy svc lib into host lib dir (required by windeployqt
+    const auto svcLib = LIB("Qt5Service");
+    const QDir bLibDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../../../../lib")};
+    QDir hLibDir{QStringLiteral(QT_LIB_DIR)};
+    QVERIFY(bLibDir.exists(svcLib));
+    hLibDir.remove(svcLib);
+    QVERIFY(QFile::copy(bLibDir.absoluteFilePath(svcLib), hLibDir.absoluteFilePath(svcLib)));
 
-	// copy svc lib
-	const auto svcLib = LIB("Qt5Service");
-	const QDir bLibDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../../../../lib")};
-	QVERIFY(bLibDir.exists(svcLib));
-	QVERIFY(QFile::copy(bLibDir.absoluteFilePath(svcLib), svcDir.absoluteFilePath(svcLib)));
+	// run windeployqt
+    QProcess windepProc;
+    windepProc.setProgram(QStringLiteral("windeployqt.exe"));  // should be in path
+    windepProc.setArguments(QStringList{
+                                deployType,
+                                QStringLiteral("--pdb"),
+                                QStringLiteral("--no-quick-import"),
+                                QStringLiteral("--no-translations"),
+                                QStringLiteral("--compiler-runtime"),
+                                QStringLiteral("--verbose"), QStringLiteral("2"),
+                                svcName
+                            });
+    windepProc.setWorkingDirectory(svcDir.absolutePath());
+    windepProc.setProcessChannelMode(QProcess::MergedChannels);
+    windepProc.start();
+    QVERIFY(windepProc.waitForFinished());
+    qDebug() << "windeployqt output:\n" << windepProc.readAll().constData();
+    QVERIFY2(windepProc.exitStatus() == QProcess::NormalExit, qUtf8Printable(windepProc.errorString()));
+    QCOMPARE(windepProc.exitCode(), EXIT_SUCCESS);
 
 	// add plugins to Qt
 	const auto plgSubDir = QStringLiteral("servicebackends");
