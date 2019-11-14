@@ -102,7 +102,11 @@ jobs:
           cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: Install systemd deps
         if: matrix.platform == 'gcc_64'
-        run: sudo apt-get -qq install libsystemd-dev
+        run: |
+          sudo apt-get -qq install libsystemd-dev
+          export XDG_RUNTIME_DIR=/run/user/`id -u`
+          echo "::set-env name=XDG_RUNTIME_DIR::$XDG_RUNTIME_DIR"
+          ps aux -q 1
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
