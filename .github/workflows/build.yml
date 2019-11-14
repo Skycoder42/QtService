@@ -106,7 +106,8 @@ jobs:
           sudo apt-get -qq install libsystemd-dev
           export XDG_RUNTIME_DIR=/run/user/`id -u`
           export XDG_SESSION_ID=2
-          mkdir -p $XDG_RUNTIME_DIR
+          sudo mkdir -p $XDG_RUNTIME_DIR
+          sudo chown `id -un` $XDG_RUNTIME_DIR
           file /sbin/init
           sudo systemctl start user@`id -u`.service
           echo "::set-env name=XDG_RUNTIME_DIR::$XDG_RUNTIME_DIR"
