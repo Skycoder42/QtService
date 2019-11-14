@@ -6,12 +6,12 @@ After=network-online.target echoservice.socket
 [Service]
 Type=notify
 NotifyAccess=exec
-ExecStart=/path/to/echoservice --backend systemd
-ExecReload=/path/to/echoservice --backend systemd reload
-ExecStop=/path/to/echoservice --backend systemd stop
+ExecStart=$${target.path}/$$TARGET --backend systemd
+ExecReload=$${target.path}/$$TARGET --backend systemd reload
+ExecStop=$${target.path}/$$TARGET --backend systemd stop
 WatchdogSec=10
 Restart=on-abnormal
-RuntimeDirectory=echoservice
+RuntimeDirectory=$$TARGET
 
 [Install]
 #WantedBy=multi-user.target
