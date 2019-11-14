@@ -16,4 +16,4 @@ SOURCES += \
 	terminalservice.cpp
 
 target.path = $$[QT_INSTALL_EXAMPLES]/service/TerminalService
-INSTALLS += target
+!install_ok: INSTALLS += target

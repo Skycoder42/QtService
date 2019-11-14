@@ -23,4 +23,4 @@ DISTFILES += \
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
 target.path = $$[QT_INSTALL_EXAMPLES]/service/$$TARGET
-INSTALLS += target
+!install_ok: INSTALLS += target

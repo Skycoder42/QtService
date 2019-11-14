@@ -22,4 +22,4 @@ DISTFILES += \
 	echoservice.plist
 
 target.path = $$[QT_INSTALL_EXAMPLES]/service/EchoService
-INSTALLS += target
+!install_ok: INSTALLS += target

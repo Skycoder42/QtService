@@ -14,4 +14,4 @@ FORMS += \
 	controlwidget.ui
 
 target.path = $$[QT_INSTALL_EXAMPLES]/service/$$TARGET
-INSTALLS += target
+!install_ok: INSTALLS += target
