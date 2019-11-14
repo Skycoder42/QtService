@@ -94,7 +94,7 @@ void TestWindowsService::init()
 	QVERIFY(svcDir.mkpath(plgSubDir));
 	QVERIFY(svcDir.cd(plgSubDir));
 	QDirIterator iter{bPlgDir, QDirIterator::NoIteratorFlags};
-	while (!iter.hasNext()) {
+	while (iter.hasNext()) {
 		qDebug() << "Found service plugin file:" << iter.next();
 		QVERIFY(QFile::copy(iter.filePath(), svcDir.absoluteFilePath(iter.fileName())));
 	}
