@@ -103,18 +103,17 @@ jobs:
       - name: Install systemd deps
         if: matrix.platform == 'gcc_64'
         run: |
-          sudo apt-get -qq install libsystemd-dev
+          sudo apt-get -qq install libsystemd-dev dbus-user-session
           export XDG_RUNTIME_DIR=/run/user/`id -u`
           export XDG_SESSION_ID=2
           sudo mkdir -p $XDG_RUNTIME_DIR
           sudo chown `id -un` $XDG_RUNTIME_DIR
-          file /sbin/init
           sudo systemctl start user@`id -u`.service
-          systemctl start --user dbus.service
-          export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/`id -u`/bus
+          #systemctl start --user dbus.service
+          #export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/`id -u`/bus
           echo "::set-env name=XDG_RUNTIME_DIR::$XDG_RUNTIME_DIR"
           echo "::set-env name=XDG_SESSION_ID::$XDG_SESSION_ID"
-          echo "::set-env name=DBUS_SESSION_BUS_ADDRESS::$DBUS_SESSION_BUS_ADDRESS"
+          #echo "::set-env name=DBUS_SESSION_BUS_ADDRESS::$DBUS_SESSION_BUS_ADDRESS"
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}
