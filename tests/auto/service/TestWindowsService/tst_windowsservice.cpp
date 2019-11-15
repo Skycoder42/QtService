@@ -118,6 +118,22 @@ void TestWindowsService::init()
 		QCOMPARE(ldd.exitCode(), EXIT_SUCCESS);
 	}
 
+	// test normal service run
+	{
+		QProcess testP;
+		testP.setProgram(svcDir.absoluteFilePath(svcName));
+		testP.setArguments({QStringLiteral("--backend"), QStringLiteral("debug")});
+		testP.setWorkingDirectory(svcDir.absolutePath());
+		testP.setProcessChannelMode(QProcess::MergedChannels);
+		testP.start();
+		QVERIFY2(testP.waitForStarted(), qUtf8Printable(testP.errorString()));
+		QThread::sleep(5);
+		testP.kill();
+		qDebug() << testP.readAll();
+		QVERIFY2(testP.waitForFinished(), qUtf8Printable(testP.errorString()));
+		qDebug() << testP.readAll();
+	}
+
 	_manager = OpenSCManagerW(nullptr, nullptr,
 							  SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE | STANDARD_RIGHTS_REQUIRED);
 	QVERIFY2(_manager, qUtf8Printable(qt_error_string(GetLastError())));
