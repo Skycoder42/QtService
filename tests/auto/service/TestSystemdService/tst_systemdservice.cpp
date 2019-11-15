@@ -135,7 +135,11 @@ void TestSystemdService::testReloadFail()
 		if (!ok)
 			QCOMPARE(control->status(), ServiceControl::Status::Unknown);
 	}
+
 	resetSettings();
+	if (control->status() == ServiceControl::Status::Running)
+		QVERIFY(control->stop());
+
 	resetFailed();
 	TEST_STATUS(ServiceControl::Status::Stopped);
 }
