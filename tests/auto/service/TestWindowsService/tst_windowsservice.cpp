@@ -100,6 +100,7 @@ void TestWindowsService::init()
 		qDebug() << "Found service plugin file:" << iter.fileName();
 		QVERIFY(QFile::copy(iter.filePath(), svcDir.absoluteFilePath(iter.fileName())));
 	}
+	QVERIFY(svcDir.cdUp());
 
 	// try dumpbin
 	{
