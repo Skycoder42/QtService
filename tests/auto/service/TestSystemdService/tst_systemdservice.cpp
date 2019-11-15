@@ -53,7 +53,7 @@ void TestSystemdService::init()
 	QVERIFY(systemdHome.mkpath(systemdpath));
 	QVERIFY(systemdHome.cd(systemdpath));
 
-	if(!systemdHome.exists(testservice)) {
+	if (!systemdHome.exists(testservice)) {
 		QFile in{srcDir.absoluteFilePath(testservice)};
 		QVERIFY(in.open(QIODevice::ReadOnly | QIODevice::Text));
 		QFile out{systemdHome.absoluteFilePath(testservice)};
@@ -63,7 +63,7 @@ void TestSystemdService::init()
 				  .replace("%{QT_PLUGIN_PATH}", qgetenv("QT_PLUGIN_PATH"))
 				  .replace("%{TESTSERVICE_PATH}", QString(QCoreApplication::applicationDirPath() + QStringLiteral("/../TestService/testservice")).toUtf8()));
 	}
-	if(!systemdHome.exists(testsocket))
+	if (!systemdHome.exists(testsocket))
 		QVERIFY(QFile::copy(srcDir.absoluteFilePath(testsocket), systemdHome.absoluteFilePath(testsocket)));
 
 	QVERIFY(daemonReload());
@@ -121,7 +121,20 @@ void TestSystemdService::testReloadFail()
 
 	QVERIFY(!control->reload());
 
-	TEST_STATUS(ServiceControl::Status::Errored);
+	if (control->supportFlags().testFlag(ServiceControl::SupportFlag::Status)) {
+		auto ok = false;
+		for (auto i = 0; i < 20; ++i) {
+			if (const auto status = control->status();
+				status == ServiceControl::Status::Running ||
+				status == ServiceControl::Status::Errored) {
+				ok = true;
+				break;
+			} else
+				QThread::msleep(500);
+		}
+		if (!ok)
+			QCOMPARE(control->status(), ServiceControl::Status::Unknown);
+	}
 	resetSettings();
 	resetFailed();
 	TEST_STATUS(ServiceControl::Status::Stopped);
@@ -130,14 +143,14 @@ void TestSystemdService::testReloadFail()
 bool TestSystemdService::daemonReload()
 {
 	QStringList args {QStringLiteral("daemon-reload")};
-	if(::geteuid() != 0)
+	if (::geteuid() != 0)
 		args.prepend(QStringLiteral("--user"));
 	return QProcess::execute(QStringLiteral("systemctl"), args) == EXIT_SUCCESS;
 }
 
 bool TestSystemdService::resetFailed()
 {
-	if(!control)
+	if (!control)
 		return false;
 	return control->callCommand<int>("reset-failed") == EXIT_SUCCESS;
 }

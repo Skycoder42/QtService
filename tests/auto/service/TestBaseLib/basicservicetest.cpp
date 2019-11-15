@@ -316,7 +316,7 @@ void BasicServiceTest::testFeature(ServiceControl::SupportFlag flag)
 	}
 }
 
-void BasicServiceTest::waitAsLongAs(ServiceControl::Status status)
+void BasicServiceTest::waitUntil(ServiceControl::Status status)
 {
 	static const QHash<ServiceControl::Status, QList<ServiceControl::Status>> statusMap {
 		{ServiceControl::Status::Stopped, {ServiceControl::Status::Stopping, ServiceControl::Status::Starting}},
