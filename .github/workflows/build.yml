@@ -120,7 +120,7 @@ jobs:
           ${{steps.qt.outputs.make}}
           ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
       - name: make tests
-        if: steps.qt.outputs.tests == 'true'
+        if: steps.qt.outputs.tests == 'true' && !contains(matrix.platform, 'mingw')
         run: |
           ${{steps.qt.outputs.make}} all
           ${{steps.qt.outputs.make}} ${{steps.qt.outputs.testflags}} run-tests
