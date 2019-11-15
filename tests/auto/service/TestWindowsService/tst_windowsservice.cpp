@@ -102,25 +102,8 @@ void TestWindowsService::init()
 	}
 	QVERIFY(svcDir.cdUp());
 
-	// try dumpbin
 	{
-		QProcess dumpBin;
-		dumpBin.setProgram(QStringLiteral("dumpbin.exe"));  // should be in path
-		dumpBin.setArguments(QStringList{
-			QStringLiteral("/dependents"),
-			svcName
-		});
-		dumpBin.setWorkingDirectory(svcDir.absolutePath());
-		dumpBin.setProcessChannelMode(QProcess::MergedChannels);
-		dumpBin.start();
-		QVERIFY2(dumpBin.waitForFinished(), qUtf8Printable(dumpBin.errorString()));
-		qInfo() << "dumpBin output:\n" << dumpBin.readAll().constData();
-		QVERIFY2(dumpBin.exitStatus() == QProcess::NormalExit, qUtf8Printable(dumpBin.errorString()));
-		QCOMPARE(dumpBin.exitCode(), EXIT_SUCCESS);
-	}
-
-	// try ldd
-	{
+		// try ldd to check deps
 		QProcess ldd;
 		ldd.setProgram(QStringLiteral("ldd"));  // should be in path
 		ldd.setArguments(QStringList{
@@ -133,22 +116,6 @@ void TestWindowsService::init()
 		qInfo() << "ldd output:\n" << ldd.readAll().constData();
 		QVERIFY2(ldd.exitStatus() == QProcess::NormalExit, qUtf8Printable(ldd.errorString()));
 		QCOMPARE(ldd.exitCode(), EXIT_SUCCESS);
-	}
-
-	// test normal service run
-	{
-		QProcess testP;
-		testP.setProgram(svcDir.absoluteFilePath(svcName));
-		testP.setArguments({QStringLiteral("--backend"), QStringLiteral("debug")});
-		testP.setWorkingDirectory(svcDir.absolutePath());
-		testP.setProcessChannelMode(QProcess::MergedChannels);
-		testP.start();
-		qDebug() << testP.waitForStarted();
-		QThread::sleep(5);
-		qDebug() << testP.state() << testP.error();
-		testP.kill();
-		QVERIFY2(windepProc.waitForFinished(), qUtf8Printable(windepProc.errorString()));
-		qDebug() << testP.readAll();
 	}
 
 	_manager = OpenSCManagerW(nullptr, nullptr,
