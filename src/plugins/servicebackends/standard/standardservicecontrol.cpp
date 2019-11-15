@@ -1,6 +1,7 @@
 #include "standardservicecontrol.h"
 #include "standardserviceplugin.h"
 #include <QtCore/QStandardPaths>
+#include <QtCore/QScopeGuard>
 #if QT_CONFIG(process)
 #include <QtCore/QProcess>
 #endif
@@ -140,29 +141,35 @@ bool StandardServiceControl::stop()
 #ifdef Q_OS_WIN
 	auto ok = false;
 	auto hadConsole = FreeConsole();
-	if(AttachConsole(static_cast<DWORD>(pid))) {
-		if(SetConsoleCtrlHandler(nullptr, true)) {
-			if(GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) {
-				for(auto i = 0; i < 10; i++) {
-					if(status() == Status::Running)
+	const auto _sg0 = qScopeGuard([hadConsole]() {
+		if (hadConsole)
+			AllocConsole();
+	});
+	if (AttachConsole(static_cast<DWORD>(pid))) {
+		const auto _sg1 = qScopeGuard([]() {
+			FreeConsole();
+		});
+		if (SetConsoleCtrlHandler(nullptr, true)) {
+			const auto _sg2 = qScopeGuard([]() {
+				SetConsoleCtrlHandler(nullptr, false);
+			});
+			for (auto i = 0; i < 10; i++) {
+				if (GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) {
+					if (status() == Status::Running)
 						QThread::msleep(500);
 					else {
 						ok = true;
 						break;
 					}
-				}
-				if(!ok)
-					setError(tr("Service did not stop yet"));
-			} else
-				setError(tr("Failed to send stop signal with error: %1").arg(qt_error_string(GetLastError())));
-			SetConsoleCtrlHandler(nullptr, false);
+				} else
+					setError(tr("Failed to send stop signal with error: %1").arg(qt_error_string(GetLastError())));
+			}
+			if (!ok)
+				setError(tr("Service did not stop yet"));
 		} else
 			setError(tr("Failed to disable local console handler with error: %1").arg(qt_error_string(GetLastError())));
-		FreeConsole();
 	} else
 		setError(tr("Failed to attach to service console with error: %1").arg(qt_error_string(GetLastError())));
-	if(hadConsole)
-		AllocConsole();
 	return ok;
 #else
 	return kill(static_cast<pid_t>(pid), SIGTERM) == 0;
