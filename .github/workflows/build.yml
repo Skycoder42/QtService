@@ -109,11 +109,8 @@ jobs:
           sudo mkdir -p $XDG_RUNTIME_DIR
           sudo chown `id -un` $XDG_RUNTIME_DIR
           sudo systemctl start user@`id -u`.service
-          #systemctl start --user dbus.service
-          #export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/`id -u`/bus
           echo "::set-env name=XDG_RUNTIME_DIR::$XDG_RUNTIME_DIR"
           echo "::set-env name=XDG_SESSION_ID::$XDG_SESSION_ID"
-          #echo "::set-env name=DBUS_SESSION_BUS_ADDRESS::$DBUS_SESSION_BUS_ADDRESS"
       - name: qmake
         run: |
           qmake CONFIG+=install_ok QT_PLATFORM=${{matrix.platform}}

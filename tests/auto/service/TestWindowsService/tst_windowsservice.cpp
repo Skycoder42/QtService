@@ -73,17 +73,17 @@ void TestWindowsService::init()
 								QStringLiteral("--no-quick-import"),
 								QStringLiteral("--no-translations"),
 								QStringLiteral("--compiler-runtime"),
-								QStringLiteral("--verbose"), QStringLiteral("2"),
 								svcName
 							});
 	auto env = QProcessEnvironment::systemEnvironment();
 	env.insert(QStringLiteral("VCINSTALLDIR"), QStringLiteral("%1\\VC").arg(qEnvironmentVariable("VSINSTALLDIR")));
 	windepProc.setProcessEnvironment(env);
 	windepProc.setWorkingDirectory(svcDir.absolutePath());
-	windepProc.setProcessChannelMode(QProcess::MergedChannels);
+	windepProc.setProcessChannelMode(QProcess::SeparateChannels);
+	windepProc.setStandardOutputFile(QProcess::nullDevice());
 	windepProc.start();
-	QVERIFY(windepProc.waitForFinished());
-	qDebug() << "windeployqt output:\n" << windepProc.readAll().constData();
+	QVERIFY2(windepProc.waitForFinished(), qUtf8Printable(windepProc.errorString()));
+	qInfo() << "windeployqt errors:" << windepProc.readAllStandardError().constData();
 	QVERIFY2(windepProc.exitStatus() == QProcess::NormalExit, qUtf8Printable(windepProc.errorString()));
 	QCOMPARE(windepProc.exitCode(), EXIT_SUCCESS);
 
@@ -96,9 +96,23 @@ void TestWindowsService::init()
 	bPlgDir.setFilter(QDir::NoDotAndDotDot | QDir::Files);
 	QDirIterator iter{bPlgDir, QDirIterator::NoIteratorFlags};
 	while (iter.hasNext()) {
-		qDebug() << "Found service plugin file:" << iter.next();
+		iter.next();
+		qDebug() << "Found service plugin file:" << iter.fileName();
 		QVERIFY(QFile::copy(iter.filePath(), svcDir.absoluteFilePath(iter.fileName())));
 	}
+
+	// test normal service run
+	QProcess testP;
+	testP.setProgram(svcDir.absoluteFilePath(svcName));
+	testP.setArguments({QStringLiteral("--backend"), QStringLiteral("debug")});
+	testP.setWorkingDirectory(svcDir.absolutePath());
+	testP.setProcessChannelMode(QProcess::MergedChannels);
+	testP.start();
+	QVERIFY2(testP.waitForStarted(), qUtf8Printable(windepProc.errorString()));
+	QThread::sleep(5);
+	testP.kill();
+	QVERIFY2(windepProc.waitForFinished(), qUtf8Printable(windepProc.errorString()));
+	qDebug() << testP.readAll();
 
 	_manager = OpenSCManagerW(nullptr, nullptr,
 							  SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE | STANDARD_RIGHTS_REQUIRED);
