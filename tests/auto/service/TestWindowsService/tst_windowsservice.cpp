@@ -157,6 +157,9 @@ void TestWindowsService::init()
 
 void TestWindowsService::cleanup()
 {
+	// Print eventlog in hopes for some error info:
+	QProcess::execute(QStringLiteral("wevtutil qe Application"));
+
 	if(_manager) {
 		auto handle = OpenServiceW(_manager,
 								   reinterpret_cast<const wchar_t*>(name().utf16()),

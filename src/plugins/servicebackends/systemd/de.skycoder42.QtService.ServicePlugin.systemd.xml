@@ -2,8 +2,8 @@
 <node name="/de/skycoder42/QtService/SystemdServiceBackend">
 	<interface name="de.skycoder42.QtService.ServicePlugin.systemd">
 		<method name="quitService" />
-
 		<method name="reloadService" />
+
 		<signal name="serviceReloaded">
 			<arg name="success" type="b" />
 		</signal>

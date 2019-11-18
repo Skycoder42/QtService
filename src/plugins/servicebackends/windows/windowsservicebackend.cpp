@@ -257,8 +257,8 @@ void WindowsServiceBackend::handler(DWORD dwOpcode)
 void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
 {
 	auto msg = qFormatLogMessage(type, context, message);
-	auto h = RegisterEventSourceW(0, SVCNAME);
-	if(h) {
+	auto hEvSrc = RegisterEventSourceW(0, SVCNAME);
+	if (hEvSrc) {
 		WORD wType;
 		switch (type) {
 		case QtFatalMsg:
@@ -292,11 +292,11 @@ void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageL
 				.toUtf8();
 
 		auto msgStr = reinterpret_cast<const wchar_t *>(msg.utf16());
-		ReportEvent(h, wType, 1, 1, NULL,
-					1, contextStr.size(),
-					&msgStr,
-					contextStr.data());
-		DeregisterEventSource(h);
+		ReportEventW(hEvSrc, wType, 1, 1, NULL,
+					 1, contextStr.size(),
+					 &msgStr,
+					 contextStr.data());
+		DeregisterEventSource(hEvSrc);
 	} else
 		std::cerr << msg.toStdString() << std::endl;
 }
