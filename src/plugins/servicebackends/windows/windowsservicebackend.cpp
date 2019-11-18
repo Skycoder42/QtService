@@ -51,6 +51,8 @@ Q_LOGGING_CATEGORY(logWinSvc, "qt.service.plugin.windows.backend")
 
 QPointer<WindowsServiceBackend> WindowsServiceBackend::_backendInstance;
 
+static QString xPath;
+
 WindowsServiceBackend::WindowsServiceBackend(Service *service) :
 	ServiceBackend{service}
 {
@@ -70,6 +72,7 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	Q_UNUSED(argc)
 	Q_UNUSED(argv)
+	xPath = QFileInfo{QString::fromUtf8(argv[0])}.dir().absolutePath();
 	qInstallMessageHandler(WindowsServiceBackend::winsvcMessageHandler);
 	qCDebug(logWinSvc) << Q_FUNC_INFO << "installed message handler";
 
@@ -281,7 +284,7 @@ void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageL
 	{
 		static QMutex logMutex;
 		static const auto tFile = []() -> QFile* {
-			auto tFile = new QFile{QCoreApplication::applicationDirPath() + QStringLiteral("/log.txt")};
+			auto tFile = new QFile{xPath + QStringLiteral("/log.txt")};
 			if (tFile->open(QIODevice::Append | QIODevice::Text)) {
 				return tFile;
 			} else {
