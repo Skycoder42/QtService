@@ -64,7 +64,6 @@ WindowsServiceBackend::WindowsServiceBackend(Service *service) :
 	_status.dwWin32ExitCode = NO_ERROR;
 	_status.dwServiceSpecificExitCode = EXIT_SUCCESS;
 	_status.dwWaitHint = 30000; //30 seconds should suffice
-	qCDebug(logWinSvc) << Q_FUNC_INFO << "Created windows service backend";
 }
 
 int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
@@ -281,7 +280,6 @@ void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageL
 	// DEBUG dump to test file
 	{
 		static QMutex logMutex;
-		QMutexLocker _{&logMutex};
 		static const auto tFile = []() -> QFile* {
 			auto tFile = new QFile{QCoreApplication::applicationDirPath() + QStringLiteral("/log.txt")};
 			if (tFile->open(QIODevice::Append | QIODevice::Text)) {
@@ -292,6 +290,7 @@ void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageL
 			}
 		}();
 		if (tFile) {
+			QMutexLocker _{&logMutex};
 			tFile->write(msg.toUtf8() + "\n");
 			tFile->flush();
 		}

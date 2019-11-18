@@ -129,9 +129,9 @@ void TestWindowsService::init()
 		QVERIFY2(testP.waitForStarted(), qUtf8Printable(testP.errorString()));
 		QThread::sleep(5);
 		testP.kill();
-		qDebug() << testP.readAll();
+		qDebug() << testP.exitCode() << testP.readAll();
 		QVERIFY2(testP.waitForFinished(), qUtf8Printable(testP.errorString()));
-		qDebug() << testP.readAll();
+		qDebug() << testP.exitCode() << testP.readAll();
 	}
 
 	_manager = OpenSCManagerW(nullptr, nullptr,
