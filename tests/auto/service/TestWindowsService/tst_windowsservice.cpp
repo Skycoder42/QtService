@@ -122,7 +122,7 @@ void TestWindowsService::init()
 	{
 		QProcess testP;
 		testP.setProgram(svcDir.absoluteFilePath(svcName));
-		testP.setArguments({QStringLiteral("--backend"), QStringLiteral("debug")});
+		testP.setArguments({QStringLiteral("--backend"), QStringLiteral("windows")});
 		testP.setWorkingDirectory(svcDir.absolutePath());
 		testP.setProcessChannelMode(QProcess::MergedChannels);
 		testP.start();
