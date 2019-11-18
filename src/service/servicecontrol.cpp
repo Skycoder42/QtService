@@ -1,6 +1,5 @@
 #include "servicecontrol.h"
 #include "servicecontrol_p.h"
-#include "logging_p.h"
 #include "service_p.h"
 
 #include <chrono>
@@ -8,6 +7,8 @@
 #include <QtCore/QTimer>
 
 using namespace QtService;
+
+Q_LOGGING_CATEGORY(QtService::logSvcCtrl, "qt.service.control");
 
 QStringList ServiceControl::listBackends()
 {
@@ -27,7 +28,7 @@ QString ServiceControl::likelyBackend()
 #else
 	QString backend;
 #endif
-	if(ServicePrivate::listBackends().contains(backend))
+	if (ServicePrivate::listBackends().contains(backend))
 		return backend;
 	else
 		return QStringLiteral("standard");
@@ -51,7 +52,7 @@ ServiceControl *ServiceControl::create(const QString &backend, QString serviceId
 ServiceControl *ServiceControl::create(const QString &backend, QString serviceId, QString serviceNameOverride, QObject *parent)
 {
 	auto control = ServicePrivate::createControl(backend, std::move(serviceId), parent);
-	if(control)
+	if (control)
 		control->d->serviceName = std::move(serviceNameOverride);
 	return control;
 }
@@ -137,6 +138,7 @@ bool ServiceControl::stop()
 bool ServiceControl::restart()
 {
 	using namespace std::chrono_literals;
+	qCDebug(logSvcCtrl) << "Using default stop-then-start method to restart the service";
 
 	// blocking services can simply call stop and start
 	if(blocking() == BlockMode::Blocking) {
@@ -222,7 +224,7 @@ void ServiceControl::clearError()
 
 bool ServiceControl::setEnabled(bool enabled)
 {
-	Q_UNUSED(enabled);
+	Q_UNUSED(enabled)
 	return false;
 }
 

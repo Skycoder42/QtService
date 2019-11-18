@@ -2,7 +2,6 @@
 #include "service_p.h"
 #include "serviceplugin.h"
 #include "terminalclient_p.h"
-#include "logging_p.h"
 #include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
 #include <qpluginfactory.h>
@@ -42,7 +41,7 @@ Q_GLOBAL_STATIC_WITH_ARGS(PluginObjectFactory, factory, (QString::fromUtf8("serv
 
 using namespace QtService;
 
-Q_LOGGING_CATEGORY(logQtService, "qtservice", QtInfoMsg);
+Q_LOGGING_CATEGORY(QtService::logSvc, "qt.service.service");
 
 Service::Service(int &argc, char **argv, int flags) :
 	QObject{},
@@ -57,38 +56,40 @@ int Service::exec()
 	d->backendProvider = QStringLiteral("standard");
 	auto backendFound = false;
 	auto asTerminal = false;
-	for(auto i = 1; i < d->argc; i++) {
+	for (auto i = 1; i < d->argc; ++i) {
 		QByteArray arg {d->argv[i]};
-		if(!backendFound && arg == "--backend") {
-			if(i+1 < d->argc) {
+		if (!backendFound && arg == "--backend") {
+			if (i+1 < d->argc) {
 				backendFound = true;
 				d->backendProvider = QString::fromUtf8(d->argv[i+1]);
 			} else {
-				qCCritical(logQtService) << "You must specify the backend name after the \"--backend\" parameter";
+				qCCritical(logSvc) << "You must specify the backend name after the \"--backend\" parameter";
 				return EXIT_FAILURE;
 			}
 		} else if(!asTerminal && arg == "--terminal")
 			asTerminal = true;
 	}
+	qCDebug(logSvc) << "Using backend" << d->backendProvider
+					<< "with terminals" << (asTerminal ? "enabled" : "disabled");
 
 	if(asTerminal) {
 		if(d->terminalActive) {
 			TerminalClient client{this};
 			return client.exec(d->argc, d->argv, d->flags);
 		} else {
-			qCCritical(logQtService) << "Terminal mode has not been enabled! See QtService::Service::terminalActive";
+			qCCritical(logSvc) << "Terminal mode has not been enabled! See QtService::Service::terminalActive";
 			return EXIT_FAILURE;
 		}
 	} else {
 		try {
 			d->backend = factory->createServiceBackend(d->backendProvider, this);
-			if(!d->backend) {
-				qCCritical(logQtService) << "No backend found for the name" << d->backendProvider;
+			if (!d->backend) {
+				qCCritical(logSvc) << "No backend found for the name" << d->backendProvider;
 				return EXIT_FAILURE;
 			}
 			return d->backend->runService(d->argc, d->argv, d->flags);
 		} catch(QPluginLoadException &e) {
-			qCCritical(logQtService) << "Failed to load backend" << d->backendProvider << "with error:" << e.what();
+			qCCritical(logSvc) << "Failed to load backend" << d->backendProvider << "with error:" << e.what();
 			return EXIT_FAILURE;
 		}
 	}
@@ -107,10 +108,10 @@ QList<int> Service::getSockets(const QByteArray &socketName)
 int Service::getSocket()
 {
 	const auto sockets = getSockets({});
-	if(sockets.isEmpty())
+	if (sockets.isEmpty())
 		return -1;
-	else if(sockets.size() > 1)
-		qCWarning(logQtService) << "Found" << sockets.size() << "default sockets - returning the first one only";
+	else if (sockets.size() > 1)
+		qCWarning(logSvc) << "Found" << sockets.size() << "default sockets - returning the first one only";
 	return sockets.first();
 }
 
@@ -181,7 +182,7 @@ void Service::setGlobalTerminal(bool globalTerminal)
 		return;
 
 	if(d->termServer && d->termServer->isRunning())
-		qCWarning(logQtService) << "Chaning the globalTerminal property will not have any effect until you disable and reenable the terminal server";
+		qCWarning(logSvc) << "Chaning the globalTerminal property will not have any effect until you disable and reenable the terminal server";
 	d->terminalGlobal = globalTerminal;
 	emit globalTerminalChanged(d->terminalGlobal, {});
 }
@@ -197,7 +198,7 @@ void Service::setStartWithTerminal(bool startWithTerminal)
 
 void Service::terminalConnected(Terminal *terminal)
 {
-	qCWarning(logQtService) << "Terminal connected but was not handled - disconnecting it again";
+	qCWarning(logSvc) << "Terminal connected but was not handled - disconnecting it again";
 	terminal->disconnectTerminal();
 }
 
@@ -208,7 +209,7 @@ bool Service::preStart()
 
 Service::CommandResult Service::onStop(int &exitCode)
 {
-	Q_UNUSED(exitCode);
+	Q_UNUSED(exitCode)
 	return CommandResult::Completed;
 }
 
@@ -229,10 +230,11 @@ Service::CommandResult Service::onResume()
 
 QVariant Service::onCallback(const QByteArray &kind, const QVariantList &args)
 {
-	if(d->callbacks.contains(kind))
+	if (d->callbacks.contains(kind)) {
+		qCDebug(logSvc) << "Found and calling dynamic callback named" << kind;
 		return d->callbacks[kind](args);
-	else {
-		qCWarning(logQtService) << "Unhandeled callback of kind" << kind;
+	} else {
+		qCWarning(logSvc) << "Unhandeled callback of kind" << kind;
 		return {};
 	}
 }
@@ -247,6 +249,7 @@ void Service::addCallback(const QByteArray &kind, const std::function<QVariant (
 {
 	Q_ASSERT_X(fn, Q_FUNC_INFO, "fn must be a valid function");
 	d->callbacks.insert(kind, fn);
+	qCDebug(logSvc) << "Registered dynamic callback for name" << kind;
 }
 
 Service::~Service() = default;
@@ -289,25 +292,25 @@ QDir ServicePrivate::runtimeDir(const QString &serviceName)
 {
 	QString runRoot;
 #ifdef Q_OS_UNIX
-	if(::geteuid() == 0)
+	if (::geteuid() == 0)
 		runRoot = QStringLiteral("/run");
 	else
 #endif
 		runRoot = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
-	if(runRoot.isEmpty())
+	if (runRoot.isEmpty())
 		runRoot = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	if(runRoot.isEmpty())
+	if (runRoot.isEmpty())
 		return QDir::current();
 
 	QDir runDir {runRoot};
-	if(!runDir.exists(serviceName)) {
+	if (!runDir.exists(serviceName)) {
 		if(!runDir.mkpath(serviceName))
 			return QDir::current();
 		if(!QFile::setPermissions(runDir.absoluteFilePath(serviceName),
-								  QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner))
-			qCWarning(logQtService) << "Failed to set permissions on runtime dir";
+								   QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner))
+			qCWarning(logSvc) << "Failed to set permissions on runtime dir";
 	}
-	if(runDir.cd(serviceName))
+	if (runDir.cd(serviceName))
 		return runDir;
 	else
 		return QDir::current();
@@ -315,10 +318,10 @@ QDir ServicePrivate::runtimeDir(const QString &serviceName)
 
 void ServicePrivate::startTerminals()
 {
-	if(!terminalActive || !isRunning)
+	if (!terminalActive || !isRunning)
 		return;
 
-	if(!termServer) {
+	if (!termServer) {
 		termServer = new TerminalServer{q};
 		QObject::connect(termServer, &TerminalServer::terminalConnected,
 						 q, &Service::terminalConnected);
@@ -328,6 +331,6 @@ void ServicePrivate::startTerminals()
 
 void ServicePrivate::stopTerminals()
 {
-	if(termServer)
+	if (termServer)
 		termServer->stop();
 }

@@ -3,6 +3,8 @@
 
 #include "servicebackend.h"
 
+#include <QtCore/QLoggingCategory>
+
 namespace QtService {
 
 class ServiceBackendPrivate
@@ -14,6 +16,8 @@ public:
 	Service *service;
 	bool operating = false;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logBackend)  // MAJOR make virtual in public part
 
 }
 

@@ -1,7 +1,6 @@
 #include "servicebackend.h"
 #include "servicebackend_p.h"
 #include "service_p.h"
-#include <QtService/private/logging_p.h>
 #include <QCtrlSignals>
 using namespace QtService;
 
@@ -9,6 +8,8 @@ using namespace QtService;
 	(a->*(x))(args..., __VA_ARGS__); \
 }
 #define PSIG(x) EXTEND(this, x, QPrivateSignal{})
+
+Q_LOGGING_CATEGORY(QtService::logBackend, "qt.service.backend");
 
 ServiceBackend::ServiceBackend(Service *service) :
 	QObject{service},
@@ -36,13 +37,14 @@ ServiceBackend::~ServiceBackend() = default;
 
 void ServiceBackend::signalTriggered(int signal)
 {
-	qCWarning(logQtService) << "Unhandled signal:" << signal;
+	qCWarning(logBackend) << "Unhandled signal:" << signal;
 }
 
 void ServiceBackend::processServiceCommand(ServiceCommand code)
 {
+	qCDebug(logBackend) << "Proccessing service command" << code;
 	if(d->operating && code != ServiceCommand::Stop) { //always allow stopping
-		qCWarning(logQtService) << "Ignoring command of type" << code << "as another command is currently beeing processed";
+		qCWarning(logBackend) << "Ignoring command of type" << code << "as another command is currently beeing processed";
 		return;
 	}
 
@@ -57,8 +59,10 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			emit d->service->started(false);
 			break;
 		case Service::CommandResult::Pending:
+			qCDebug(logBackend) << "Service start is still pending";
 			break;
 		case Service::CommandResult::Exit:
+			qCDebug(logBackend) << "Service started and has completed it's task";
 			emit d->service->started(true);
 			quitService();
 			break;
@@ -75,10 +79,11 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			emit d->service->stopped(exitCode);
 			break;
 		case Service::CommandResult::Failed:
-			qCWarning(logQtService) << "The stop-operation should never fail. The result is ignored and the service will stop anyways";
+			qCWarning(logBackend) << "The stop-operation should never fail. The result is ignored and the service will stop anyways";
 			emit d->service->stopped(exitCode == EXIT_SUCCESS ? EXIT_FAILURE : exitCode);
 			break;
 		case Service::CommandResult::Pending:
+			qCDebug(logBackend) << "Service start is still stopping";
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();
@@ -95,6 +100,7 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 			emit d->service->reloaded(false);
 			break;
 		case Service::CommandResult::Pending:
+			qCDebug(logBackend) << "Service is still reloading";
 			break;
 		default: //all other cases should never happen
 			Q_UNREACHABLE();
@@ -111,6 +117,7 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 				emit d->service->paused(false);
 				break;
 			case Service::CommandResult::Pending:
+				qCDebug(logBackend) << "Service is still pausing";
 				break;
 			default: //all other cases should never happen
 				Q_UNREACHABLE();
@@ -128,6 +135,7 @@ void ServiceBackend::processServiceCommand(ServiceCommand code)
 				emit d->service->resumed(false);
 				break;
 			case Service::CommandResult::Pending:
+				qCDebug(logBackend) << "Service is still resuming";
 				break;
 			default: //all other cases should never happen
 				Q_UNREACHABLE();
@@ -153,6 +161,7 @@ Service *ServiceBackend::service() const
 
 bool ServiceBackend::registerForSignal(int signal)
 {
+	qCDebug(logBackend) << "Registering signal handler for signal" << signal;
 	auto handler = QCtrlSignalHandler::instance();
 	connect(handler, &QCtrlSignalHandler::ctrlSignal,
 			this, &ServiceBackend::signalTriggered,
@@ -162,16 +171,19 @@ bool ServiceBackend::registerForSignal(int signal)
 
 bool ServiceBackend::unregisterFromSignal(int signal)
 {
+	qCDebug(logBackend) << "Unregistering signal handler for signal" << signal;
 	return QCtrlSignalHandler::instance()->unregisterFromSignal(signal);
 }
 
 bool ServiceBackend::preStartService()
 {
+	qCDebug(logBackend) << "Running pre start service routine";
 	return d->service->preStart();
 }
 
 void ServiceBackend::onSvcStarted(bool success)
 {
+	qCDebug(logBackend) << "Completed service start with result" << success;
 	d->operating = false;
 	if(success) {
 		d->service->d->isRunning = true;
@@ -181,6 +193,7 @@ void ServiceBackend::onSvcStarted(bool success)
 
 void ServiceBackend::onSvcStopped()
 {
+	qCDebug(logBackend) << "Completed service stop";
 	d->operating = false;
 	d->service->d->stopTerminals();
 	d->service->d->isRunning = false;
@@ -188,12 +201,14 @@ void ServiceBackend::onSvcStopped()
 
 void ServiceBackend::onSvcReloaded(bool success)
 {
+	qCDebug(logBackend) << "Completed service reload with result" << success;
 	d->operating = false;
 	Q_UNUSED(success)
 }
 
 void ServiceBackend::onSvcResumed(bool success)
 {
+	qCDebug(logBackend) << "Completed service resume with result" << success;
 	d->operating = false;
 	if(success)
 		d->service->d->wasPaused = false;
@@ -201,6 +216,7 @@ void ServiceBackend::onSvcResumed(bool success)
 
 void ServiceBackend::onSvcPaused(bool success)
 {
+	qCDebug(logBackend) << "Completed service pause with result" << success;
 	d->operating = false;
 	if(success)
 		d->service->d->wasPaused = true;

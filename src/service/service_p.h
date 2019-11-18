@@ -1,11 +1,12 @@
 #ifndef QTSERVICE_SERVICE_P_H
 #define QTSERVICE_SERVICE_P_H
 
-#include <QtCore/QPointer>
-
 #include "service.h"
 #include "servicebackend.h"
 #include "terminalserver_p.h"
+
+#include <QtCore/QPointer>
+#include <QtCore/QLoggingCategory>
 
 namespace QtService {
 
@@ -47,6 +48,8 @@ public:
 private:
 	Service *q;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logSvc)
 
 }
 

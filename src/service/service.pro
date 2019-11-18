@@ -8,7 +8,6 @@ HEADERS += \
 	service.h \
 	service_p.h \
 	serviceplugin.h \
-	logging_p.h \
 	qtservice_helpertypes.h \
 	servicebackend.h \
 	servicebackend_p.h \

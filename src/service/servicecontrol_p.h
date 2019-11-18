@@ -4,6 +4,8 @@
 #include "qtservice_global.h"
 #include "servicecontrol.h"
 
+#include <QtCore/QLoggingCategory>
+
 namespace QtService {
 
 class ServiceControlPrivate
@@ -18,6 +20,8 @@ public:
 	bool blocking = true;
 	QString error;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logSvcCtrl)
 
 }
 
