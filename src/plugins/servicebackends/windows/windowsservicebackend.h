@@ -7,6 +7,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QAbstractNativeEventFilter>
 #include <QtCore/QTimer>
+#include <QtCore/QLoggingCategory>
 
 #include <QtService/ServiceBackend>
 
@@ -65,5 +66,7 @@ private:
 
 	static void winsvcMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logWinSvc)
 
 #endif // WINDOWSSERVICEBACKEND_H

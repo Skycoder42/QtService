@@ -157,6 +157,11 @@ void TestWindowsService::init()
 
 void TestWindowsService::cleanup()
 {
+	// print log file
+	QFile lFile{_svcDir.filePath(QStringLiteral("log.txt"))};
+	lFile.open(QIODevice::ReadOnly | QIODevice::Text);
+	qDebug() << lFile.readAll();
+
 	// Print eventlog in hopes for some error info:
 	QProcess::execute(QStringLiteral("wevtutil qe Application"));
 
