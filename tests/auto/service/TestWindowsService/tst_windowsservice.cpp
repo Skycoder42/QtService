@@ -25,6 +25,7 @@ protected:
 private:
 	QTemporaryDir _svcDir;
 	SC_HANDLE _manager = nullptr;
+	bool _printLog = false;
 };
 
 QString TestWindowsService::backend()
@@ -56,7 +57,7 @@ void TestWindowsService::init()
 	QVERIFY(QFile::copy(svcSrcPath, svcDir.absoluteFilePath(svcName)));
 	const auto svcArg = QStringLiteral("\"%1\" --backend windows").arg(QDir::toNativeSeparators(svcDir.absoluteFilePath(svcName)));
 
-	// copy svc lib into host lib dir (required by windeployqt
+	// copy svc lib into host lib dir (required by windeployqt)
 	const auto svcLib = LIB("Qt5Service");
 	const QDir bLibDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../../../../lib")};
 	QDir hLibDir{QStringLiteral(QT_LIB_DIR)};
@@ -136,7 +137,8 @@ void TestWindowsService::init()
 void TestWindowsService::cleanup()
 {
 	// Print eventlog in hopes for some error info:
-	//QProcess::execute(QStringLiteral("wevtutil qe Application"));
+	if (_printLog)
+		QProcess::execute(QStringLiteral("wevtutil qe Application"));
 
 	if(_manager) {
 		auto handle = OpenServiceW(_manager,
@@ -155,6 +157,7 @@ void TestWindowsService::cleanup()
 
 void TestWindowsService::testCustomImpl()
 {
+	_printLog = true;
 	testFeature(ServiceControl::SupportFlag::Status);
 	QCOMPARE(control->status(), ServiceControl::Status::Running);
 
@@ -169,6 +172,7 @@ void TestWindowsService::testCustomImpl()
 
 	testFeature(ServiceControl::SupportFlag::Status);
 	QCOMPARE(control->status(), ServiceControl::Status::Running);
+	_printLog = false;
 }
 
 QTEST_MAIN(TestWindowsService)

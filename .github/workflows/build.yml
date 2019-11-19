@@ -172,4 +172,7 @@ jobs:
           submodules: recursive
       - uses: actions/setup-python@v1
       - name: Deploy releases
-        run: echo "Hello World"
+        run: |
+          echo yes
+          false
+          echo no
