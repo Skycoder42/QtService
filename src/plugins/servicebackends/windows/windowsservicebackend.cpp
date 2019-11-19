@@ -214,9 +214,9 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 
 	qInfo() << Q_FUNC_INFO << "registering service";
 	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(SVCNAME, WindowsServiceBackend::handler);
-	if (_backendInstance->_statusHandle) {
+	if (!_backendInstance->_statusHandle) {
 		qCCritical(logBackend) << "Failed to acquire service handle with error:"
-							  << qUtf8Printable(qt_error_string(GetLastError()));
+							   << qUtf8Printable(qt_error_string(GetLastError()));
 		return;
 	}
 	_backendInstance->setStatus(SERVICE_START_PENDING);
