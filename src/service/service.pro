@@ -1,6 +1,6 @@
 TARGET = QtService
 
-QT = core network
+QT = core network core-private
 android: QT += androidextras
 
 HEADERS += \
@@ -40,7 +40,6 @@ win32 {
 
 QDEP_DEPENDS += \
 	Skycoder42/QCtrlSignals@1.2.0 \
-	Skycoder42/QPluginFactory@1.5.0 \
 	Skycoder42/QConsole@1.3.1
 
 !load(qdep):error("Failed to load qdep feature! Run 'qdep prfgen --qmake $$QMAKE_QMAKE' to create it.")

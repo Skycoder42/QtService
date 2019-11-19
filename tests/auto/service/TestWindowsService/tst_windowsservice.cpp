@@ -118,8 +118,19 @@ void TestWindowsService::init()
 		QCOMPARE(ldd.exitCode(), EXIT_SUCCESS);
 	}
 
-	// test normal service run
 	{
+		// list files recursively
+		QDirIterator lIter{
+			_svcDir.path(),
+			QDir::NoDotAndDotDot | QDir::AllEntries | QDir::Hidden | QDir::System | QDir::CaseSensitive,
+			QDirIterator::Subdirectories
+		};
+		while (lIter.hasNext())
+			qDebug() << lIter.next();
+	}
+
+	{
+		// test normal service run
 		QProcess testP;
 		testP.setProgram(svcDir.absoluteFilePath(svcName));
 		testP.setArguments({QStringLiteral("--backend"), QStringLiteral("windows")});

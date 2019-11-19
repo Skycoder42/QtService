@@ -4,40 +4,59 @@
 #include "terminalclient_p.h"
 #include <QtCore/QFileInfo>
 #include <QtCore/QStandardPaths>
-#include <qpluginfactory.h>
 #ifdef Q_OS_UNIX
 #include <unistd.h>
 #endif
 
 #include "servicecontrol.h"
 
-#define METHOD_EXPAND(method, retType) \
-	template <typename... TArgs> \
-	retType method(const QString &provider, TArgs&&... args) { \
-		auto plg = plugin(provider); \
-		if(plg) \
-			return plg->method(provider, std::forward<TArgs>(args)...); \
-		else \
-			return {}; \
-	}
+#include <QtCore/private/qfactoryloader_p.h>
 
 namespace {
 
-class PluginObjectFactory : public QPluginFactory<QtService::ServicePlugin>
+class ServiceFactory : public QFactoryLoader
 {
 public:
-	PluginObjectFactory(const QString &pluginType, QObject *parent = nullptr)  :
-		QPluginFactory{pluginType, parent}
+	template <typename... TArgs>
+	ServiceFactory(TArgs&&... args) :
+		  QFactoryLoader{std::forward<TArgs>(args)...}
 	{}
 
-	METHOD_EXPAND(currentServiceId, QString)
-	METHOD_EXPAND(findServiceId, QString)
-	METHOD_EXPAND(createServiceBackend, QtService::ServiceBackend*)
-	METHOD_EXPAND(createServiceControl, QtService::ServiceControl*)
+	QtService::ServicePlugin *instance(const QString &key) const {
+		const auto index = indexOf(key);
+		if (index != -1) {
+			const auto factoryObject = QFactoryLoader::instance(index);
+			if (const auto factory = qobject_cast<QtService::ServicePlugin*>(factoryObject); factory)
+				return factory;
+		}
+		return nullptr;
+	}
+
+	inline QString currentServiceId(const QString &backend) const {
+		const auto inst = instance(backend);
+		return inst ? inst->currentServiceId(backend) : QString{};
+	}
+
+	inline QString findServiceId(const QString &backend, const QString &serviceName, const QString &domain) const {
+		const auto inst = instance(backend);
+		return inst ? inst->findServiceId(backend, serviceName, domain) : QString{};
+	}
+
+	inline QtService::ServiceBackend *createServiceBackend(const QString &backend, QtService::Service *service) {
+		const auto inst = instance(backend);
+		return inst ? inst->createServiceBackend(backend, service) : nullptr;
+	}
+
+	inline QtService::ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) {
+		const auto inst = instance(backend);
+		return inst ? inst->createServiceControl(backend, std::move(serviceId), parent) : nullptr;
+	}
 };
-Q_GLOBAL_STATIC_WITH_ARGS(PluginObjectFactory, factory, (QString::fromUtf8("servicebackends")))
 
 }
+
+Q_GLOBAL_STATIC_WITH_ARGS(ServiceFactory, loader,
+						  (QtService_ServicePlugin_Iid, QLatin1String("/servicebackends")))
 
 using namespace QtService;
 
@@ -81,17 +100,12 @@ int Service::exec()
 			return EXIT_FAILURE;
 		}
 	} else {
-		try {
-			d->backend = factory->createServiceBackend(d->backendProvider, this);
-			if (!d->backend) {
-				qCCritical(logSvc) << "No backend found for the name" << d->backendProvider;
-				return EXIT_FAILURE;
-			}
-			return d->backend->runService(d->argc, d->argv, d->flags);
-		} catch(QPluginLoadException &e) {
-			qCCritical(logSvc) << "Failed to load backend" << d->backendProvider << "with error:" << e.what();
+		d->backend = loader->createServiceBackend(d->backendProvider, this);
+		if (!d->backend) {
+			qCCritical(logSvc) << "No backend found for the name" << d->backendProvider;
 			return EXIT_FAILURE;
 		}
+		return d->backend->runService(d->argc, d->argv, d->flags);
 	}
 }
 
@@ -267,23 +281,23 @@ ServicePrivate::ServicePrivate(Service *q_ptr, int &argc, char **argv, int flags
 
 QStringList ServicePrivate::listBackends()
 {
-	return factory->allKeys();
+	return loader->keyMap().values();
 }
 
 QString ServicePrivate::idFromName(const QString &provider, const QString &serviceName, const QString &domain)
 {
-	return factory->findServiceId(provider, serviceName, domain);
+	return loader->findServiceId(provider, serviceName, domain);
 }
 
 ServiceControl *ServicePrivate::createControl(const QString &provider, QString &&serviceId, QObject *parent)
 {
-	return factory->createServiceControl(provider, std::move(serviceId), parent);
+	return loader->createServiceControl(provider, std::move(serviceId), parent);
 }
 
 ServiceControl *ServicePrivate::createLocalControl(const QString &provider, QObject *parent)
 {
 	return ServiceControl::create(provider,
-								  factory->currentServiceId(provider),
+								  loader->currentServiceId(provider),
 								  QCoreApplication::applicationName(), // make shure we get the same serviceName, even if the serviceId suggests otherwise
 								  parent);
 }
