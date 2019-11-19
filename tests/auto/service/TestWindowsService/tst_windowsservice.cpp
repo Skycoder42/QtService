@@ -72,7 +72,7 @@ void TestWindowsService::init()
 								QStringLiteral("--pdb"),
 								QStringLiteral("--no-quick-import"),
 								QStringLiteral("--no-translations"),
-								QStringLiteral("--compiler-runtime")
+								QStringLiteral("--compiler-runtime"),
 								svcName
 							});
 	auto env = QProcessEnvironment::systemEnvironment();
