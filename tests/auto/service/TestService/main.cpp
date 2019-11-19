@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-#ifndef Q_CC_MSVC
+#ifdef Q_CC_MSVC
 	// WORKAROUND for windows service not beeing able to pass env vars
 	if (qEnvironmentVariable("QT_PLUGIN_PATH").isEmpty()) {
 		qputenv("QT_PLUGIN_PATH", QFileInfo{QString::fromUtf8(argv[0])}.dir().absolutePath().toUtf8());
