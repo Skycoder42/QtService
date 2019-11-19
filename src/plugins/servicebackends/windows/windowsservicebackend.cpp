@@ -73,16 +73,14 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	Q_UNUSED(argc)
 	Q_UNUSED(argv)
 	xPath = QFileInfo{QString::fromUtf8(argv[0])}.dir().absolutePath();
-	qInfo() << Q_FUNC_INFO << "installing message handler";
 	qInstallMessageHandler(WindowsServiceBackend::winsvcMessageHandler);
-	qInfo() << Q_FUNC_INFO << "installed message handler";
 
 	// if not set: get the app name from it's basename
 	Q_ASSERT_X(!QCoreApplication::applicationName().isEmpty(), Q_FUNC_INFO, "QCoreApplication::applicationName must be set before starting a windows service!");
 
 	// start handler and wait for service init
 	SvcControlThread controlThread{this};
-	qInfo() << Q_FUNC_INFO << "waiting for control thread...";
+	qCDebug(logBackend) << "waiting for control thread...";
 	controlThread.start();
 	QMutexLocker lock(&_svcLock);
 	if(!_startCondition.wait(&_svcLock, 20000))
@@ -98,7 +96,7 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	lock.unlock();
 
 	// create and prepare the coreapp
-	qInfo() << Q_FUNC_INFO << "setting status to start pending";
+	qCDebug(logBackend) << "setting status to start pending";
 	setStatus(SERVICE_START_PENDING);
 	QCoreApplication app(sArgc, sArgv.data(), flags);
 	app.installNativeEventFilter(new SvcEventFilter{});
@@ -126,21 +124,20 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	setStatus(SERVICE_START_PENDING);
 
 	lock.relock();
-	qInfo() << Q_FUNC_INFO << "continuing control thread";
+	qCDebug(logBackend) << "continuing control thread";
 	_startCondition.wakeAll();
 	lock.unlock();
 
 	//execute the app
-	qInfo() << Q_FUNC_INFO << "running application";
+	qCDebug(logBackend) << "running application";
 	_status.dwServiceSpecificExitCode = app.exec();
-	qInfo() << Q_FUNC_INFO << "setting exit code";
 	if(_status.dwServiceSpecificExitCode != EXIT_SUCCESS)
 		_status.dwWin32ExitCode = ERROR_SERVICE_SPECIFIC_ERROR;
 	setStatus(SERVICE_STOPPED);
 
 	//cleanup
 	if(controlThread.isRunning()) {
-		qInfo() << Q_FUNC_INFO << "stopping control thread";
+		qCDebug(logBackend) << "stopping control thread";
 		controlThread.requestInterruption();
 		if(!controlThread.wait(2000)) {
 			controlThread.terminate();
@@ -209,10 +206,10 @@ void WindowsServiceBackend::setStatus(DWORD status)
 
 void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 {
-	qInfo() << Q_FUNC_INFO << "entered control thread";
+	qCDebug(logBackend) << "entered control thread";
 	Q_ASSERT(_backendInstance);
 
-	qInfo() << Q_FUNC_INFO << "registering service";
+	qCDebug(logBackend) << "registering service";
 	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(SVCNAME, WindowsServiceBackend::handler);
 	if (!_backendInstance->_statusHandle) {
 		qCCritical(logBackend) << "Failed to acquire service handle with error:"
@@ -222,7 +219,7 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 	_backendInstance->setStatus(SERVICE_START_PENDING);
 
 	// pass the arguments to the main thread and notifiy him
-	qInfo() << Q_FUNC_INFO << "passing start arguments to main thread";
+	qCDebug(logBackend) << "passing start arguments to main thread";
 	QMutexLocker lock(&_backendInstance->_svcLock);
 	_backendInstance->_svcArgs.clear();
 	_backendInstance->_svcArgs.reserve(dwArgc);
@@ -234,12 +231,12 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 
 	// wait for the mainthread to finish startup, then register the service handler
 	lock.relock();
-	qInfo() << Q_FUNC_INFO << "wait for main thread to finish startup";
+	qCDebug(logBackend) << "wait for main thread to finish startup";
 	_backendInstance->_startCondition.wait(&_backendInstance->_svcLock);
 	lock.unlock();
 
 	// handle the start event
-	qInfo() << Q_FUNC_INFO << "handle service start event";
+	qCDebug(logBackend) << "handle service start event";
 	_backendInstance->setStatus(SERVICE_START_PENDING);
 	QMetaObject::invokeMethod(_backendInstance, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
@@ -247,7 +244,7 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 
 void WindowsServiceBackend::handler(DWORD dwOpcode)
 {
-	qInfo() << Q_FUNC_INFO << "received service event" << dwOpcode;
+	qCDebug(logBackend) << "received service event" << dwOpcode;
 	// could theoretically happen in a cleanup scenario?
 	if(!_backendInstance)
 		return;

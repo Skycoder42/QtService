@@ -72,8 +72,7 @@ void TestWindowsService::init()
 								QStringLiteral("--pdb"),
 								QStringLiteral("--no-quick-import"),
 								QStringLiteral("--no-translations"),
-								QStringLiteral("--compiler-runtime"),
-								QStringLiteral("--verbose"), QStringLiteral("2"),
+								QStringLiteral("--compiler-runtime")
 								svcName
 							});
 	auto env = QProcessEnvironment::systemEnvironment();
@@ -113,55 +112,6 @@ void TestWindowsService::init()
 	}
 	QVERIFY(svcDir.cdUp());
 
-//	{
-//		// try ldd to check deps
-//		QProcess ldd;
-//		ldd.setProgram(QStringLiteral("ldd"));  // should be in path
-//		ldd.setArguments(QStringList{
-//			svcName
-//		});
-//		ldd.setWorkingDirectory(svcDir.absolutePath());
-//		ldd.setProcessChannelMode(QProcess::MergedChannels);
-//		ldd.start();
-//		QVERIFY2(ldd.waitForFinished(), qUtf8Printable(ldd.errorString()));
-//		qInfo() << "ldd output:\n" << ldd.readAll().constData();
-//		QVERIFY2(ldd.exitStatus() == QProcess::NormalExit, qUtf8Printable(ldd.errorString()));
-//		QCOMPARE(ldd.exitCode(), EXIT_SUCCESS);
-//	}
-
-//	{
-//		// list files recursively
-//		QDirIterator lIter{
-//			_svcDir.path(),
-//			QDir::NoDotAndDotDot | QDir::AllEntries | QDir::Hidden | QDir::System | QDir::CaseSensitive,
-//			QDirIterator::Subdirectories
-//		};
-//		while (lIter.hasNext())
-//			qDebug() << lIter.next();
-//	}
-
-//	{
-//		// test normal service run
-//		QProcess testP;
-//		testP.setProgram(svcDir.absoluteFilePath(svcName));
-//		testP.setArguments({QStringLiteral("--backend"), QStringLiteral("windows")});
-//		testP.setWorkingDirectory(svcDir.absolutePath());
-//		testP.setProcessChannelMode(QProcess::MergedChannels);
-//		auto env = QProcessEnvironment::systemEnvironment();
-//		env.remove(QStringLiteral("PATH"));
-//		env.remove(QStringLiteral("QT_PLUGIN_PATH"));
-//		env.remove(QStringLiteral("QML2_IMPORT_PATH"));
-//		env.remove(QStringLiteral("QT_PLUGIN_PATH"));
-//		testP.setProcessEnvironment(env);
-//		testP.start();
-//		QVERIFY2(testP.waitForStarted(), qUtf8Printable(testP.errorString()));
-//		QThread::sleep(5);
-//		testP.kill();
-//		qDebug() << testP.exitCode() << testP.readAll();
-//		QVERIFY2(testP.waitForFinished(), qUtf8Printable(testP.errorString()));
-//		qDebug() << testP.exitCode() << testP.readAll().constData();
-//	}
-
 	_manager = OpenSCManagerW(nullptr, nullptr,
 							  SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE | STANDARD_RIGHTS_REQUIRED);
 	QVERIFY2(_manager, qUtf8Printable(qt_error_string(GetLastError())));
@@ -185,13 +135,8 @@ void TestWindowsService::init()
 
 void TestWindowsService::cleanup()
 {
-	// print log file
-	QFile lFile{_svcDir.filePath(QStringLiteral("log.txt"))};
-	lFile.open(QIODevice::ReadOnly | QIODevice::Text);
-	qDebug() << lFile.readAll().constData();
-
 	// Print eventlog in hopes for some error info:
-	QProcess::execute(QStringLiteral("wevtutil qe Application"));
+	//QProcess::execute(QStringLiteral("wevtutil qe Application"));
 
 	if(_manager) {
 		auto handle = OpenServiceW(_manager,
@@ -205,7 +150,7 @@ void TestWindowsService::cleanup()
 		_manager = nullptr;
 	}
 
-	QVERIFY(_svcDir.remove());
+	qDebug() << "cleanup result:" << _svcDir.remove();
 }
 
 void TestWindowsService::testCustomImpl()

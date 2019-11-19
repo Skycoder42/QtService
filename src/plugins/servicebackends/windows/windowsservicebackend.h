@@ -67,6 +67,6 @@ private:
 	static void winsvcMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };
 
-Q_DECLARE_LOGGING_CATEGORY(logWinSvc)
+Q_DECLARE_LOGGING_CATEGORY(logBackend)
 
 #endif // WINDOWSSERVICEBACKEND_H
