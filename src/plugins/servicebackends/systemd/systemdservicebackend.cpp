@@ -12,8 +12,9 @@
 #include <systemd/sd-daemon.h>
 
 #include "systemd_interface.h"
-
 using namespace QtService;
+
+Q_LOGGING_CATEGORY(logBackend, "qt.service.plugin.systemd.backend")
 
 const QString SystemdServiceBackend::DBusObjectPath = QStringLiteral("/de/skycoder42/QtService/SystemdServiceBackend");
 
@@ -35,9 +36,14 @@ int SystemdServiceBackend::runService(int &argc, char **argv, int flags)
 
 	QCommandLineParser parser;
 	parser.addHelpOption();
-	QCommandLineOption backendOpt{QStringLiteral("backend"), {}, QStringLiteral("backend")};
-	backendOpt.setFlags(QCommandLineOption::HiddenFromHelp);
-	parser.addOption(backendOpt);
+	{
+		QCommandLineOption backendOpt{QStringLiteral("backend"), {}, QStringLiteral("backend")};
+		backendOpt.setFlags(QCommandLineOption::HiddenFromHelp);
+		parser.addOption(backendOpt);
+		QCommandLineOption terminalOpt{QStringLiteral("terminal")};
+		terminalOpt.setFlags(QCommandLineOption::HiddenFromHelp);
+		parser.addOption(terminalOpt);
+	}
 	parser.addOption({
 						 QStringLiteral("system"),
 						 tr("Run the service as system service, independend of the current user id")
@@ -53,16 +59,16 @@ int SystemdServiceBackend::runService(int &argc, char **argv, int flags)
 								 QStringLiteral("[stop|reload]"));
 
 	parser.process(app);
-	if(parser.isSet(QStringLiteral("user")))
+	if (parser.isSet(QStringLiteral("user")))
 		_userService = true;
-	else if(parser.isSet(QStringLiteral("system")))
+	else if (parser.isSet(QStringLiteral("system")))
 		_userService = false;
 	else
 		_userService = ::geteuid() != 0;
 
-	if(parser.positionalArguments().startsWith(QStringLiteral("stop")))
+	if (parser.positionalArguments().startsWith(QStringLiteral("stop")))
 		return stop();
-	else if(parser.positionalArguments().startsWith(QStringLiteral("reload")))
+	else if (parser.positionalArguments().startsWith(QStringLiteral("reload")))
 		return reload();
 	else
 		return run();
@@ -85,23 +91,22 @@ void SystemdServiceBackend::reloadService()
 
 QList<int> SystemdServiceBackend::getActivatedSockets(const QByteArray &name)
 {
-	if(_sockets.isEmpty()) {
-		char **names = nullptr;
-		auto cnt = sd_listen_fds_with_names(false, &names);
-		if(cnt > 0) {
+	if (_sockets.isEmpty()) {
+		char **namesRaw = nullptr;
+		auto cnt = sd_listen_fds_with_names(false, &namesRaw);
+		QScopedPointer<char*, QScopedPointerPodDeleter> names{namesRaw};
+		if (cnt > 0) {
 			_sockets.reserve(cnt);
-			for(auto i = 0; i < cnt; i++) {
+			for (auto i = 0; i < cnt; i++) {
 				QByteArray sockName;
-				if(names[i])
-					sockName = names[i];
+				if (names.data()[i])
+					sockName = names.data()[i];
 				_sockets.insert(sockName, SD_LISTEN_FDS_START + i);
 			}
 		}
-		if(names)
-			free(names);
 	}
 
-	if(name.isNull())
+	if (name.isNull())
 		return _sockets.isEmpty() ? QList<int>{} : QList<int>{SD_LISTEN_FDS_START};
 	else
 		return _sockets.values(name);
@@ -109,6 +114,7 @@ QList<int> SystemdServiceBackend::getActivatedSockets(const QByteArray &name)
 
 void SystemdServiceBackend::signalTriggered(int signal)
 {
+	qCDebug(logBackend) << "Processing signal" << signal;
 	switch(signal) {
 	case SIGINT:
 	case SIGTERM:
@@ -143,7 +149,7 @@ void SystemdServiceBackend::sendWatchdog()
 
 void SystemdServiceBackend::onStarted(bool success)
 {
-	if(success)
+	if (success)
 		sd_notify(false, "READY=1");
 	else
 		onStopped(EXIT_FAILURE);
@@ -157,22 +163,22 @@ void SystemdServiceBackend::onReloaded(bool success)
 
 void SystemdServiceBackend::onStopped(int exitCode)
 {
-	if(_watchdogTimer)
+	if (_watchdogTimer)
 		_watchdogTimer->stop();
 	qApp->exit(exitCode);
 }
 
 void SystemdServiceBackend::onPaused(bool success)
 {
-	if(success)
-		kill(getpid(), SIGSTOP); //now actually stop
+	if (success)
+		kill(getpid(), SIGSTOP);  // now actually stop
 }
 
 int SystemdServiceBackend::run()
 {
-	//prepare the app
-	prepareWatchdog(); //do as early as possible
-	if(!preStartService())
+	// prepare the app
+	prepareWatchdog();  // do as early as possible
+	if (!preStartService())
 		return EXIT_FAILURE;
 
 	connect(service(), QOverload<bool>::of(&Service::started),
@@ -182,19 +188,21 @@ int SystemdServiceBackend::run()
 	connect(service(), QOverload<bool>::of(&Service::paused),
 			this, &SystemdServiceBackend::onPaused);
 
-	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2})
+	for (const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2})
 		registerForSignal(signal);
 
 	// register the D-Bus service
 	auto connection = dbusConnection();
-	if(!connection.registerObject(DBusObjectPath, this)) {
+	if (!connection.registerObject(DBusObjectPath, this)) {
 		printDbusError(connection.lastError());
 		return EXIT_FAILURE;
 	}
-	if(!connection.registerService(dbusId())) {
+	const auto dId = dbusId();
+	if (!connection.registerService(dId)) {
 		printDbusError(connection.lastError());
 		return EXIT_FAILURE;
 	}
+	qCInfo(logBackend) << "Activated D-BUS control service as" << dId;
 
 	// start the eventloop
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
@@ -214,7 +222,8 @@ int SystemdServiceBackend::stop()
 		return EXIT_FAILURE;
 	}
 
-	qCDebug(logQtService) << "Sending stop signal to main process";
+	qCDebug(logBackend) << "Sending stop signal to main process via D-BUS service"
+						<< dbusInterface->service();
 	// forward service stop result
 	connect(dbusInterface, &systemd::serviceStopped,
 			qApp, &QCoreApplication::exit);
@@ -222,7 +231,7 @@ int SystemdServiceBackend::stop()
 	connect(connection.interface(), &QDBusConnectionInterface::serviceUnregistered,
 			this, [this](const QString &svcName) {
 		if(svcName == dbusId()) {
-			qCWarning(logQtService) << "D-Bus Service of main process was removed before the stop result was received! Assuming successful exit";
+			qCWarning(logBackend) << "D-Bus Service of main process was removed before the stop result was received! Assuming successful exit";
 			qApp->quit();
 		}
 	}, Qt::QueuedConnection);
@@ -251,7 +260,8 @@ int SystemdServiceBackend::reload()
 		return EXIT_FAILURE;
 	}
 
-	qCDebug(logQtService) << "Sending reload signal to main process";
+	qCDebug(logBackend) << "Sending reload signal to main process via D-BUS service"
+						<< dbusInterface->service();
 	// forward service reload result
 	connect(dbusInterface, &systemd::serviceReloaded,
 			qApp, [](bool success) {
@@ -275,10 +285,10 @@ void SystemdServiceBackend::prepareWatchdog()
 	using namespace std::chrono;
 	using namespace std::chrono_literals;
 	uint64_t usec = 0;
-	if(sd_watchdog_enabled(false, &usec) > 0) {
+	if (sd_watchdog_enabled(false, &usec) > 0) {
 		auto mSecs = duration_cast<milliseconds>(microseconds{usec} / 2);
-		if(mSecs.count() <= 1) {
-			qCWarning(logQtService) << "Watchdog timout <= 1 millisecond - QTimer does not support intervals that small!";
+		if (mSecs.count() <= 1) {
+			qCWarning(logBackend) << "Watchdog timout <= 1 millisecond - QTimer does not support intervals that small!";
 			mSecs = 1ms;
 		}
 
@@ -288,13 +298,13 @@ void SystemdServiceBackend::prepareWatchdog()
 		connect(_watchdogTimer, &QTimer::timeout,
 				this, &SystemdServiceBackend::sendWatchdog);
 		_watchdogTimer->start();
-		qCDebug(logQtService) << "Enabled watchdog with an interval of" << mSecs.count() << "ms";
+		qCDebug(logBackend) << "Enabled watchdog with an interval of" << mSecs.count() << "ms";
 	}
 }
 
 QDBusConnection SystemdServiceBackend::dbusConnection() const
 {
-	if(_userService)
+	if (_userService)
 		return QDBusConnection::sessionBus();
 	else
 		return QDBusConnection::systemBus();
@@ -303,7 +313,7 @@ QDBusConnection SystemdServiceBackend::dbusConnection() const
 QString SystemdServiceBackend::dbusId() const
 {
 	auto dId = QCoreApplication::organizationDomain();
-	if(dId.isEmpty())
+	if (dId.isEmpty())
 		dId = QCoreApplication::applicationName();
 	else
 		dId = dId + QLatin1Char('.') + QCoreApplication::applicationName();
@@ -312,9 +322,9 @@ QString SystemdServiceBackend::dbusId() const
 
 void SystemdServiceBackend::printDbusError(const QDBusError &error) const
 {
-	if(error.type() != QDBusError::NoError) {
-		qCCritical(logQtService).noquote().nospace() << error.name() << ": "
-													 << error.message();
+	if (error.type() != QDBusError::NoError) {
+		qCCritical(logBackend).noquote().nospace() << error.name() << ": "
+												   << error.message();
 	}
 }
 
@@ -322,22 +332,22 @@ void SystemdServiceBackend::systemdMessageHandler(QtMsgType type, const QMessage
 {
 	auto formattedMessage = qFormatLogMessage(type, context, message);
 
-	int priority; // Informational
+	int priority;
 	switch (type) {
 	case QtDebugMsg:
-		priority = LOG_DEBUG; // Debug-level messages
+		priority = LOG_DEBUG;
 		break;
 	case QtInfoMsg:
-		priority = LOG_INFO; // Informational conditions
+		priority = LOG_INFO;
 		break;
 	case QtWarningMsg:
-		priority = LOG_WARNING; // Warning conditions
+		priority = LOG_WARNING;
 		break;
 	case QtCriticalMsg:
-		priority = LOG_CRIT; // Critical conditions
+		priority = LOG_CRIT;
 		break;
 	case QtFatalMsg:
-		priority = LOG_ALERT; // Action must be taken immediately
+		priority = LOG_ALERT;
 		break;
 	default:
 		Q_UNREACHABLE();
@@ -350,5 +360,5 @@ void SystemdServiceBackend::systemdMessageHandler(QtMsgType type, const QMessage
 					"CODE_LINE=%d", context.line,
 					"CODE_FILE=%s", context.file ? context.file : "unknown",
 					"QT_CATEGORY=%s", context.category ? context.category : "unknown",
-					NULL);
+					nullptr);
 }

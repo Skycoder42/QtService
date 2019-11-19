@@ -1,11 +1,13 @@
 #ifndef QTSERVICE_TERMINALSERVER_P_H
 #define QTSERVICE_TERMINALSERVER_P_H
 
-#include <QtCore/QObject>
-#include <QtNetwork/QLocalServer>
-
 #include "terminal.h"
 #include "service.h"
+
+#include <QtCore/QObject>
+#include <QtCore/QLoggingCategory>
+
+#include <QtNetwork/QLocalServer>
 
 namespace QtService {
 
@@ -39,6 +41,8 @@ private:
 
 	bool setSocketDescriptor(int socket);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logTermServer)
 
 }
 

@@ -6,8 +6,9 @@
 
 #include <unistd.h>
 #include <sys/types.h>
-
 using namespace QtService;
+
+Q_LOGGING_CATEGORY(logControl, "qt.service.plugin.launchd.control")
 
 LaunchdServiceControl::LaunchdServiceControl(QString &&serviceId, QObject *parent) :
 	ServiceControl{std::move(serviceId), parent}
@@ -50,7 +51,7 @@ QVariant LaunchdServiceControl::callGenericCommand(const QByteArray &kind, const
 {
 	QStringList sArgs;
 	sArgs.reserve(args.size());
-	for(const auto &arg : args)
+	for (const auto &arg : args)
 		sArgs.append(arg.toString());
 	return runLaunchctl(kind, sArgs);
 }
@@ -84,7 +85,7 @@ QString LaunchdServiceControl::serviceName() const
 int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QStringList &extraArgs, bool withServiceId, QByteArray *outData) const
 {
 	const auto launchctl = QStandardPaths::findExecutable(QStringLiteral("launchctl"));
-	if(launchctl.isEmpty()) {
+	if (launchctl.isEmpty()) {
 		setError(tr("Failed to find launchctl executable"));
 		return -1;
 	}
@@ -105,11 +106,13 @@ int LaunchdServiceControl::runLaunchctl(const QByteArray &command, const QString
 		process.setStandardOutputFile(QProcess::nullDevice());
 	process.setProcessChannelMode(QProcess::ForwardedErrorChannel);
 
+	qCDebug(logControl) << "Executing" << process.program()
+						<< process.arguments();
 	process.start(QProcess::ReadOnly);
-	if(process.waitForFinished(2500)) {  // non-blocking calls should finish within two seconds
-		if(outData)
+	if (process.waitForFinished(2500)) {  // non-blocking calls should finish within two seconds
+		if (outData)
 			*outData = process.readAllStandardOutput();
-		if(process.exitStatus() == QProcess::NormalExit)
+		if (process.exitStatus() == QProcess::NormalExit)
 			return process.exitCode();
 		else {
 			setError(tr("launchctl crashed with error: %1").arg(process.errorString()));

@@ -1,6 +1,8 @@
 #ifndef ANDROIDSERVICECONTROL_H
 #define ANDROIDSERVICECONTROL_H
 
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceControl>
 
 #include <QtAndroidExtras/QAndroidJniObject>
@@ -39,5 +41,7 @@ private:
 	void unbind(QAndroidServiceConnection *serviceConnection);
 	void startWithIntent(const QAndroidIntent &intent);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logControl)
 
 #endif // ANDROIDSERVICECONTROL_H

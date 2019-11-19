@@ -1,6 +1,8 @@
 #ifndef SYSTEMDSERVICECONTROL_H
 #define SYSTEMDSERVICECONTROL_H
 
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceControl>
 
 class SystemdServiceControl : public QtService::ServiceControl
@@ -40,8 +42,12 @@ protected:
 	QString serviceName() const override;
 
 private:
-	mutable bool _existsRefBase = false;
-	mutable bool *_exists = nullptr;
+	enum class SvcExists {
+		Unknown = -1,
+		Yes = true,
+		No = false
+	};
+	mutable SvcExists _svcInfo = SvcExists::Unknown;
 	bool _blocking = true;
 	bool _runAsUser;
 
@@ -50,5 +56,7 @@ private:
 					 QByteArray *outData = nullptr,
 					 bool noPrepare = false) const;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logControl)
 
 #endif // SYSTEMDSERVICECONTROL_H

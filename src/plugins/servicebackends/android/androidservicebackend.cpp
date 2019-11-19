@@ -7,6 +7,8 @@
 #include <QtAndroidExtras/QAndroidJniExceptionCleaner>
 using namespace QtService;
 
+Q_LOGGING_CATEGORY(logBackend, "qt.service.plugin.android.backend")
+
 QPointer<AndroidServiceBackend> AndroidServiceBackend::_backendInstance = nullptr;
 
 AndroidServiceBackend::AndroidServiceBackend(Service *service) :
@@ -20,10 +22,11 @@ int AndroidServiceBackend::runService(int &argc, char **argv, int flags)
 	QAndroidService app(argc, argv,
 						std::bind(&AndroidServiceBackend::onBind, this, std::placeholders::_1),
 						flags);
-	if(!preStartService())
+	if (!preStartService())
 		return EXIT_FAILURE;
 
 	//NOTE check if onStartCommand is supported with QAndroidService yet
+	qCDebug(logBackend) << "registering service JNI natives";
 	_javaService = QtAndroid::androidService();
 	QAndroidJniEnvironment env;
 	static const JNINativeMethod methods[] = {
@@ -33,6 +36,7 @@ int AndroidServiceBackend::runService(int &argc, char **argv, int flags)
 	env->RegisterNatives(env->FindClass("de/skycoder42/qtservice/AndroidService"),
 						 methods,
 						 sizeof(methods)/sizeof(JNINativeMethod));
+	qCDebug(logBackend) << "Continue service startup";
 	_javaService.callMethod<void>("nativeReady");
 
 	// handle start result
@@ -58,6 +62,7 @@ void AndroidServiceBackend::reloadService()
 
 jint AndroidServiceBackend::callStartCommand(JNIEnv *, jobject, jobject intent, jint flags, jint startId, jint oldId)
 {
+	qCDebug(logBackend) << "JNI callStartCommand on" << _backendInstance;
 	if (_backendInstance) {
 		auto var = _backendInstance->processServiceCallbackImpl("onStartCommand", QVariantList {
 																	QVariant::fromValue(QAndroidIntent{intent}),
@@ -66,7 +71,7 @@ jint AndroidServiceBackend::callStartCommand(JNIEnv *, jobject, jobject intent, 
 																});
 		auto ok = false;
 		auto res = var.toInt(&ok);
-		if(ok)
+		if (ok)
 			return res;
 	}
 
@@ -75,6 +80,7 @@ jint AndroidServiceBackend::callStartCommand(JNIEnv *, jobject, jobject intent, 
 
 jboolean AndroidServiceBackend::exitService(JNIEnv *, jobject)
 {
+	qCDebug(logBackend) << "JNI exitService on" << _backendInstance;
 	if (_backendInstance)
 		return QMetaObject::invokeMethod(_backendInstance, "onExit", Qt::QueuedConnection);
 	else
@@ -103,7 +109,7 @@ void AndroidServiceBackend::onExit()
 
 void AndroidServiceBackend::onStopped(int exitCode)
 {
-	qCInfo(logQtService) << "QAndroidService exited with code:" << exitCode;
+	qCInfo(logBackend) << "QAndroidService exited with code:" << exitCode;
 	_javaService.callMethod<void>("nativeExited");
 }
 

@@ -298,6 +298,7 @@ void WindowsServiceBackend::winsvcMessageHandler(QtMsgType type, const QMessageL
 			tFile->write(msg.toUtf8() + "\n");
 			tFile->flush();
 		}
+		std::cerr << msg.toStdString() << std::endl;
 	}
 
 	auto hEvSrc = RegisterEventSourceW(0, SVCNAME);

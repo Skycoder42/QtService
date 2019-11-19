@@ -2,6 +2,8 @@
 #define STANDARDSERVICEBACKEND_H
 
 #include <QtCore/QPointer>
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceBackend>
 
 class StandardServiceBackend : public QtService::ServiceBackend
@@ -25,5 +27,7 @@ private Q_SLOTS:
 private:
 	const bool _debugMode;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logBackend)
 
 #endif // STANDARDSERVICEBACKEND_H

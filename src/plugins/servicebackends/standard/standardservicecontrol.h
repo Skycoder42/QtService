@@ -2,6 +2,8 @@
 #define STANDARDSERVICECONTROL_H
 
 #include <QtCore/QLockFile>
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceControl>
 
 class StandardServiceControl : public QtService::ServiceControl
@@ -32,5 +34,7 @@ private:
 	QSharedPointer<QLockFile> statusLock() const;
 	qint64 getPid();
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logControl)
 
 #endif // STANDARDSERVICECONTROL_H

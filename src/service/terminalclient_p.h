@@ -1,12 +1,14 @@
 #ifndef QTSERVICE_TERMINALCLIENT_P_H
 #define QTSERVICE_TERMINALCLIENT_P_H
 
+#include "qtservice_global.h"
+#include "service.h"
+
 #include <QtCore/QObject>
 #include <QtCore/QDataStream>
-#include <QtNetwork/QLocalSocket>
-#include "qtservice_global.h"
+#include <QtCore/QLoggingCategory>
 
-#include "service.h"
+#include <QtNetwork/QLocalSocket>
 
 class QConsole;
 
@@ -52,6 +54,8 @@ private:
 
 	static void cerrMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logTermClient)
 
 }
 

@@ -9,6 +9,8 @@
 #endif
 using namespace QtService;
 
+Q_LOGGING_CATEGORY(logBackend, "qt.service.plugin.standard.backend")
+
 StandardServiceBackend::StandardServiceBackend(bool debugMode, Service *service) :
 	ServiceBackend{service},
 	_debugMode{debugMode}
@@ -18,7 +20,7 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	//setup logging
 	QString filePrefix;
-	if(_debugMode)
+	if (_debugMode)
 		filePrefix = QStringLiteral("%{file}:%{line} ");
 #ifdef Q_OS_WIN
 	qSetMessagePattern(QStringLiteral("[%{time} "
@@ -41,23 +43,27 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 #endif
 
 	QCoreApplication app(argc, argv, flags);
-	if(!preStartService())
+	if (!preStartService())
 		return EXIT_FAILURE;
 
 	// create lock
+	qCDebug(logBackend) << "Creating service lock";
 	QLockFile lock{service()->runtimeDir().absoluteFilePath(QStringLiteral("qstandard.lock"))};
 	lock.setStaleLockTime(std::numeric_limits<int>::max()); //disable stale locks
-	if(!lock.tryLock(5000)) {
-		qCCritical(logQtService) << "Failed to create service lock in"
-								 << service()->runtimeDir().absolutePath()
-								 << "with error code:" << lock.error();
-		qint64 pid = 0;
-		QString hostname, appname;
-		if(lock.getLockInfo(&pid, &hostname, &appname)) {
-			qCCritical(logQtService).noquote() << "Lock information:"
-											   << "\n\tPID:" << pid
-											   << "\n\tHostname:" << hostname
-											   << "\n\tAppname:" << appname;
+	if (!lock.tryLock(5000)) {
+		qCCritical(logBackend) << "Failed to create service lock in"
+							   << service()->runtimeDir().absolutePath()
+							   << "with error code:" << lock.error();
+		if (lock.error() == QLockFile::LockFailedError) {
+			qint64 pid = 0;
+			QString hostname, appname;
+			if (lock.getLockInfo(&pid, &hostname, &appname)) {
+				qCCritical(logBackend).noquote() << "Service already running as:"
+												 << "\n\tPID:" << pid
+												 << "\n\tHostname:" << hostname
+												 << "\n\tAppname:" << appname;
+			} else
+				qCCritical(logBackend) << "Unable to determine current lock owner";
 		}
 		return EXIT_FAILURE;
 	}
@@ -73,14 +79,15 @@ int StandardServiceBackend::runService(int &argc, char **argv, int flags)
 			this, &StandardServiceBackend::onPaused);
 
 #ifdef Q_OS_WIN
-	for(const auto signal : {CTRL_C_EVENT, CTRL_BREAK_EVENT}) {
+	for (const auto signal : {CTRL_C_EVENT, CTRL_BREAK_EVENT}) {
 #else
-	for(const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2}) {
+	for (const auto signal : {SIGINT, SIGTERM, SIGQUIT, SIGHUP, SIGTSTP, SIGCONT, SIGUSR1, SIGUSR2}) {
 #endif
 		registerForSignal(signal);
 	}
 
 	// start the eventloop
+	qCDebug(logBackend) << "Starting service";
 	QMetaObject::invokeMethod(this, "processServiceCommand", Qt::QueuedConnection,
 							  Q_ARG(QtService::ServiceBackend::ServiceCommand, ServiceCommand::Start));
 	return app.exec();
@@ -101,6 +108,7 @@ void StandardServiceBackend::reloadService()
 
 void StandardServiceBackend::signalTriggered(int signal)
 {
+	qCDebug(logBackend) << "Handeling signal" << signal;
 	switch(signal) {
 #ifdef Q_OS_WIN
 	case CTRL_C_EVENT:
@@ -137,15 +145,15 @@ void StandardServiceBackend::signalTriggered(int signal)
 
 void StandardServiceBackend::onStarted(bool success)
 {
-	if(!success)
+	if (!success)
 		qApp->exit(EXIT_FAILURE);
 }
 
 void StandardServiceBackend::onPaused(bool success)
 {
 #ifdef Q_OS_UNIX
-	if(success)
-		kill(getpid(), SIGSTOP); //now actually stop
+	if (success)
+		kill(getpid(), SIGSTOP);  // now actually stop
 #endif
 }
 

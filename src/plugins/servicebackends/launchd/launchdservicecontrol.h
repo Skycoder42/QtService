@@ -1,6 +1,8 @@
 #ifndef LAUNCHDSERVICECONTROL_H
 #define LAUNCHDSERVICECONTROL_H
 
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceControl>
 
 class LaunchdServiceControl : public QtService::ServiceControl
@@ -30,5 +32,7 @@ private:
 					 bool withServiceId = true,
 					 QByteArray *outData = nullptr) const;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logControl)
 
 #endif // LAUNCHDSERVICECONTROL_H

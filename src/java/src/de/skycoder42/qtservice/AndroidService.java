@@ -29,7 +29,7 @@ public class AndroidService extends QtService {
 		int res = super.onStartCommand(intent, flags, startId);
 		try {
 			_startSem.acquire();
-		} catch(InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 			return res;
 		}
@@ -42,9 +42,9 @@ public class AndroidService extends QtService {
 	@Override
 	public void onDestroy() {
 		try {
-			if(exitService())
+			if (exitService())
 				_exitSem.acquire();
-		} catch(InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		_exitSem.release();

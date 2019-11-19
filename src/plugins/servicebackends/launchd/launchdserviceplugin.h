@@ -2,7 +2,6 @@
 #define LAUNCHDSERVICEPLUGIN_H
 
 #include <QtService/ServicePlugin>
-#include <QtCore/QLoggingCategory>
 
 class LaunchdServicePlugin : public QObject, public QtService::ServicePlugin
 {
@@ -17,7 +16,5 @@ public:
 	QtService::ServiceBackend *createServiceBackend(const QString &backend, QtService::Service *service) override;
 	QtService::ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) override;
 };
-
-Q_DECLARE_LOGGING_CATEGORY(logQtService)
 
 #endif // LAUNCHDSERVICEPLUGIN_H

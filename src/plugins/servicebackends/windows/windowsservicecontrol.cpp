@@ -2,12 +2,14 @@
 #include "windowsserviceplugin.h"
 using namespace QtService;
 
+Q_LOGGING_CATEGORY(logControl, "qt.service.plugin.windows.control")
+
 WindowsServiceControl::WindowsServiceControl(QString &&serviceId, QObject *parent) :
 	ServiceControl{std::move(serviceId), parent}
 {
 	//try to open the handle
 	_manager = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_CONNECT);
-	if(!_manager)
+	if (!_manager)
 		setWinError(tr("Failed to get acces to service manager with error: %1"));
 }
 
@@ -33,18 +35,18 @@ bool WindowsServiceControl::serviceExists() const
 
 ServiceControl::Status WindowsServiceControl::status() const
 {
-	HandleHolder handle {svcHandle(SERVICE_QUERY_STATUS)};
-	if(!handle)
+	const auto handle = svcHandle(SERVICE_QUERY_STATUS);
+	if (!handle)
 		return Status::Unknown;
 
 	SERVICE_STATUS status;
 	ZeroMemory(&status, sizeof(status));
-	if(!QueryServiceStatus(handle, &status)) {
+	if (!QueryServiceStatus(handle, &status)) {
 		setWinError(tr("Failed to query service status with error: %1"));
 		return Status::Unknown;
 	}
 
-	switch(status.dwCurrentState) {
+	switch (status.dwCurrentState) {
 	case SERVICE_START_PENDING:
 		return Status::Starting;
 	case SERVICE_RUNNING:
@@ -52,7 +54,7 @@ ServiceControl::Status WindowsServiceControl::status() const
 	case SERVICE_STOP_PENDING:
 		return Status::Stopping;
 	case SERVICE_STOPPED:
-		if(status.dwWin32ExitCode == NO_ERROR)
+		if (status.dwWin32ExitCode == NO_ERROR)
 			return Status::Stopped;
 		else
 			return Status::Errored;
@@ -69,15 +71,15 @@ ServiceControl::Status WindowsServiceControl::status() const
 
 bool WindowsServiceControl::isAutostartEnabled() const
 {
-	HandleHolder handle {svcHandle(SERVICE_QUERY_CONFIG)};
-	if(!handle)
+	const auto handle = svcHandle(SERVICE_QUERY_CONFIG);
+	if (!handle)
 		return false;
 
 	DWORD sizeNeeded = 0;
 	QueryServiceConfigW(handle, nullptr, 0, &sizeNeeded);
 	QByteArray cData{static_cast<int>(sizeNeeded), '\0'};
 	auto config = reinterpret_cast<LPQUERY_SERVICE_CONFIGW>(cData.data());
-	if(!QueryServiceConfigW(handle, config, cData.size(), &sizeNeeded)) {
+	if (!QueryServiceConfigW(handle, config, cData.size(), &sizeNeeded)) {
 		setWinError(tr("Failed to query service status with error: %1"));
 		return false;
 	}
@@ -94,20 +96,20 @@ bool WindowsServiceControl::isAutostartEnabled() const
 
 bool WindowsServiceControl::isEnabled() const
 {
-	HandleHolder handle {svcHandle(SERVICE_QUERY_CONFIG)};
-	if(!handle)
+	const auto handle = svcHandle(SERVICE_QUERY_CONFIG);
+	if (!handle)
 		return true;  // assume enabled by default
 
 	DWORD sizeNeeded = 0;
 	QueryServiceConfigW(handle, nullptr, 0, &sizeNeeded);
 	QByteArray cData{static_cast<int>(sizeNeeded), '\0'};
 	auto config = reinterpret_cast<LPQUERY_SERVICE_CONFIGW>(cData.data());
-	if(!QueryServiceConfigW(handle, config, cData.size(), &sizeNeeded)) {
+	if (!QueryServiceConfigW(handle, config, cData.size(), &sizeNeeded)) {
 		setWinError(tr("Failed to query service status with error: %1"));
 		return true;  // assume enabled by default
 	}
 
-	switch(config->dwStartType) {
+	switch (config->dwStartType) {
 	case SERVICE_DISABLED:
 		return false;
 	default:
@@ -122,23 +124,23 @@ ServiceControl::BlockMode WindowsServiceControl::blocking() const
 
 QVariant WindowsServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
 {
-	if(kind == "command") {
-		if(args.size() != 1) {
+	if (kind == "command") {
+		if (args.size() != 1) {
 			setError(tr("The command must be called with a single integer [128,255] as argument"));
 			return {};
 		}
 		auto ok = false;
 		DWORD cmd = args.first().toUInt(&ok);
-		if(!ok || cmd < 128 || cmd > 255) {
+		if (!ok || cmd < 128 || cmd > 255) {
 			setError(tr("The command must be called with a single integer [128,255] as argument"));
 			return {};
 		}
 
-		HandleHolder handle {svcHandle(SERVICE_USER_DEFINED_CONTROL)};
-		if(!handle)
+		const auto handle = svcHandle(SERVICE_USER_DEFINED_CONTROL);
+		if (!handle)
 			return false;
 		SERVICE_STATUS status;
-		if(ControlService(handle, cmd, &status))
+		if (ControlService(handle, cmd, &status))
 			return true;
 		else {
 			setWinError(tr("Failed to send command %1 to service with error: %2").arg(cmd));
@@ -150,17 +152,17 @@ QVariant WindowsServiceControl::callGenericCommand(const QByteArray &kind, const
 
 bool WindowsServiceControl::start()
 {
-	HandleHolder handle {svcHandle(SERVICE_START)};
-	if(!handle)
+	const auto handle = svcHandle(SERVICE_START);
+	if (!handle)
 		return false;
-	if(StartServiceW(handle, 0, nullptr))
+	if (StartServiceW(handle, 0, nullptr))
 		return true;
 	else {
 		auto code = GetLastError();
-		if(code == ERROR_SERVICE_ALREADY_RUNNING)
+		if (code == ERROR_SERVICE_ALREADY_RUNNING)
 			return true;
 		else {
-			setWinError(tr("Failed to start service with error: %1"));
+			setError(tr("Failed to start service with error: %1").arg(qt_error_string(code)));
 			return false;
 		}
 	}
@@ -168,18 +170,18 @@ bool WindowsServiceControl::start()
 
 bool WindowsServiceControl::stop()
 {
-	HandleHolder handle {svcHandle(SERVICE_STOP)};
+	const auto handle = svcHandle(SERVICE_STOP);
 	if(!handle)
 		return false;
 	SERVICE_STATUS status;
-	if(ControlService(handle, SERVICE_CONTROL_STOP, &status))
+	if (ControlService(handle, SERVICE_CONTROL_STOP, &status))
 		return true;
 	else {
 		auto code = GetLastError();
-		if(code == ERROR_SERVICE_NOT_ACTIVE)
+		if (code == ERROR_SERVICE_NOT_ACTIVE)
 			return true;
 		else {
-			setWinError(tr("Failed to stop service with error: %1"));
+			setError(tr("Failed to stop service with error: %1").arg(qt_error_string(code)));
 			return false;
 		}
 	}
@@ -187,11 +189,11 @@ bool WindowsServiceControl::stop()
 
 bool WindowsServiceControl::pause()
 {
-	HandleHolder handle {svcHandle(SERVICE_PAUSE_CONTINUE)};
-	if(!handle)
+	const auto handle = svcHandle(SERVICE_PAUSE_CONTINUE);
+	if (!handle)
 		return false;
 	SERVICE_STATUS status;
-	if(ControlService(handle, SERVICE_CONTROL_PAUSE, &status))
+	if (ControlService(handle, SERVICE_CONTROL_PAUSE, &status))
 		return true;
 	else {
 		setWinError(tr("Failed to pause service with error: %1"));
@@ -201,11 +203,11 @@ bool WindowsServiceControl::pause()
 
 bool WindowsServiceControl::resume()
 {
-	HandleHolder handle {svcHandle(SERVICE_PAUSE_CONTINUE)};
-	if(!handle)
+	const auto handle = svcHandle(SERVICE_PAUSE_CONTINUE);
+	if (!handle)
 		return false;
 	SERVICE_STATUS status;
-	if(ControlService(handle, SERVICE_CONTROL_CONTINUE, &status))
+	if (ControlService(handle, SERVICE_CONTROL_CONTINUE, &status))
 		return true;
 	else {
 		setWinError(tr("Failed to resume service with error: %1"));
@@ -216,18 +218,18 @@ bool WindowsServiceControl::resume()
 bool WindowsServiceControl::enableAutostart()
 {
 	// do not change anything on a disabled service
-	if(!isEnabled())
+	if (!isEnabled())
 		return false;
 
 	// If autostart is already enabled, keep it as is, i.e. do not change the autostart type
-	if(isAutostartEnabled())
+	if (isAutostartEnabled())
 		return true;
 
-	HandleHolder handle {svcHandle(SERVICE_CHANGE_CONFIG)};
-	if(!handle)
+	const auto handle = svcHandle(SERVICE_CHANGE_CONFIG);
+	if (!handle)
 		return false;
 
-	if(ChangeServiceConfigW(handle,
+	if (ChangeServiceConfigW(handle,
 							 SERVICE_NO_CHANGE,
 							 SERVICE_AUTO_START, // only line that actually changes stuff
 							 SERVICE_NO_CHANGE,
@@ -242,10 +244,10 @@ bool WindowsServiceControl::enableAutostart()
 bool WindowsServiceControl::disableAutostart()
 {
 	// do not change anything on a disabled service
-	if(!isEnabled())
+	if (!isEnabled())
 		return true;
 
-	HandleHolder handle {svcHandle(SERVICE_CHANGE_CONFIG)};
+	const auto handle = svcHandle(SERVICE_CHANGE_CONFIG);
 	if (!handle)
 		return false;
 
@@ -263,10 +265,10 @@ bool WindowsServiceControl::disableAutostart()
 
 bool WindowsServiceControl::setEnabled(bool enabled)
 {
-	if(enabled == isEnabled())
+	if (enabled == isEnabled())
 		return true;
 
-	HandleHolder handle {svcHandle(SERVICE_CHANGE_CONFIG)};
+	const auto handle = svcHandle(SERVICE_CHANGE_CONFIG);
 	if (!handle)
 		return false;
 
@@ -282,15 +284,15 @@ bool WindowsServiceControl::setEnabled(bool enabled)
 	}
 }
 
-SC_HANDLE WindowsServiceControl::svcHandle(DWORD permissions) const
+WindowsServiceControl::HandleHolder WindowsServiceControl::svcHandle(DWORD permissions) const
 {
-	if(!_manager)
-		return nullptr; // error set in constructor
+	if (!_manager)
+		return {}; // error set in constructor
 
 	auto handle = OpenServiceW(_manager,
 							   reinterpret_cast<const wchar_t*>(serviceId().utf16()),
 							   permissions);
-	if(!handle)
+	if (!handle)
 		setWinError(tr("Failed to get access to service with error: %1"));
 	return handle;
 }
@@ -306,17 +308,28 @@ WindowsServiceControl::HandleHolder::HandleHolder(SC_HANDLE handle) :
 	_handle(std::move(handle))
 {}
 
+WindowsServiceControl::HandleHolder::HandleHolder(WindowsServiceControl::HandleHolder &&other) noexcept
+{
+	swap(_handle, other._handle);
+}
+
 WindowsServiceControl::HandleHolder &WindowsServiceControl::HandleHolder::operator=(SC_HANDLE handle)
 {
-	if(_handle)
+	if (_handle)
 		CloseServiceHandle(handle);
 	_handle = std::move(handle);
 	return *this;
 }
 
+WindowsServiceControl::HandleHolder &WindowsServiceControl::HandleHolder::operator=(WindowsServiceControl::HandleHolder &&other) noexcept
+{
+	swap(_handle, other._handle);
+	return *this;
+}
+
 WindowsServiceControl::HandleHolder::~HandleHolder()
 {
-	if(_handle)
+	if (_handle)
 		CloseServiceHandle(_handle);
 }
 

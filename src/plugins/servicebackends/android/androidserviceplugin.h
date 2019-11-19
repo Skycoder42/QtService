@@ -2,7 +2,6 @@
 #define ANDROIDSERVICEPLUGIN_H
 
 #include <QtService/ServicePlugin>
-#include <QtCore/QLoggingCategory>
 
 #include <QtAndroidExtras/QAndroidIntent>
 #include <QtAndroidExtras/QAndroidBinder>
@@ -22,8 +21,6 @@ public:
 	QtService::ServiceBackend *createServiceBackend(const QString &backend, QtService::Service *service) override;
 	QtService::ServiceControl *createServiceControl(const QString &backend, QString &&serviceId, QObject *parent) override;
 };
-
-Q_DECLARE_LOGGING_CATEGORY(logQtService)
 
 Q_DECLARE_METATYPE(QAndroidBinder*)
 Q_DECLARE_METATYPE(QAndroidIntent)

@@ -1,7 +1,10 @@
 #ifndef WINDOWSSERVICECONTROL_H
 #define WINDOWSSERVICECONTROL_H
 
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceControl>
+
 #include <QtCore/qt_windows.h>
 
 class WindowsServiceControl : public QtService::ServiceControl
@@ -34,19 +37,23 @@ private:
 		Q_DISABLE_COPY(HandleHolder)
 	public:
 		HandleHolder(SC_HANDLE handle = nullptr);
+		HandleHolder(HandleHolder &&other) noexcept;
 		HandleHolder &operator=(SC_HANDLE handle);
+		HandleHolder &operator=(HandleHolder &&other) noexcept;
 		~HandleHolder();
 
 		bool operator!() const;
 		operator SC_HANDLE() const;
 	private:
-		SC_HANDLE _handle;
+		SC_HANDLE _handle = nullptr;
 	};
 
 	HandleHolder _manager;
 
-	SC_HANDLE svcHandle(DWORD permissions) const;
+	HandleHolder svcHandle(DWORD permissions) const;
 	void setWinError(const QString &baseMsg) const;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logControl)
 
 #endif // WINDOWSSERVICECONTROL_H

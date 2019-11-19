@@ -1,11 +1,13 @@
 #ifndef QTSERVICE_TERMINAL_P_H
 #define QTSERVICE_TERMINAL_P_H
 
-#include <QtCore/QDataStream>
-#include <QtNetwork/QLocalSocket>
-
 #include "qtservice_global.h"
 #include "terminal.h"
+
+#include <QtCore/QDataStream>
+#include <QtCore/QLoggingCategory>
+
+#include <QtNetwork/QLocalSocket>
 
 namespace QtService {
 
@@ -57,6 +59,8 @@ public:
 	QMetaObject::Connection connection;
 	QByteArray result;
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logTerm)
 
 }
 

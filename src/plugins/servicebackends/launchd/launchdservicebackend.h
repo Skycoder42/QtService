@@ -1,6 +1,8 @@
 #ifndef LAUNCHDSERVICEBACKEND_H
 #define LAUNCHDSERVICEBACKEND_H
 
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceBackend>
 
 class LaunchdServiceBackend : public QtService::ServiceBackend
@@ -28,5 +30,7 @@ private:
 
 	static void syslogMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logBackend)
 
 #endif // LAUNCHDSERVICEBACKEND_H

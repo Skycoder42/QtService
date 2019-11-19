@@ -7,6 +7,8 @@
 #include <QtCore/QRegularExpression>
 using namespace QtService;
 
+Q_LOGGING_CATEGORY(logControl, "qt.service.plugin.systemd.control")
+
 SystemdServiceControl::SystemdServiceControl(QString &&serviceId, QObject *parent) :
 	ServiceControl{std::move(serviceId), parent},
 	_runAsUser{::geteuid() != 0}
@@ -29,17 +31,17 @@ ServiceControl::SupportFlags SystemdServiceControl::supportFlags() const
 
 bool SystemdServiceControl::serviceExists() const
 {
-	_exists = &_existsRefBase;
-	_existsRefBase = false;
+	_svcInfo = SvcExists::No;
 	auto svcName = serviceId().toUtf8();
 	auto svcType = serviceId().mid(realServiceName().size() + 1);
-	if(svcType.isEmpty()) {
+	if (svcType.isEmpty()) {
 		svcType = QStringLiteral("service");
 		svcName += '.' + svcType.toUtf8();
 	}
+	qCDebug(logControl) << "Detected service type as:" << svcType;
 
 	QByteArray data;
-	if(runSystemctl("list-unit-files", {
+	if (runSystemctl("list-unit-files", {
 						QStringLiteral("--all"),
 						QStringLiteral("--full"),
 						QStringLiteral("--no-pager"),
@@ -52,15 +54,15 @@ bool SystemdServiceControl::serviceExists() const
 
 	QBuffer buffer{&data};
 	buffer.open(QIODevice::ReadOnly);
-	while(!buffer.atEnd()) {
+	while (!buffer.atEnd()) {
 		// read the line and check if it is this service, and if yes "parse" the line and verify again
 		auto line = buffer.readLine();
-		if(!line.startsWith(svcName))
+		if (!line.startsWith(svcName))
 			continue;
 		auto lineData = line.simplified().split(' ');
-		if(lineData[0] != svcName)
+		if (lineData[0] != svcName)
 			continue;
-		_existsRefBase = true;
+		_svcInfo = SvcExists::Yes;
 		return true;
 	}
 
@@ -71,13 +73,14 @@ ServiceControl::Status SystemdServiceControl::status() const
 {
 	auto svcName = serviceId().toUtf8();
 	auto svcType = serviceId().mid(realServiceName().size() + 1);
-	if(svcType.isEmpty()) {
+	if (svcType.isEmpty()) {
 		svcType = QStringLiteral("service");
 		svcName += '.' + svcType.toUtf8();
 	}
+	qCDebug(logControl) << "Detected service type as:" << svcType;
 
 	QByteArray data;
-	if(runSystemctl("list-units", {
+	if (runSystemctl("list-units", {
 						QStringLiteral("--all"),
 						QStringLiteral("--full"),
 						QStringLiteral("--no-pager"),
@@ -90,28 +93,28 @@ ServiceControl::Status SystemdServiceControl::status() const
 
 	QBuffer buffer{&data};
 	buffer.open(QIODevice::ReadOnly);
-	while(!buffer.atEnd()) {
+	while (!buffer.atEnd()) {
 		// read the line and check if it is this service, and if yes "parse" the line and verify again
 		auto line = buffer.readLine();
-		if(!line.startsWith(svcName))
+		if (!line.startsWith(svcName))
 			continue;
 		auto lineData = line.simplified().split(' ');
-		if(lineData.size() < 3 || lineData[0] != svcName)
+		if (lineData.size() < 3 || lineData[0] != svcName)
 			continue;
 
 		// found correct service! now read the status
 		const auto &svcState = lineData[2];
-		if(svcState == "active")
+		if (svcState == "active")
 			return Status::Running;
-		else if(svcState == "reloading")
+		else if (svcState == "reloading")
 			return Status::Reloading;
-		else if(svcState == "inactive")
+		else if (svcState == "inactive")
 			return Status::Stopped;
-		else if(svcState == "failed")
+		else if (svcState == "failed")
 			return Status::Errored;
-		else if(svcState == "activating")
+		else if (svcState == "activating")
 			return Status::Starting;
-		else if(svcState == "deactivating")
+		else if (svcState == "deactivating")
 			return Status::Stopping;
 		else {
 			setError(tr("Unknown service state %1 for service %2")
@@ -120,9 +123,9 @@ ServiceControl::Status SystemdServiceControl::status() const
 		}
 	}
 
-	if(!_exists)
+	if (_svcInfo == SvcExists::Unknown)
 		serviceExists();
-	if(_exists)
+	if (_svcInfo == SvcExists::Yes)
 		return Status::Stopped;
 	else {
 		setError(tr("Service %1 was not found as systemd service")
@@ -150,7 +153,7 @@ QVariant SystemdServiceControl::callGenericCommand(const QByteArray &kind, const
 {
 	QStringList sArgs;
 	sArgs.reserve(args.size());
-	for(const auto &arg : args)
+	for (const auto &arg : args)
 		sArgs.append(arg.toString());
 	return runSystemctl(kind, sArgs);
 }
@@ -187,7 +190,7 @@ bool SystemdServiceControl::disableAutostart()
 
 bool SystemdServiceControl::setBlocking(bool blocking)
 {
-	if(_blocking == blocking)
+	if (_blocking == blocking)
 		return true;
 
 	_blocking = blocking;
@@ -214,7 +217,7 @@ QString SystemdServiceControl::serviceName() const
 	const static QRegularExpression regex(QStringLiteral(R"__((.+)\.(?:service|socket|device|mount|automount|swap|target|path|timer|slice|scope))__"));
 	const auto svcId = serviceId();
 	auto match = regex.match(svcId);
-	if(match.hasMatch())
+	if (match.hasMatch())
 		return match.captured(1);
 	else
 		return svcId;
@@ -223,7 +226,7 @@ QString SystemdServiceControl::serviceName() const
 int SystemdServiceControl::runSystemctl(const QByteArray &command, const QStringList &extraArgs, QByteArray *outData, bool noPrepare) const
 {
 	const auto systemctl = QStandardPaths::findExecutable(QStringLiteral("systemctl"));
-	if(systemctl.isEmpty()) {
+	if (systemctl.isEmpty()) {
 		setError(tr("Failed to find systemctl executable"));
 		return -1;
 	}
@@ -233,30 +236,32 @@ int SystemdServiceControl::runSystemctl(const QByteArray &command, const QString
 
 	QStringList args;
 	args.reserve(extraArgs.size() + 4);
-	if(_runAsUser)
+	if (_runAsUser)
 		args.append(QStringLiteral("--user"));
 	else
 		args.append(QStringLiteral("--system"));
 	args.append(QString::fromUtf8(command));
-	if(!noPrepare) {
+	if (!noPrepare) {
 		args.append(serviceId());
-		if(!_blocking)
+		if (!_blocking)
 			args.append(QStringLiteral("--no-block"));
 	}
 	args.append(extraArgs);
 	process.setArguments(args);
 
 	process.setStandardInputFile(QProcess::nullDevice());
-	if(!outData)
+	if (!outData)
 		process.setStandardOutputFile(QProcess::nullDevice());
 	process.setProcessChannelMode(QProcess::ForwardedErrorChannel);
 
+	qCDebug(logControl) << "Executing" << process.program()
+						<< process.arguments();
 	process.start(QProcess::ReadOnly);
-	if(process.waitForFinished(_blocking ? -1 : 2500)) {//non-blocking calls should finish within two seconds
-		if(outData)
+	if (process.waitForFinished(_blocking ? -1 : 2500)) {//non-blocking calls should finish within two seconds
+		if (outData)
 			*outData = process.readAllStandardOutput();
 
-		if(process.exitStatus() == QProcess::NormalExit)
+		if (process.exitStatus() == QProcess::NormalExit)
 			return process.exitCode();
 		else {
 			setError(tr("systemctl crashed with error: %1").arg(process.errorString()));

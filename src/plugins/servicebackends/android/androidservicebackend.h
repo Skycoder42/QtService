@@ -1,7 +1,10 @@
 #ifndef ANDROIDSERVICEBACKEND_H
 #define ANDROIDSERVICEBACKEND_H
 
+#include <QtCore/QLoggingCategory>
+
 #include <QtService/ServiceBackend>
+
 #include <QtAndroidExtras/QAndroidJniObject>
 #include <QtAndroidExtras/QAndroidBinder>
 #include <QtAndroidExtras/QAndroidIntent>
@@ -33,5 +36,7 @@ private:
 
 	QAndroidBinder* onBind(const QAndroidIntent &intent);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logBackend)
 
 #endif // ANDROIDSERVICEBACKEND_H

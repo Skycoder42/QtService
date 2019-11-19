@@ -2,6 +2,7 @@
 #define SYSTEMDSERVICEBACKEND_H
 
 #include <QtCore/QTimer>
+#include <QtCore/QLoggingCategory>
 
 #include <QtDBus/QDBusConnection>
 
@@ -53,5 +54,7 @@ private:
 
 	static void systemdMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message);
 };
+
+Q_DECLARE_LOGGING_CATEGORY(logBackend)
 
 #endif // SYSTEMDSERVICEBACKEND_H

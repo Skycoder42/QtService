@@ -4,7 +4,10 @@
 #include <unistd.h>
 #include <launch.h>
 #include <syslog.h>
+#include <QtCore/QScopedPointer>
 using namespace QtService;
+
+Q_LOGGING_CATEGORY(logBackend, "qt.service.plugin.launchd.backend")
 
 LaunchdServiceBackend::LaunchdServiceBackend(Service *service) :
 	ServiceBackend{service}
@@ -14,7 +17,7 @@ int LaunchdServiceBackend::runService(int &argc, char **argv, int flags)
 {
 	qInstallMessageHandler(LaunchdServiceBackend::syslogMessageHandler);
 	QCoreApplication app(argc, argv, flags);
-	if(!preStartService())
+	if (!preStartService())
 		return EXIT_FAILURE;
 
 	connect(service(), QOverload<bool>::of(&Service::started),
@@ -47,19 +50,18 @@ void LaunchdServiceBackend::reloadService()
 QList<int> LaunchdServiceBackend::getActivatedSockets(const QByteArray &name)
 {
 	auto mName = name.isNull() ? QByteArrayLiteral("Listeners") : name;
-	if(!_socketCache.contains(mName)) {
-		int *fds = nullptr;
+	if (!_socketCache.contains(mName)) {
+		int *fdsRaw = nullptr;
 		size_t cnt = 0;
-		int err = launch_activate_socket(mName.constData(), &fds, &cnt);
-		if(err != 0)
-			qCWarning(logQtService) << "Failed to get sockets with error:" << strerror(err);
+		int err = launch_activate_socket(mName.constData(), &fdsRaw, &cnt);
+		QScopedPointer<int, QScopedPointerPodDeleter> fds{fdsRaw};
+		if (err != 0)
+			qCWarning(logBackend) << "Failed to get sockets with error:" << qUtf8Printable(qt_error_string(err));
 		else {
 			_socketCache.reserve(_socketCache.size() + static_cast<int>(cnt));
 			for(size_t i = 0; i < cnt; i++)
-				_socketCache.insert(mName, fds[i]);
+				_socketCache.insert(mName, fds.data()[i]);
 		}
-		if(fds)
-			free(fds);
 	}
 
 	return _socketCache.values(mName);
@@ -67,6 +69,7 @@ QList<int> LaunchdServiceBackend::getActivatedSockets(const QByteArray &name)
 
 void LaunchdServiceBackend::signalTriggered(int signal)
 {
+	qCDebug(logBackend) << "Handling signal" << signal;
 	switch(signal) {
 	case SIGINT:
 	case SIGTERM:
@@ -96,36 +99,36 @@ void LaunchdServiceBackend::signalTriggered(int signal)
 
 void LaunchdServiceBackend::onStarted(bool success)
 {
-	if(!success)
+	if (!success)
 		qApp->exit(EXIT_FAILURE);
 }
 
 void LaunchdServiceBackend::onPaused(bool success)
 {
-	if(success)
-		kill(getpid(), SIGSTOP); //now actually stop
+	if (success)
+		kill(getpid(), SIGSTOP);  // now actually stop
 }
 
 void LaunchdServiceBackend::syslogMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
 {
 	auto formattedMessage = qFormatLogMessage(type, context, message);
 
-	int priority; // Informational
+	int priority;
 	switch (type) {
 	case QtDebugMsg:
-		priority = LOG_DEBUG; // Debug-level messages
+		priority = LOG_DEBUG;
 		break;
 	case QtInfoMsg:
-		priority = LOG_INFO; // Informational conditions
+		priority = LOG_INFO;
 		break;
 	case QtWarningMsg:
-		priority = LOG_WARNING; // Warning conditions
+		priority = LOG_WARNING;
 		break;
 	case QtCriticalMsg:
-		priority = LOG_CRIT; // Critical conditions
+		priority = LOG_CRIT;
 		break;
 	case QtFatalMsg:
-		priority = LOG_ALERT; // Action must be taken immediately
+		priority = LOG_ALERT;
 		break;
 	default:
 		Q_UNREACHABLE();

@@ -2,8 +2,6 @@
 #include "windowsservicebackend.h"
 #include "windowsservicecontrol.h"
 
-Q_LOGGING_CATEGORY(logQtService, "qtservice.servicebackends.windows", QtInfoMsg);
-
 WindowsServicePlugin::WindowsServicePlugin(QObject *parent) :
 	QObject(parent)
 {}

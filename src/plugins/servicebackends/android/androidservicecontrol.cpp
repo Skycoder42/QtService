@@ -4,6 +4,8 @@
 #include <QtAndroidExtras/QAndroidJniExceptionCleaner>
 using namespace QtService;
 
+Q_LOGGING_CATEGORY(logControl, "qt.service.plugin.android.control")
+
 AndroidServiceControl::AndroidServiceControl(QString &&serviceId, QObject *parent) :
 	ServiceControl{std::move(serviceId), parent}
 {}
@@ -31,7 +33,7 @@ bool AndroidServiceControl::serviceExists() const
 bool AndroidServiceControl::isEnabled() const
 {
 	auto componentName = serviceComponent();
-	if(!componentName.isValid())
+	if (!componentName.isValid())
 		return false;
 
 	QAndroidJniExceptionCleaner cleaner;
@@ -39,17 +41,18 @@ bool AndroidServiceControl::isEnabled() const
 	static const auto COMPONENT_ENABLED_STATE_ENABLED = QAndroidJniObject::getStaticField<jint>("android/content/pm/PackageManager", "COMPONENT_ENABLED_STATE_ENABLED");
 
 	auto pm = QtAndroid::androidContext().callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
-	const auto componentState = pm.callMethod<jint>("getComponentEnabledSettin", "(Landroid/content/ComponentName;)I",
+	const auto componentState = pm.callMethod<jint>("getComponentEnabledSetting", "(Landroid/content/ComponentName;)I",
 													componentName.object());
+	qCDebug(logControl) << "Android component state:" << componentState;
 
 	if (componentState == COMPONENT_ENABLED_STATE_ENABLED)
 		return true;
-	else if(componentState != COMPONENT_ENABLED_STATE_DEFAULT)
+	else if (componentState != COMPONENT_ENABLED_STATE_DEFAULT)
 		return false;
 	else {
-		// special case: was never changes, so value from manifest is needed
+		// special case: was never changed, so value from manifest is needed
 		auto svcInfo = serviceInfo();
-		if(svcInfo.isValid())
+		if (svcInfo.isValid())
 			return svcInfo.callMethod<jboolean>("isEnabled");
 		else
 			return false;
@@ -58,42 +61,42 @@ bool AndroidServiceControl::isEnabled() const
 
 QVariant AndroidServiceControl::callGenericCommand(const QByteArray &kind, const QVariantList &args)
 {
-	if(kind == "bind") {
-		if(args.size() < 1 || args.size() > 2) {
+	if (kind == "bind") {
+		if (args.size() < 1 || args.size() > 2) {
 			setError(tr("The bind command must be called with a QAndroidServiceConnection* as first parameter and QtAndroid::BindFlags as optional second parameter"));
 			return {};
 		}
 
 		auto connection = args.value(0).value<QAndroidServiceConnection*>();
-		if(!connection) {
+		if (!connection) {
 			setError(tr("The bind command must be called with a QAndroidServiceConnection* as first parameter and QtAndroid::BindFlags as optional second parameter"));
 			return {};
 		}
 		auto flags = args.size() == 2 ? args.value(1).value<QtAndroid::BindFlags>() : QtAndroid::BindFlag::None;
 
 		return bind(connection, flags);
-	} else if(kind == "unbind") {
-		if(args.size() != 1) {
+	} else if (kind == "unbind") {
+		if (args.size() != 1) {
 			setError(tr("The unbind command must be called with a QAndroidServiceConnection* as only parameter"));
 			return {};
 		}
 
 		auto connection = args.value(0).value<QAndroidServiceConnection*>();
-		if(!connection) {
+		if (!connection) {
 			setError(tr("The unbind command must be called with a QAndroidServiceConnection* as only parameter"));
 			return {};
 		}
 
 		unbind(connection);
 		return {};
-	} else if(kind == "startWithIntent") {
-		if(args.size() != 1) {
+	} else if (kind == "startWithIntent") {
+		if (args.size() != 1) {
 			setError(tr("The startWithIntent command must be called with a QAndroidIntent as only parameter"));
 			return {};
 		}
 
 		auto intent = args.value(0).value<QAndroidIntent>();
-		if(!intent.handle().isValid()) {
+		if (!intent.handle().isValid()) {
 			setError(tr("The startWithIntent command must be called with a QAndroidIntent as only parameter"));
 			return {};
 		}
@@ -111,7 +114,7 @@ ServiceControl::BlockMode AndroidServiceControl::blocking() const
 
 bool AndroidServiceControl::start()
 {
-	if(!serviceExists())
+	if (!serviceExists())
 		return false;
 
 	QAndroidJniExceptionCleaner cleaner;
@@ -169,24 +172,28 @@ QAndroidJniObject AndroidServiceControl::serviceComponent() const
 	QAndroidJniEnvironment env;
 
 	QAndroidJniObject jClass{static_cast<jobject>(env->FindClass(jniServiceId().constData()))};
-	if(!jClass.isValid())
+	if (!jClass.isValid()) {
+		qCCritical(logControl) << "Cannot find jclass for" << jniServiceId();
 		return {};
+	}
 
 	QAndroidJniObject componentName {
 		"android/content/ComponentName", "(Landroid/content/Context;Ljava/lang/Class;)V",
 		QtAndroid::androidContext().object(),
 		jClass.object()
 	};
-	if(!componentName.isValid())
-		return {};
-	else
+	if (componentName.isValid())
 		return componentName;
+	else {
+		qCCritical(logControl) << "Unable to create component name from jclass" << jClass.toString();
+		return {};
+	}
 }
 
 QAndroidJniObject AndroidServiceControl::serviceInfo() const
 {
 	const auto componentName = serviceComponent();
-	if(!componentName.isValid())
+	if (!componentName.isValid())
 		return {};
 
 	QAndroidJniExceptionCleaner cleaner;
@@ -198,15 +205,17 @@ QAndroidJniObject AndroidServiceControl::serviceInfo() const
 	const auto svcInfo = pm.callObjectMethod("getServiceInfo", "(Landroid/content/ComponentName;I)Landroid/content/pm/ServiceInfo;",
 											 componentName.object(),
 											 MATCH_DISABLED_COMPONENTS | MATCH_DIRECT_BOOT_AWARE | MATCH_DIRECT_BOOT_UNAWARE);
-	if(svcInfo.isValid())
+	if (svcInfo.isValid())
 		return svcInfo;
-	else
+	else {
+		qCCritical(logControl) << "Unable to get service info for component" << componentName.toString();
 		return {};
+	}
 }
 
 bool AndroidServiceControl::bind(QAndroidServiceConnection *serviceConnection, QtAndroid::BindFlags flags)
 {
-	if(!serviceExists())
+	if (!serviceExists())
 		return false;
 
 	QAndroidJniExceptionCleaner cleaner;

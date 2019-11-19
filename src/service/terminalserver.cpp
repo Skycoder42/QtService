@@ -1,8 +1,9 @@
 #include "terminalserver_p.h"
 #include "terminal_p.h"
-#include "logging_p.h"
 #include "service_p.h"
 using namespace QtService;
+
+Q_LOGGING_CATEGORY(QtService::logTermServer, "qt.service.terminal.server")
 
 TerminalServer::TerminalServer(Service *service) :
 	QObject{service},
@@ -27,26 +28,26 @@ bool TerminalServer::start(bool globally)
 {
 	_server->setSocketOptions(globally ? QLocalServer::WorldAccessOption : QLocalServer::UserAccessOption);
 	auto activeSockets = _service->getSockets("terminal");
-	if(activeSockets.isEmpty()) {
+	if (activeSockets.isEmpty()) {
 		auto name = serverName();
-		if(!_server->listen(name)) {
-			if(_server->serverError() == QAbstractSocket::AddressInUseError) {
-				if(QLocalServer::removeServer(name))
+		if (!_server->listen(name)) {
+			if (_server->serverError() == QAbstractSocket::AddressInUseError) {
+				if (QLocalServer::removeServer(name))
 					_server->listen(name);
 			}
 		}
 	} else {
-		if(_activated)
-			qCWarning(logQtService) << "Reopening an already closed activated socket is not supported and will result in undefined behaviour!";
-		if(activeSockets.size() > 1)
-			qCWarning(logQtService) << "Found more then 1 activated terminal socket - using first one:" << activeSockets.first();
+		if (_activated)
+			qCWarning(logTermServer) << "Reopening an already closed activated socket is not supported and will result in undefined behaviour!";
+		if (activeSockets.size() > 1)
+			qCWarning(logTermServer) << "Found more then 1 activated terminal socket - using first one:" << activeSockets.first();
 		_activated = _server->listen(activeSockets.first()) || _activated;
 	}
 
-	if(_server->isListening())
+	if (_server->isListening())
 		return true;
 	else {
-		qCCritical(logQtService) << "Failed to create terminal server with error:" << _server->errorString();
+		qCCritical(logTermServer) << "Failed to create terminal server with error:" << _server->errorString();
 		return false;
 	}
 }
@@ -63,7 +64,7 @@ bool TerminalServer::isRunning() const
 
 void TerminalServer::newConnection()
 {
-	while(_server->hasPendingConnections()) {
+	while (_server->hasPendingConnections()) {
 		auto terminal = new TerminalPrivate {
 			_server->nextPendingConnection(),
 			this
@@ -75,7 +76,7 @@ void TerminalServer::newConnection()
 
 void TerminalServer::terminalReady(TerminalPrivate *terminal, bool success)
 {
-	if(success)
+	if (success)
 		emit terminalConnected(new Terminal{terminal, _service});
 	else
 		terminal->deleteLater();

@@ -1,7 +1,8 @@
 #include "terminal.h"
 #include "terminal_p.h"
-#include "logging_p.h"
 using namespace QtService;
+
+Q_LOGGING_CATEGORY(QtService::logTerm, "qt.service.terminal.instance")
 
 Terminal::Terminal(TerminalPrivate *d_ptr, QObject *parent) :
 	QIODevice{parent},
@@ -22,8 +23,10 @@ Terminal::Terminal(TerminalPrivate *d_ptr, QObject *parent) :
 		mode = QIODevice::ReadWrite;
 		break;
 	}
+	qCDebug(logTerm) << "Determined open mode as" << mode;
 	// open as combination of theoretical mode, limited to actual mode, but unbuffered
 	QIODevice::open((mode & d->socket->openMode()) | QIODevice::Unbuffered);
+	qCDebug(logTerm) << "Actual open mode" << openMode();
 
 	connect(d->socket, &QLocalSocket::disconnected,
 			this, &Terminal::terminalDisconnected);
@@ -121,8 +124,8 @@ void Terminal::disconnectTerminal()
 
 void Terminal::requestChar()
 {
-	if(d->terminalMode != Service::TerminalMode::ReadWriteActive) {
-		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
+	if (d->terminalMode != Service::TerminalMode::ReadWriteActive) {
+		qCWarning(logTerm) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
 		return;
 	}
 	d->commandStream << true
@@ -133,8 +136,8 @@ void Terminal::requestChar()
 void Terminal::requestChars(qint64 num)
 {
 	Q_ASSERT_X(num > 0, Q_FUNC_INFO, "Cannot read negative amounts of data");
-	if(d->terminalMode != Service::TerminalMode::ReadWriteActive) {
-		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
+	if (d->terminalMode != Service::TerminalMode::ReadWriteActive) {
+		qCWarning(logTerm) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
 		return;
 	}
 	d->commandStream << true
@@ -145,8 +148,8 @@ void Terminal::requestChars(qint64 num)
 
 void Terminal::requestLine()
 {
-	if(d->terminalMode != Service::TerminalMode::ReadWriteActive) {
-		qCWarning(logQtService) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
+	if (d->terminalMode != Service::TerminalMode::ReadWriteActive) {
+		qCWarning(logTerm) << "The request methods are only avialable for QtService::Service::ReadWriteActive terminal mode - doing nothing!";
 		return;
 	}
 	d->commandStream << true
@@ -157,7 +160,7 @@ void Terminal::requestLine()
 void Terminal::writeLine(const QByteArray &line, bool flush)
 {
 	write(line + '\n');
-	if(flush)
+	if (flush)
 		this->flush();
 }
 
@@ -187,9 +190,9 @@ qint64 Terminal::readLineData(char *data, qint64 maxlen)
 
 qint64 Terminal::writeData(const char *data, qint64 len)
 {
-	if(d->terminalMode == Service::TerminalMode::ReadWriteActive) {
-		if(len > std::numeric_limits<int>::max()) {
-			for(qint64 lIndex = 0; lIndex < len; lIndex += std::numeric_limits<int>::max()) {
+	if (d->terminalMode == Service::TerminalMode::ReadWriteActive) {
+		if (len > std::numeric_limits<int>::max()) {
+			for (qint64 lIndex = 0; lIndex < len; lIndex += std::numeric_limits<int>::max()) {
 				auto writeData = data + lIndex;
 				auto writeLen = (len - lIndex) > std::numeric_limits<int>::max() ?
 									std::numeric_limits<int>::max() :
@@ -205,7 +208,7 @@ qint64 Terminal::writeData(const char *data, qint64 len)
 
 bool Terminal::open(QIODevice::OpenMode mode)
 {
-	Q_UNUSED(mode);
+	Q_UNUSED(mode)
 	Q_ASSERT_X(false, Q_FUNC_INFO, "QIODevice::open must not be called on a terminal!");
 	return false;
 }
@@ -234,24 +237,24 @@ Terminal::Awaitable::~Awaitable() = default;
 void Terminal::Awaitable::prepare(std::function<void()> resume)
 {
 	d->connection = QObject::connect(d->terminal, &QIODevice::readyRead,
-									 [this, resume]() {
-		switch(d->readCnt) {
+									 [this, rs=std::move(resume)]() {
+		switch (d->readCnt) {
 		case ReadLine:
-			if(!d->terminal->canReadLine())
+			if (!d->terminal->canReadLine())
 				return;
 			d->result = d->terminal->readLine();
 			break;
 		default:
-			if(d->terminal->bytesAvailable() < d->readCnt)
+			if (d->terminal->bytesAvailable() < d->readCnt)
 				return;
 			d->result = d->terminal->read(d->readCnt);
 			break;
 		}
 		QObject::disconnect(d->connection);
-		resume();
+		rs();
 	});
 
-	switch(d->readCnt) {
+	switch (d->readCnt) {
 	case ReadLine:
 		d->terminal->requestLine();
 		break;
@@ -288,20 +291,23 @@ TerminalPrivate::TerminalPrivate(QLocalSocket *socket, QObject *parent) :
 
 void TerminalPrivate::disconnected()
 {
-	if(isLoading) {
+	if (isLoading) {
+		qCDebug(logTerm) << "Terminal closed after command was transfered";
 		isLoading = false;
 		emit terminalReady(this, false);
 		socket->close();
-	} else if(autoDelete && parent())
+	} else if(autoDelete && parent()) {
+		qCDebug(logTerm) << "Terminal was closed - auto-deleting terminal";
 		parent()->deleteLater();
+	}
 }
 
 void TerminalPrivate::error()
 {
-	if(isLoading) {
-		qCWarning(logQtService).noquote() << "Terminal closed due to connection error while loading terminal status:"
-										  << socket->errorString();
-		if(socket->state() == QLocalSocket::ConnectedState)
+	if (isLoading) {
+		qCWarning(logTerm).noquote() << "Terminal closed due to connection error while loading terminal status:"
+									 << socket->errorString();
+		if (socket->state() == QLocalSocket::ConnectedState)
 			socket->disconnectFromServer();
 		else {
 			isLoading = false;
@@ -313,12 +319,12 @@ void TerminalPrivate::error()
 
 void TerminalPrivate::readyRead()
 {
-	if(isLoading) {
+	if (isLoading) {
 		commandStream.startTransaction();
 		int tMode;
 		commandStream >> tMode >> command;
 		command.prepend(QCoreApplication::applicationFilePath());
-		if(commandStream.commitTransaction()) {
+		if (commandStream.commitTransaction()) {
 			terminalMode = static_cast<Service::TerminalMode>(tMode);
 			isLoading = false;
 			//disconnect all but "disconencted" - that one is needed for auto-delete
