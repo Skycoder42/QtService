@@ -310,7 +310,7 @@ WindowsServiceControl::HandleHolder::HandleHolder(SC_HANDLE handle) :
 
 WindowsServiceControl::HandleHolder::HandleHolder(WindowsServiceControl::HandleHolder &&other) noexcept
 {
-	swap(_handle, other._handle);
+	qSwap(_handle, other._handle);
 }
 
 WindowsServiceControl::HandleHolder &WindowsServiceControl::HandleHolder::operator=(SC_HANDLE handle)
@@ -323,7 +323,7 @@ WindowsServiceControl::HandleHolder &WindowsServiceControl::HandleHolder::operat
 
 WindowsServiceControl::HandleHolder &WindowsServiceControl::HandleHolder::operator=(WindowsServiceControl::HandleHolder &&other) noexcept
 {
-	swap(_handle, other._handle);
+	qSwap(_handle, other._handle);
 	return *this;
 }
 

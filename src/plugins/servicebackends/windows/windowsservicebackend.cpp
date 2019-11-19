@@ -47,7 +47,7 @@ using namespace QtService;
 
 #define SVCNAME const_cast<wchar_t*>(reinterpret_cast<const wchar_t*>(QCoreApplication::applicationName().utf16()))
 
-Q_LOGGING_CATEGORY(logWinSvc, "qt.service.plugin.windows.backend")
+Q_LOGGING_CATEGORY(logBackend, "qt.service.plugin.windows.backend")
 
 QPointer<WindowsServiceBackend> WindowsServiceBackend::_backendInstance;
 
@@ -215,7 +215,7 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 	qInfo() << Q_FUNC_INFO << "registering service";
 	_backendInstance->_statusHandle = RegisterServiceCtrlHandlerW(SVCNAME, WindowsServiceBackend::handler);
 	if (_backendInstance->_statusHandle) {
-		qCCritical(logWinSvc) << "Failed to acquire service handle with error:"
+		qCCritical(logBackend) << "Failed to acquire service handle with error:"
 							  << qUtf8Printable(qt_error_string(GetLastError()));
 		return;
 	}
@@ -363,7 +363,7 @@ void WindowsServiceBackend::SvcControlThread::run()
 	st[1].lpServiceProc = 0;
 
 	if (StartServiceCtrlDispatcherW(st) == 0) { //blocking method
-		qCCritical(logQtService).noquote() << qt_error_string(GetLastError());
+		qCCritical(logBackend).noquote() << qt_error_string(GetLastError());
 		QMutexLocker lock(&_backend->_svcLock);
 		_backend->_status.dwWin32ExitCode = ERROR_SERVICE_SPECIFIC_ERROR;
 		_backend->_startCondition.wakeAll();
