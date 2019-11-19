@@ -5,8 +5,10 @@ int main(int argc, char *argv[])
 {
 #ifdef Q_CC_MSVC
 	// WORKAROUND for CI bug
-	qputenv("QT_PLUGIN_PATH", QFileInfo{QString::fromUtf8(argv[0])}.dir().absolutePath().toUtf8());
-	qDebug() << "QT_PLUGIN_PATH" << qEnvironmentVariable("QT_PLUGIN_PATH");
+	if (qEnvironmentVariable("QT_PLUGIN_PATH").isEmpty()) {
+		qputenv("QT_PLUGIN_PATH", QFileInfo{QString::fromUtf8(argv[0])}.dir().absolutePath().toUtf8());
+		qDebug() << "QT_PLUGIN_PATH" << qEnvironmentVariable("QT_PLUGIN_PATH");
+	}
 #endif
 	qDebug() << "libraryPaths" << QCoreApplication::libraryPaths();
 
