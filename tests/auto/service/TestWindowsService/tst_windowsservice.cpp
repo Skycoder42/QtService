@@ -125,13 +125,19 @@ void TestWindowsService::init()
 		testP.setArguments({QStringLiteral("--backend"), QStringLiteral("windows")});
 		testP.setWorkingDirectory(svcDir.absolutePath());
 		testP.setProcessChannelMode(QProcess::MergedChannels);
+		auto env = QProcessEnvironment::systemEnvironment();
+		env.remove(QStringLiteral("PATH"));
+		env.remove(QStringLiteral("QT_PLUGIN_PATH"));
+		env.remove(QStringLiteral("QML2_IMPORT_PATH"));
+		env.remove(QStringLiteral("QT_PLUGIN_PATH"));
+		testP.setProcessEnvironment(env);
 		testP.start();
 		QVERIFY2(testP.waitForStarted(), qUtf8Printable(testP.errorString()));
 		QThread::sleep(5);
 		testP.kill();
 		qDebug() << testP.exitCode() << testP.readAll();
 		QVERIFY2(testP.waitForFinished(), qUtf8Printable(testP.errorString()));
-		qDebug() << testP.exitCode() << testP.readAll();
+		qDebug() << testP.exitCode() << testP.readAll().constData();
 	}
 
 	_manager = OpenSCManagerW(nullptr, nullptr,
@@ -160,7 +166,7 @@ void TestWindowsService::cleanup()
 	// print log file
 	QFile lFile{_svcDir.filePath(QStringLiteral("log.txt"))};
 	lFile.open(QIODevice::ReadOnly | QIODevice::Text);
-	qDebug() << lFile.readAll();
+	qDebug() << lFile.readAll().constData();
 
 	// Print eventlog in hopes for some error info:
 	QProcess::execute(QStringLiteral("wevtutil qe Application"));
