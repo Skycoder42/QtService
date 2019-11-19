@@ -119,6 +119,10 @@ jobs:
         run: |
           ${{steps.qt.outputs.make}}
           ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
+      - run: cat ${{steps.qt.outputs.qtdir}}/bin/qt.conf
+        if: contains(matrix.platform, 'msvc')
+        shell: bash
+        continue-on-error: true
       - name: make tests
         if: steps.qt.outputs.tests == 'true' && !contains(matrix.platform, 'mingw')
         run: |

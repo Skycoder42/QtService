@@ -73,6 +73,7 @@ void TestWindowsService::init()
 								QStringLiteral("--no-quick-import"),
 								QStringLiteral("--no-translations"),
 								QStringLiteral("--compiler-runtime"),
+								QStringLiteral("--verbose"), QStringLiteral("2"),
 								svcName
 							});
 	auto env = QProcessEnvironment::systemEnvironment();
@@ -86,6 +87,16 @@ void TestWindowsService::init()
 	qInfo() << "windeployqt errors:" << windepProc.readAllStandardError().constData();
 	QVERIFY2(windepProc.exitStatus() == QProcess::NormalExit, qUtf8Printable(windepProc.errorString()));
 	QCOMPARE(windepProc.exitCode(), EXIT_SUCCESS);
+
+	// write qt.conf
+	QFile qtConf {svcDir.absoluteFilePath(QStringLiteral("qt.conf"))};
+	QVERIFY(qtConf.open(QIODevice::WriteOnly | QIODevice::Text));
+	qtConf.write("[Paths]\n");
+	qtConf.write("Prefix=.\n");
+	qtConf.write("Binaries=.\n");
+	qtConf.write("Libraries=.\n");
+	qtConf.write("Plugins=.\n");
+	qtConf.close();
 
 	// add plugins to Qt
 	const auto plgSubDir = QStringLiteral("servicebackends");
