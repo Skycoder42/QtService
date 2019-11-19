@@ -56,7 +56,7 @@ void TestWindowsService::init()
 	QVERIFY(QFile::copy(svcSrcPath, svcDir.absoluteFilePath(svcName)));
 	const auto svcArg = QStringLiteral("\"%1\" --backend windows").arg(QDir::toNativeSeparators(svcDir.absoluteFilePath(svcName)));
 
-	// copy svc lib into host lib dir (required by windeployqt)
+	// copy svc lib into host lib dir (required by windeployqt
 	const auto svcLib = LIB("Qt5Service");
 	const QDir bLibDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../../../../lib")};
 	QDir hLibDir{QStringLiteral(QT_LIB_DIR)};
@@ -97,13 +97,20 @@ void TestWindowsService::init()
 	qtConf.write("Plugins=.\n");
 	qtConf.close();
 
-	// write env file
-	QFile envFile{svcDir.absoluteFilePath(svcName + QStringLiteral(".env"))};
-	QVERIFY(envFile.open(QIODevice::WriteOnly | QIODevice::Text));
-	envFile.write("QT_PLUGIN_PATH=" + qgetenv("QT_PLUGIN_PATH") + '\n');
-	envFile.write("QML2_IMPORT_PATH=" + qgetenv("QT_PLUGIN_PATH") + '\n');
-	envFile.write("QT_LOGGING_RULES=" + qgetenv("QT_PLUGIN_PATH") + '\n');
-	envFile.close();
+	// add plugins to Qt
+	const auto plgSubDir = QStringLiteral("servicebackends");
+	QDir bPlgDir{QCoreApplication::applicationDirPath() + QStringLiteral("/../../../../../plugins/") + plgSubDir};
+	QVERIFY(bPlgDir.exists());
+	QVERIFY(svcDir.mkpath(plgSubDir));
+	QVERIFY(svcDir.cd(plgSubDir));
+	bPlgDir.setFilter(QDir::NoDotAndDotDot | QDir::Files);
+	QDirIterator iter{bPlgDir, QDirIterator::NoIteratorFlags};
+	while (iter.hasNext()) {
+		iter.next();
+		qDebug() << "Found service plugin file:" << iter.fileName();
+		QVERIFY(QFile::copy(iter.filePath(), svcDir.absoluteFilePath(iter.fileName())));
+	}
+	QVERIFY(svcDir.cdUp());
 
 	_manager = OpenSCManagerW(nullptr, nullptr,
 							  SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE | STANDARD_RIGHTS_REQUIRED);
@@ -129,7 +136,7 @@ void TestWindowsService::init()
 void TestWindowsService::cleanup()
 {
 	// Print eventlog in hopes for some error info:
-	QProcess::execute(QStringLiteral("wevtutil qe Application"));
+	//QProcess::execute(QStringLiteral("wevtutil qe Application"));
 
 	if(_manager) {
 		auto handle = OpenServiceW(_manager,

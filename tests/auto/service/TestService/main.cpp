@@ -4,32 +4,14 @@
 int main(int argc, char *argv[])
 {
 #ifdef Q_CC_MSVC
-	QFile envFile{QString::fromUtf8(argv[0]) + QStringLiteral(".env")};
-	if (envFile.exists()) {
-		if (!envFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-			qCritical() << "Failed to read env file" << envFile.fileName()
-						<< "with error:" << qUtf8Printable(envFile.errorString());
-			return EXIT_FAILURE;
-		}
-
-		while (!envFile.atEnd()) {
-			const auto lineStr = envFile.readLine().trimmed();
-			if (lineStr.isEmpty())
-				continue;
-			const auto envLine = lineStr.split('=');
-			if (envFile.size() != 2) {
-				qWarning() << "Invalid env line:" << envLine;
-				continue;
-			}
-			if (qputenv(envLine[0], envLine[1])) {
-				qInfo().nospace() << "Set env var: " << envLine[0]
-						<< "=" << envLine[1];
-			} else {
-				qWarning() << "Failed to set env var" << envLine[0]
-						   << "to" << envLine[1];
-			}
-		}
-		envFile.close();
+	// WORKAROUND for windows service not beeing able to pass env vars
+	if (qEnvironmentVariable("QT_PLUGIN_PATH").isEmpty()) {
+		qputenv("QT_PLUGIN_PATH", QFileInfo{QString::fromUtf8(argv[0])}.dir().absolutePath().toUtf8());
+		qDebug() << "QT_PLUGIN_PATH" << qEnvironmentVariable("QT_PLUGIN_PATH");
+	}
+	if (qEnvironmentVariable("QT_LOGGING_RULES").isEmpty()) {
+		qputenv("QT_LOGGING_RULES", "qt.service.*.debug=true");
+		qDebug() << "QT_LOGGING_RULES" << qEnvironmentVariable("QT_LOGGING_RULES");
 	}
 #endif
 	qDebug() << "libraryPaths" << QCoreApplication::libraryPaths();
