@@ -81,7 +81,7 @@ jobs:
         with:
           version: ${{matrix.emsdk}}
           actions-cache-folder: emsdk-cache
-      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: ilammy/msvc-dev-cmd@v1.0.0
         if: contains(matrix.platform, 'msvc')
         with:
           arch: ${{matrix.vcarch}}
