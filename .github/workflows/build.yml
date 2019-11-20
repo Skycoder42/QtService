@@ -41,19 +41,19 @@ jobs:
             os: ubuntu-latest
             emsdk: sdk-1.38.27-64bit
           - platform: msvc2017_64
-            os: windows-2016
+            os: windows-latest
             vcarch: x64
           - platform: msvc2017
-            os: windows-2016
+            os: windows-latest
             vcarch: x64_x86
           - platform: winrt_x64_msvc2017
-            os: windows-2016
+            os: windows-latest
             vcarch: x64
           - platform: winrt_x86_msvc2017
-            os: windows-2016
+            os: windows-latest
             vcarch: x64_x86
           - platform: winrt_armv7_msvc2017
-            os: windows-2016
+            os: windows-latest
             vcarch: x64_arm
           - platform: mingw73_64
             os: windows-latest
@@ -85,7 +85,7 @@ jobs:
         if: contains(matrix.platform, 'msvc')
         with:
           arch: ${{matrix.vcarch}}
-          #toolset: 14.16
+          toolset: 14.16
           uwp: ${{contains(matrix.platform, 'winrt')}}
       - name: actions/cache qt
         uses: actions/cache@v1
@@ -173,6 +173,4 @@ jobs:
       - uses: actions/setup-python@v1
       - name: Deploy releases
         run: |
-          echo yes
-          false
-          echo no
+          echo hello world
