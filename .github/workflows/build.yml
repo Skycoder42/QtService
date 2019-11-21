@@ -163,16 +163,18 @@ jobs:
           overwrite: true
 
   deploy:
-    #if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
         with:
           submodules: recursive
-      - uses: actions/setup-python@v1
-      - name: Deploy releases
-        run: |
-          echo yes
-          false
-          echo no
+      - uses: Skycoder42/action-deploy-qt@master
+        id: qt
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          version: ${{matrix.version}}
+          host: ${{secrets.SSHFS_HOST}}
+          key: ${{secrets.SSHFS_KEY}}
+          port: ${{secrets.SSHFS_PORT}}
