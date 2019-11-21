@@ -183,9 +183,9 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: deploy-packages
-          path: source/packages
+          path: packages
       - uses: actions/upload-artifact@v1
         with:
           name: deploy-repository
-          path: source/dummy-deploy
+          path: deploy
     
