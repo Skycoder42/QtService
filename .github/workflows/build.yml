@@ -170,11 +170,17 @@ jobs:
       - uses: actions/checkout@v1
         with:
           submodules: recursive
+          path: source
       - uses: Skycoder42/action-deploy-qt@master
-        id: qt
         with:
           token: ${{secrets.GITHUB_TOKEN}}
-          version: ${{matrix.version}}
+          version: 5.13.2
           host: ${{secrets.SSHFS_HOST}}
           key: ${{secrets.SSHFS_KEY}}
           port: ${{secrets.SSHFS_PORT}}
+        continue-on-error: true
+      - uses: actions/upload-artifact@v1
+        with:
+          name: deploy-packages
+          path: packages
+    
