@@ -1,8 +1,7 @@
 # QtService
 A platform independent library to easily create system services and use some of their features
 
-[![Travis Build Status](https://travis-ci.org/Skycoder42/QtService.svg?branch=master)](https://travis-ci.org/Skycoder42/QtService)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/6mag0932qeloxuru?svg=true)](https://ci.appveyor.com/project/Skycoder42/qtservice)
+[![Github Actions status](https://github.com/Skycoder42/QtService/workflows/CI%20build/badge.svg)](https://github.com/Skycoder42/QtService/actions?query=workflow%3A%22CI%20build%22)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8596bb56c0df40c0bba7ddd28da65fee)](https://www.codacy.com/app/Skycoder42/QtService)
 [![AUR](https://img.shields.io/aur/version/qt5-service.svg)](https://aur.archlinux.org/packages/qt5-service/)
 

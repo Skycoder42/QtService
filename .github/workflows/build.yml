@@ -1,4 +1,4 @@
-name: Build, test and upload the module
+name: CI build
 
 on: [push, check_run]
 
@@ -179,13 +179,3 @@ jobs:
           host: ${{secrets.SSHFS_HOST}}
           key: ${{secrets.SSHFS_KEY}}
           port: ${{secrets.SSHFS_PORT}}
-        continue-on-error: true
-      - uses: actions/upload-artifact@v1
-        with:
-          name: deploy-packages
-          path: packages
-      - uses: actions/upload-artifact@v1
-        with:
-          name: deploy-repository
-          path: deploy
-    
