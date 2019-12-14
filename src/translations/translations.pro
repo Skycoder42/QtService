@@ -20,7 +20,7 @@ QDEP_DEPENDS += \
 
 #replace template qm by ts
 QM_FILES -= $$__qdep_lrelease_real_dir/qtservice_template.qm
-QM_FILES += translations/qtservice_template.ts
+QM_FILES += qtservice_template.ts
 
 HEADERS =
 SOURCES =
