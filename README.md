@@ -135,6 +135,27 @@ exec /path/to/service --backend systemd --terminal "$@"
 ### Service Control
 The `QtService::ServiceControl` allows you to control services by sending commands to them and retrieving the status. However, what exactly is possible greatly varies for each platform. Always use `QtService::ServiceControl::supportFlags` to figure out what you can actually do on the current platform. You can also check the doxygen documentation to get an overview over all the backends and their features.
 
+### Trouble shooting
+Sometimes, a service just won't start, without any apparent reason. This can be very hard to debug, as you cannot debug a service with traditional means. The best tricks I came by this problems are:
+
+1. Enable as much debugging as possible, by setting the `QT_LOGGING_RULES` environment variable to `qt.service.*.debug=true`. This will enable debug logging for the service internals, which might help. To access the system logs, refer to your service managers documentation.
+2. Sometimes, logs are empty or the service crashes before starting. This often indicates, that the service plugins cannot be found. In that case, make sure that:
+    1. If you deployed your application, check that the `servicebackends` plugin folder exists and that the plugin you want to use is in there (for example, `qwindows[d].dll` for the windows backend).
+    2. Check or generate the `qt.conf` file. It should contain an enty named `Plugins` that points to the directory that *contains* the `servicebackends` folder.
+    3. If that still does not help, you can try to manually specify the plugin folder via an environment variable. Simply set `QT_PLUGIN_PATH` to the directory that *contains* the `servicebackends` folder. Use an absolute path if possible.
+
+**Important:** Some service managers (like windows) do not allow to set environment variables for services from the outside. In such cases, you must set the variables in your main, before loading the service. For example, to set `QT_PLUGIN_PATH`, you would do:
+
+```
+int main(int argc, char **argv) {
+    const auto appDir = QFileInfo{QString::fromUtf8(argv[0])}.dir();
+    qputenv("QT_PLUGIN_PATH", appDir.absolutePath().toUtf8());
+    
+    QtService::Service service{argc, argv};
+    return service.exec();
+}
+```
+
 ## Documentation
 The documentation is available on [github pages](https://skycoder42.github.io/QtService/). It was created using [doxygen](http://www.doxygen.org/). The HTML-documentation and Qt-Help files are shipped together with the module for both the custom repository and the package on the release page. Please note that doxygen docs do not perfectly integrate with QtCreator/QtAssistant.
 
