@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - 5.14.0
+          - 5.14.1
         platform:
           - gcc_64
           - android
@@ -32,13 +32,13 @@ jobs:
             os: ubuntu-latest
             emsdk: sdk-fastcomp-1.38.27-64bit
           - platform: msvc2017_64
-            os: windows-2016
+            os: windows-latest
           - platform: msvc2017
-            os: windows-2016
+            os: windows-latest
           - platform: winrt_x64_msvc2017
-            os: windows-2016
+            os: windows-latest
           - platform: winrt_x86_msvc2017
-            os: windows-2016
+            os: windows-latest
           - platform: winrt_armv7_msvc2017
             os: windows-2016
           - platform: mingw73_64
@@ -78,7 +78,6 @@ jobs:
         with:
           version: ${{matrix.version}}
           platform: ${{matrix.platform}}
-          install-args: --verbose
           cachedir: qt/${{matrix.version}}/${{matrix.platform}}
       - name: Install systemd deps
         if: matrix.platform == 'gcc_64'
@@ -128,7 +127,7 @@ jobs:
         if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.qt.outputs.outdir}}/Examples
+          directory: ${{steps.qt.outputs.outdir}}/${{matrix.version}}/${{matrix.platform}}/examples
           asset_name: qtservice-examples-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
@@ -137,7 +136,7 @@ jobs:
         if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.qt.outputs.outdir}}/Docs
+          directory: ${{steps.qt.outputs.outdir}}/${{matrix.version}}/${{matrix.platform}}/doc
           asset_name: qtservice-doc-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
@@ -155,7 +154,7 @@ jobs:
       - uses: Skycoder42/action-deploy-qt@master
         with:
           token: ${{secrets.GITHUB_TOKEN}}
-          version: 5.14.0
+          version: 5.14.1
           host: ${{secrets.SSHFS_HOST}}
           key: ${{secrets.SSHFS_KEY}}
           port: ${{secrets.SSHFS_PORT}}
