@@ -111,7 +111,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.qt.outputs.outdir}}/${{matrix.version}}
+          directory: ${{steps.qt.outputs.outdir}}
+          platform: ${{matrix.platform}}
           asset_name: qtservice-${{matrix.platform}}-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
@@ -120,7 +121,8 @@ jobs:
         if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.qt.outputs.outdir}}/${{matrix.version}}/${{matrix.platform}}/examples
+          directory: ${{steps.qt.outputs.outdir}}
+          platform: examples
           asset_name: qtservice-examples-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
@@ -129,7 +131,8 @@ jobs:
         if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.qt.outputs.outdir}}/${{matrix.version}}/${{matrix.platform}}/doc
+          directory: ${{steps.qt.outputs.outdir}}
+          platform: doc
           asset_name: qtservice-doc-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
