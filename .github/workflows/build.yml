@@ -106,16 +106,6 @@ jobs:
         run: |
           ${{steps.qt.outputs.make}} doxygen
           cd doc && ${{steps.qt.outputs.make}} INSTALL_ROOT="${{steps.qt.outputs.installdir}}" install
-      - name: upload module to releases
-        uses: Skycoder42/action-upload-release@master
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          repo_token: ${{secrets.GITHUB_TOKEN}}
-          directory: ${{steps.qt.outputs.outdir}}
-          platform: ${{matrix.platform}}
-          asset_name: qtservice-${{matrix.platform}}-${{matrix.version}}
-          tag: ${{github.ref}}
-          overwrite: true
       - name: upload examples to releases
         uses: Skycoder42/action-upload-release@master
         if: matrix.platform == 'gcc_64' && startsWith(github.ref, 'refs/tags/')
@@ -134,6 +124,16 @@ jobs:
           directory: ${{steps.qt.outputs.outdir}}
           platform: doc
           asset_name: qtservice-doc-${{matrix.version}}
+          tag: ${{github.ref}}
+          overwrite: true
+      - name: upload module to releases
+        uses: Skycoder42/action-upload-release@master
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          directory: ${{steps.qt.outputs.outdir}}
+          platform: ${{matrix.platform}}
+          asset_name: qtservice-${{matrix.platform}}-${{matrix.version}}
           tag: ${{github.ref}}
           overwrite: true
 

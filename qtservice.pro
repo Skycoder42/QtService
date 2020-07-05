@@ -22,4 +22,5 @@ QMAKE_EXTRA_TARGETS += lupdate
 
 DISTFILES += .qmake.conf \
 	sync.profile \
+        .github/workflows/build.yml \
 	ProjectTemplate/*
