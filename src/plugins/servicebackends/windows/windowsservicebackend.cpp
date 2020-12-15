@@ -52,6 +52,7 @@ Q_LOGGING_CATEGORY(logBackend, "qt.service.plugin.windows.backend")
 QPointer<WindowsServiceBackend> WindowsServiceBackend::_backendInstance;
 
 static QString xPath;
+static std::atomic<bool> isApplicationReady{false};
 
 WindowsServiceBackend::WindowsServiceBackend(Service *service) :
 	ServiceBackend{service}
@@ -130,6 +131,7 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 
 	//execute the app
 	qCDebug(logBackend) << "running application";
+    isApplicationReady = true;
 	_status.dwServiceSpecificExitCode = app.exec();
 	if(_status.dwServiceSpecificExitCode != EXIT_SUCCESS)
 		_status.dwWin32ExitCode = ERROR_SERVICE_SPECIFIC_ERROR;
@@ -230,10 +232,14 @@ void WindowsServiceBackend::serviceMain(DWORD dwArgc, wchar_t **lpszArgv)
 	lock.unlock();
 
 	// wait for the mainthread to finish startup, then register the service handler
-	lock.relock();
-	qCDebug(logBackend) << "wait for main thread to finish startup";
-	_backendInstance->_startCondition.wait(&_backendInstance->_svcLock);
-	lock.unlock();
+    // we wait until variable isApplicationReady become true
+    while (!isApplicationReady)
+    {
+        lock.relock();
+        qCDebug(logBackend) << "wait for main thread to finish startup";
+        _backendInstance->_startCondition.wait(&_backendInstance->_svcLock, 5000);
+        lock.unlock();
+    }
 
 	// handle the start event
 	qCDebug(logBackend) << "handle service start event";
