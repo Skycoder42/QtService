@@ -30,7 +30,7 @@ Terminal::Terminal(TerminalPrivate *d_ptr, QObject *parent) :
 
 	connect(d->socket, &QLocalSocket::disconnected,
 			this, &Terminal::terminalDisconnected);
-	connect(d->socket, QOverload<QLocalSocket::LocalSocketError>::of(&QLocalSocket::error),
+    connect(d->socket, &QLocalSocket::errorOccurred,
 			this, [this](QLocalSocket::LocalSocketError e) {
 		if(e != QLocalSocket::PeerClosedError) {
 			setErrorString(d->socket->errorString());
@@ -283,7 +283,7 @@ TerminalPrivate::TerminalPrivate(QLocalSocket *socket, QObject *parent) :
 
 	connect(socket, &QLocalSocket::disconnected,
 			this, &TerminalPrivate::disconnected);
-	connect(socket, QOverload<QLocalSocket::LocalSocketError>::of(&QLocalSocket::error),
+    connect(socket, &QLocalSocket::errorOccurred,
 			this, &TerminalPrivate::error);
 	connect(socket, &QLocalSocket::readyRead,
 			this, &TerminalPrivate::readyRead);
@@ -328,7 +328,7 @@ void TerminalPrivate::readyRead()
 			terminalMode = static_cast<Service::TerminalMode>(tMode);
 			isLoading = false;
 			//disconnect all but "disconencted" - that one is needed for auto-delete
-			disconnect(socket, QOverload<QLocalSocket::LocalSocketError>::of(&QLocalSocket::error),
+            disconnect(socket, &QLocalSocket::errorOccurred,
 					   this, &TerminalPrivate::error);
 			disconnect(socket, &QLocalSocket::readyRead,
 					   this, &TerminalPrivate::readyRead);

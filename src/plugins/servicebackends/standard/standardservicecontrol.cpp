@@ -193,7 +193,7 @@ QString StandardServiceControl::serviceName() const
 	if (info.isExecutable())
 		return QFileInfo{serviceId()}.completeBaseName();
 	else
-		return serviceId().split(QLatin1Char('/'), QString::SkipEmptyParts).last();
+        return serviceId().split(QLatin1Char('/'), Qt::SkipEmptyParts).last();
 }
 
 QSharedPointer<QLockFile> StandardServiceControl::statusLock() const
