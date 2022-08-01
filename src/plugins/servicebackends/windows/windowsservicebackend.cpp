@@ -88,7 +88,7 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	if(_status.dwWin32ExitCode != NO_ERROR)
 		return EXIT_FAILURE;
 	// generate "local" arguments
-	auto sArgc = _svcArgs.size();
+    int sArgc = _svcArgs.size();
 	QVector<char*> sArgv;
 	sArgv.reserve(sArgc);
 	for(auto &arg : _svcArgs)
@@ -98,7 +98,7 @@ int WindowsServiceBackend::runService(int &argc, char **argv, int flags)
 	// create and prepare the coreapp
 	qCDebug(logBackend) << "setting status to start pending";
 	setStatus(SERVICE_START_PENDING);
-	QCoreApplication app(sArgc, sArgv.data(), flags);
+    QCoreApplication app(sArgc, sArgv.data(), flags);
 	app.installNativeEventFilter(new SvcEventFilter{});
 	setStatus(SERVICE_START_PENDING);
 	if(!preStartService())
@@ -368,8 +368,13 @@ void WindowsServiceBackend::SvcControlThread::run()
 }
 
 
-
-bool WindowsServiceBackend::SvcEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+bool WindowsServiceBackend::SvcEventFilter::nativeEventFilter(
+        const QByteArray &eventType, void *message, long *result)
+#else
+bool WindowsServiceBackend::SvcEventFilter::nativeEventFilter(
+        const QByteArray &eventType, void *message, long long *result)
+#endif
 {
 	if(eventType == "windows_generic_MSG" ||
 	   eventType == "windows_dispatcher_MSG") {

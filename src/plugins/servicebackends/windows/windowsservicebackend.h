@@ -44,7 +44,11 @@ private:
 	class SvcEventFilter : public QAbstractNativeEventFilter
 	{
 	public:
-		bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);
+#else
+        bool nativeEventFilter(const QByteArray &eventType, void *message, long long *result);
+#endif
 	};
 
 	static QPointer<WindowsServiceBackend> _backendInstance;

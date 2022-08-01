@@ -255,7 +255,7 @@ void TerminalClient::setupChannels()
 			this, &TerminalClient::connected);
 	connect(_socket, &QLocalSocket::disconnected,
 			this, &TerminalClient::disconnected);
-	connect(_socket, QOverload<QLocalSocket::LocalSocketError>::of(&QLocalSocket::error),
+    connect(_socket, &QLocalSocket::errorOccurred,
 			this, &TerminalClient::error);
 	connect(_socket, &QLocalSocket::readyRead,
 			this, &TerminalClient::socketReady,
