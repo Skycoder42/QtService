@@ -5,7 +5,7 @@ A platform independent library to easily create system services and use some of 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8596bb56c0df40c0bba7ddd28da65fee)](https://www.codacy.com/app/Skycoder42/QtService)
 [![AUR](https://img.shields.io/aur/version/qt5-service.svg)](https://aur.archlinux.org/packages/qt5-service/)
 
-> Looking for a maintainer! If anyone is interested in continuing development of the library, please write me here: #30
+> Looking for a maintainer! If anyone is interested in continuing development of the library, please write me here: https://github.com/Skycoder42/QtService/issues/30
 
 ## Features
 - Allows you to create system (and user) services for various systems
